@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Scaglia - Red Suma | Expertos en Inversión Inmobiliaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,17 +15,18 @@
         }
 
         :root {
-            --primary: #0284c7;
-            --primary-dark: #0c4a99;
-            --secondary: #64748b;
-            --light-bg: #f8fafc;
-            --dark-bg: #0f172a;
-            --border: #e2e8f0;
-            --text: #1e293b;
+            --primary: #253C64;
+            --primary-dark: #1a2847;
+            --accent: #988355;
+            --secondary: #626970;
+            --light-bg: #f5f5f5;
+            --dark-bg: #000000;
+            --border: #e0e0e0;
+            --text: #333333;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             color: var(--text);
             line-height: 1.6;
             background: #ffffff;
@@ -39,22 +43,25 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
+            padding: 16px 48px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .logo {
-            font-size: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
             font-weight: 700;
             background: linear-gradient(to right, var(--primary), var(--primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            min-width: 180px;
         }
 
         nav-links {
@@ -63,36 +70,64 @@
 
         nav-links.active {
             display: flex;
-            gap: 32px;
+            gap: 40px;
             font-size: 14px;
             font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
         }
 
         nav-links a {
             color: var(--text);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
         }
 
         nav-links a:hover {
-            color: var(--primary);
+            color: var(--accent);
         }
 
-        .nav-icons {
+        nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-contact {
             display: flex;
-            gap: 12px;
-            font-size: 18px;
+            gap: 16px;
+            align-items: center;
         }
 
-        .nav-icons a {
+        .nav-icon {
+            font-size: 18px;
             color: var(--text);
             text-decoration: none;
             cursor: pointer;
-            transition: opacity 0.3s;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
         }
 
-        .nav-icons a:hover {
-            opacity: 0.7;
+        .nav-icon:hover {
+            background: rgba(152, 131, 85, 0.1);
+            color: var(--accent);
+            transform: scale(1.1);
         }
 
         .menu-toggle {
@@ -143,29 +178,49 @@
         /* HERO */
         section.hero {
             margin-top: 60px;
-            padding: 80px 24px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #f8fafc 100%);
+            padding: 100px 24px;
+            background: linear-gradient(135deg, #1a2847 0%, #253C64 50%, #333333 100%);
             text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        section.hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="1200" height="600" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        section.hero > * {
+            position: relative;
+            z-index: 1;
         }
 
         section.hero h1 {
-            font-size: 48px;
-            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            font-size: 72px;
+            font-weight: 900;
             margin-bottom: 24px;
-            color: var(--dark-bg);
-            line-height: 1.2;
+            color: white;
+            line-height: 1.1;
+            letter-spacing: -1px;
         }
 
         section.hero h1 .highlight {
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #988355;
+            font-weight: 900;
         }
 
         section.hero p {
             font-size: 18px;
-            color: var(--secondary);
+            color: #e0e0e0;
             margin-bottom: 32px;
             max-width: 600px;
             margin-left: auto;
@@ -191,23 +246,26 @@
         }
 
         button.primary {
-            background: var(--primary);
+            background: var(--accent);
             color: white;
+            box-shadow: 0 4px 12px rgba(152, 131, 85, 0.3);
         }
 
         button.primary:hover {
-            background: var(--primary-dark);
+            background: #a89368;
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(152, 131, 85, 0.4);
         }
 
         button.secondary {
             background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            color: var(--accent);
+            border: 2px solid var(--accent);
         }
 
         button.secondary:hover {
-            background: #eff6ff;
+            background: rgba(152, 131, 85, 0.1);
+            border-color: #a89368;
         }
 
         .scroll-indicator {
@@ -230,11 +288,13 @@
         }
 
         section h2 {
-            font-size: 36px;
-            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            font-weight: 800;
             text-align: center;
             margin-bottom: 48px;
             color: var(--dark-bg);
+            letter-spacing: -0.5px;
         }
 
         section.alt {
@@ -269,8 +329,9 @@
         }
 
         .card h3 {
-            font-size: 18px;
-            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 8px;
             color: var(--dark-bg);
         }
@@ -282,16 +343,18 @@
 
         /* EQUIPO */
         .team-card {
-            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+            background: white;
             padding: 28px;
             border-radius: 12px;
             border: 1px solid var(--border);
             transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .team-card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37, 60, 100, 0.15);
+            transform: translateY(-6px);
+            border-color: var(--accent);
         }
 
         .team-card .avatar {
@@ -300,15 +363,16 @@
         }
 
         .team-card h3 {
-            font-size: 18px;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
             font-weight: 700;
-            color: var(--dark-bg);
+            color: var(--primary);
             margin-bottom: 4px;
         }
 
         .team-card .role {
             font-size: 14px;
-            color: var(--primary);
+            color: var(--accent);
             font-weight: 600;
             margin-bottom: 16px;
         }
@@ -329,6 +393,7 @@
         }
 
         .team-info a:hover {
+            color: var(--accent);
             text-decoration: underline;
         }
 
@@ -347,7 +412,7 @@
         }
 
         .property-image {
-            background: linear-gradient(135deg, #bfdbfe 0%, #e0f2fe 100%);
+            background: linear-gradient(135deg, #253C64 0%, #1a2847 100%);
             height: 160px;
             display: flex;
             align-items: center;
@@ -360,7 +425,8 @@
         }
 
         .property-info h3 {
-            font-size: 16px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
             font-weight: 700;
             color: var(--dark-bg);
             margin-bottom: 8px;
@@ -369,7 +435,7 @@
         .property-price {
             font-size: 20px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--accent);
             margin-bottom: 12px;
         }
 
@@ -384,7 +450,7 @@
             font-size: 12px;
             font-weight: 600;
             border-radius: 20px;
-            background: #dbeafe;
+            background: rgba(37, 60, 100, 0.1);
             color: var(--primary);
         }
 
@@ -413,12 +479,13 @@
 
         .contact-icon {
             font-size: 28px;
-            color: var(--primary);
+            color: var(--accent);
             flex-shrink: 0;
         }
 
         .contact-icon-text h4 {
-            font-size: 16px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 4px;
             color: var(--dark-bg);
@@ -431,21 +498,23 @@
         }
 
         .contact-icon-text a:hover {
-            color: var(--primary);
+            color: var(--accent);
         }
 
         .form-box {
-            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+            background: white;
             padding: 32px;
             border-radius: 16px;
             border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(37, 60, 100, 0.08);
         }
 
         .form-box h3 {
-            font-size: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 24px;
-            color: var(--dark-bg);
+            color: var(--primary);
         }
 
         .form-group {
@@ -466,8 +535,8 @@
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(152, 131, 85, 0.1);
         }
 
         textarea {
@@ -495,8 +564,56 @@
         }
 
         @media (max-width: 768px) {
+            nav {
+                padding: 12px 16px;
+            }
+
+            .logo {
+                font-size: 18px;
+                min-width: auto;
+            }
+
+            nav-links {
+                display: none !important;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: white;
+                border-bottom: 1px solid var(--border);
+                flex-direction: column;
+                gap: 0;
+                padding: 16px;
+            }
+
+            nav-links.active {
+                display: flex !important;
+            }
+
+            nav-links a {
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            nav-links a::after {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-contact {
+                gap: 8px;
+            }
+
+            .nav-icon {
+                width: 32px;
+                height: 32px;
+            }
+
             section.hero h1 {
-                font-size: 32px;
+                font-size: 48px;
             }
 
             section.hero p {
@@ -504,7 +621,7 @@
             }
 
             section h2 {
-                font-size: 28px;
+                font-size: 36px;
                 margin-bottom: 32px;
             }
 
@@ -565,13 +682,15 @@
         <div class="logo">Team Scaglia</div>
         <nav-links id="navLinks">
             <a href="#inicio">Inicio</a>
-            <a href="#equipo">Equipo</a>
             <a href="#propiedades">Propiedades</a>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#emprendimientos">Emprendimientos</a>
             <a href="#contacto">Contacto</a>
         </nav-links>
-        <div class="nav-icons">
-            <a href="https://instagram.com/teamscaglia" target="_blank" title="Instagram">📱</a>
-            <a href="tel:+5491100000000" title="Teléfono">📞</a>
+        <div class="nav-contact">
+            <a href="https://instagram.com/teamscaglia" target="_blank" title="Instagram" class="nav-icon">📱</a>
+            <a href="tel:+5491100000000" title="Teléfono" class="nav-icon">📞</a>
+            <a href="https://wa.me/5491100000000" target="_blank" title="WhatsApp" class="nav-icon">💬</a>
         </div>
         <button class="menu-toggle" id="menuToggle">☰</button>
     </nav>
@@ -615,6 +734,23 @@
     </section>
 
     <!-- EQUIPO -->
+    <section id="nosotros">
+        <h2>Nosotros</h2>
+        <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; color: #626970; line-height: 1.8; margin-bottom: 24px;">
+                Team Scaglia es parte de Red Suma, una red inmobiliaria con más de una década de trayectoria en Buenos Aires. Somos un equipo de profesionales especializados en venta, alquiler y desarrollo inmobiliario, con una cultura de excelencia y procesos probados que garantizan resultados.
+            </p>
+            <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; color: #626970; line-height: 1.8; margin-bottom: 24px;">
+                Nuestra metodología combina análisis de mercado riguroso, atención personalizada y tecnología avanzada para posicionar a nuestros clientes en el mejor lugar dentro del mercado inmobiliario bonaerense.
+            </p>
+            <div style="background: rgba(37, 60, 100, 0.05); padding: 24px; border-radius: 12px; border-left: 4px solid #988355;">
+                <p style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #253C64; margin: 0;">Misión</p>
+                <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 8px 0 0;">Brindar soluciones inmobiliarias estratégicas que generen valor genuino para nuestros clientes, basadas en experiencia, integridad y profesionalismo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- EQUIPO -->
     <section id="equipo">
         <h2>Nuestro equipo</h2>
         <div class="grid-4" id="equipoContainer">
@@ -627,6 +763,51 @@
         <h2>Propiedades destacadas</h2>
         <div class="grid-4" id="propiedadesContainer">
             <!-- Se llena dinámicamente con JS -->
+        </div>
+    </section>
+
+    <!-- EMPRENDIMIENTOS -->
+    <section id="emprendimientos">
+        <h2>Desarrollos inmobiliarios</h2>
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                <div style="display: flex; gap: 24px; align-items: start;">
+                    <div style="font-size: 48px; flex-shrink: 0;">🏗️</div>
+                    <div>
+                        <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Desarrollo Premium - La Boca</h3>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
+                            Proyecto de desarrollo residencial de alta gama con 12 unidades, ubicado en zona de crecimiento de La Boca. Unidades de 2 y 3 dormitorios con amenities exclusivas.
+                        </p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En pre-venta • Consultar detalles</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+                <div style="display: flex; gap: 24px; align-items: start;">
+                    <div style="font-size: 48px; flex-shrink: 0;">🏢</div>
+                    <div>
+                        <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Complejo Mixto - San Telmo</h3>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
+                            Desarrollo mixto con espacios comerciales, departamentos para inversión y oficinas premium. Ubicación estratégica en pleno San Telmo con acceso a servicios de categoría.
+                        </p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En construcción • Consultar disponibilidad</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border);">
+                <div style="display: flex; gap: 24px; align-items: start;">
+                    <div style="font-size: 48px; flex-shrink: 0;">🏘️</div>
+                    <div>
+                        <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Barrio Cerrado - Zona Norte</h3>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
+                            Proyecto de barrio cerrado con 24 lotes premium en Zona Norte. Diseño moderno, seguridad 24/7 y acceso a infraestructura de clase mundial.
+                        </p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En comercialización • Consultar lotes disponibles</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
