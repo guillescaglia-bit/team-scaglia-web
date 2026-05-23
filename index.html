@@ -17,7 +17,7 @@
         :root {
             --primary: #253C64;
             --primary-dark: #1a2847;
-            --accent: #988355;
+            --accent: #626970;
             --secondary: #626970;
             --light-bg: #f5f5f5;
             --dark-bg: #000000;
@@ -70,7 +70,7 @@
 
         nav-links.active {
             display: flex;
-            gap: 40px;
+            gap: 48px;
             font-size: 14px;
             font-weight: 500;
             font-family: 'Montserrat', sans-serif;
@@ -105,29 +105,31 @@
 
         .nav-contact {
             display: flex;
-            gap: 16px;
+            gap: 32px;
             align-items: center;
         }
 
-        .nav-icon {
-            font-size: 18px;
+        .nav-link {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
             color: var(--text);
             text-decoration: none;
-            cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: transparent;
+            font-weight: 500;
         }
 
-        .nav-icon:hover {
-            background: rgba(152, 131, 85, 0.1);
+        .nav-link:hover {
             color: var(--accent);
-            transform: scale(1.1);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+            padding: 0;
         }
 
         .menu-toggle {
@@ -184,8 +186,30 @@
             color: white;
             position: relative;
             overflow: hidden;
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
+        /* Background parallax image */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1a2847 0%, #253C64 50%, #333333 100%);
+            background-image: url('https://images.unsplash.com/photo-1486406146926-c627de92fbb0?w=1600&h=900&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.25;
+            z-index: 0;
+        }
+
+        /* Grid overlay */
         section.hero::before {
             content: '';
             position: absolute;
@@ -195,12 +219,12 @@
             bottom: 0;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="1200" height="600" fill="url(%23grid)"/></svg>');
             opacity: 0.5;
-            z-index: 0;
+            z-index: 1;
         }
 
         section.hero > * {
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         section.hero h1 {
@@ -214,7 +238,7 @@
         }
 
         section.hero h1 .highlight {
-            color: #988355;
+            color: #626970;
             font-weight: 900;
         }
 
@@ -688,22 +712,22 @@
             <a href="#contacto">Contacto</a>
         </nav-links>
         <div class="nav-contact">
-            <a href="https://instagram.com/teamscaglia" target="_blank" title="Instagram" class="nav-icon">📱</a>
-            <a href="tel:+5491100000000" title="Teléfono" class="nav-icon">📞</a>
-            <a href="https://wa.me/5491100000000" target="_blank" title="WhatsApp" class="nav-icon">💬</a>
+            <a href="https://instagram.com/teamscaglia" target="_blank" class="nav-link">Instagram</a>
+            <a href="tel:+5491100000000" class="nav-link">+54 9 11 0000-0000</a>
         </div>
         <button class="menu-toggle" id="menuToggle">☰</button>
     </nav>
 
     <!-- HERO -->
     <section id="inicio" class="hero">
+        <div class="hero-bg" id="heroBg"></div>
         <h1>Expertos en <span class="highlight">inversión inmobiliaria</span></h1>
         <p>13 años de experiencia, procesos comprobados y un equipo dedicado a hacer realidad tus proyectos inmobiliarios.</p>
         <div class="btn-group">
             <button class="primary" onclick="document.getElementById('contacto').scrollIntoView()">Consultar ahora</button>
             <button class="secondary" onclick="document.getElementById('propiedades').scrollIntoView()">Ver propiedades</button>
         </div>
-        <div class="scroll-indicator">⬇️</div>
+        <div class="scroll-indicator">↓</div>
     </section>
 
     <!-- POR QUÉ ELEGIRNOS -->
@@ -711,22 +735,22 @@
         <h2>Por qué elegirnos</h2>
         <div class="grid-4">
             <div class="card fade-in stagger-1">
-                <div class="icon">🏆</div>
+                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
                 <h3>Experiencia</h3>
                 <p>13 años operando en el mercado inmobiliario</p>
             </div>
             <div class="card fade-in stagger-2">
-                <div class="icon">📋</div>
+                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
                 <h3>Procesos</h3>
                 <p>Metodología probada y sistemática</p>
             </div>
             <div class="card fade-in stagger-3">
-                <div class="icon">👥</div>
+                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
                 <h3>Equipo</h3>
                 <p>Profesionales especializados y dedicados</p>
             </div>
             <div class="card fade-in stagger-4">
-                <div class="icon">📈</div>
+                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
                 <h3>Resultados</h3>
                 <p>Posicionamiento y crecimiento constante</p>
             </div>
@@ -743,7 +767,7 @@
             <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; color: #626970; line-height: 1.8; margin-bottom: 24px;">
                 Nuestra metodología combina análisis de mercado riguroso, atención personalizada y tecnología avanzada para posicionar a nuestros clientes en el mejor lugar dentro del mercado inmobiliario bonaerense.
             </p>
-            <div style="background: rgba(37, 60, 100, 0.05); padding: 24px; border-radius: 12px; border-left: 4px solid #988355;">
+            <div style="background: rgba(37, 60, 100, 0.05); padding: 24px; border-radius: 12px; border-left: 4px solid #626970;">
                 <p style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #253C64; margin: 0;">Misión</p>
                 <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 8px 0 0;">Brindar soluciones inmobiliarias estratégicas que generen valor genuino para nuestros clientes, basadas en experiencia, integridad y profesionalismo.</p>
             </div>
@@ -778,7 +802,7 @@
                         <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
                             Proyecto de desarrollo residencial de alta gama con 12 unidades, ubicado en zona de crecimiento de La Boca. Unidades de 2 y 3 dormitorios con amenities exclusivas.
                         </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En pre-venta • Consultar detalles</p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En pre-venta • Consultar detalles</p>
                     </div>
                 </div>
             </div>
@@ -791,7 +815,7 @@
                         <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
                             Desarrollo mixto con espacios comerciales, departamentos para inversión y oficinas premium. Ubicación estratégica en pleno San Telmo con acceso a servicios de categoría.
                         </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En construcción • Consultar disponibilidad</p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En construcción • Consultar disponibilidad</p>
                     </div>
                 </div>
             </div>
@@ -804,7 +828,7 @@
                         <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
                             Proyecto de barrio cerrado con 24 lotes premium en Zona Norte. Diseño moderno, seguridad 24/7 y acceso a infraestructura de clase mundial.
                         </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #988355; font-weight: 600; margin: 0;">En comercialización • Consultar lotes disponibles</p>
+                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En comercialización • Consultar lotes disponibles</p>
                     </div>
                 </div>
             </div>
@@ -988,6 +1012,14 @@
         }, observerOptions);
 
         document.querySelectorAll('.card').forEach(card => observer.observe(card));
+
+        // PARALLAX EFFECT
+        const heroBg = document.getElementById('heroBg');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            // Velocidad del parallax (cuanto más bajo, más lento se mueve)
+            heroBg.style.backgroundPosition = `center ${scrolled * 0.5}px`;
+        });
     </script>
 </body>
 </html>
