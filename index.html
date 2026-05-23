@@ -204,9 +204,10 @@
             background-image: url('https://images.unsplash.com/photo-1486406146926-c627de92fbb0?w=1600&h=900&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-repeat: no-repeat;
             opacity: 0.25;
             z-index: 0;
+            will-change: background-position;
         }
 
         /* Grid overlay */
@@ -1013,13 +1014,15 @@
 
         document.querySelectorAll('.card').forEach(card => observer.observe(card));
 
-        // PARALLAX EFFECT
+        // PARALLAX EFFECT - Mejorado
         const heroBg = document.getElementById('heroBg');
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            // Velocidad del parallax (cuanto más bajo, más lento se mueve)
-            heroBg.style.backgroundPosition = `center ${scrolled * 0.5}px`;
-        });
+        if (heroBg) {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const offset = scrolled * 0.4; // Velocidad parallax
+                heroBg.style.transform = `translateY(${offset}px)`;
+            }, { passive: true });
+        }
     </script>
 </body>
 </html>
