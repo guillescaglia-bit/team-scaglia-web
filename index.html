@@ -181,7 +181,6 @@
         section.hero {
             margin-top: 60px;
             padding: 100px 24px;
-            background: linear-gradient(135deg, #1a2847 0%, #253C64 50%, #333333 100%);
             text-align: center;
             color: white;
             position: relative;
@@ -193,7 +192,7 @@
             align-items: center;
         }
 
-        /* Background parallax image */
+        /* Background parallax image - Solo imagen */
         .hero-bg {
             position: absolute;
             top: 0;
@@ -204,7 +203,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.6;
+            opacity: 1;
             z-index: 0;
             will-change: transform;
         }
@@ -217,20 +216,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(26, 40, 71, 0.7) 0%, rgba(37, 60, 100, 0.7) 50%, rgba(51, 51, 51, 0.7) 100%);
-            z-index: -1;
-        }
-
-        /* Grid overlay */
-        section.hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="1200" height="600" fill="url(%23grid)"/></svg>');
-            opacity: 0.5;
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1;
         }
 
