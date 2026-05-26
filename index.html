@@ -291,10 +291,28 @@
         }
 
         .scroll-indicator {
-            text-align: center;
             margin-top: 48px;
-            font-size: 24px;
+            background: none;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator:hover {
+            color: rgba(255, 255, 255, 1);
+            transform: translateY(4px);
+        }
+
+        .scroll-indicator svg {
+            display: block;
+            width: 24px;
+            height: 40px;
         }
 
         @keyframes bounce {
@@ -722,10 +740,14 @@
         <h1>Expertos en <span class="highlight">inversión inmobiliaria</span></h1>
         <p>13 años de experiencia, procesos comprobados y un equipo dedicado a hacer realidad tus proyectos inmobiliarios.</p>
         <div class="btn-group">
-            <button class="primary" onclick="document.getElementById('contacto').scrollIntoView()">Consultar ahora</button>
-            <button class="secondary" onclick="document.getElementById('propiedades').scrollIntoView()">Ver propiedades</button>
+            <button class="primary" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})">Consultar ahora</button>
+            <button class="secondary" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})">Ver propiedades</button>
         </div>
-        <div class="scroll-indicator">↓</div>
+        <button class="scroll-indicator" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})" title="Ir a propiedades">
+            <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2V35M2 20L12 35L22 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
     </section>
 
     <!-- POR QUÉ ELEGIRNOS -->
