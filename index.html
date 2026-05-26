@@ -982,21 +982,62 @@
         }
 
         // RENDERIZAR PROPIEDADES
-        function renderPropiedades() {
-            const container = document.getElementById('propiedadesContainer');
-            container.innerHTML = propiedades.map((prop, idx) => `
-                <div class="property-card fade-in stagger-${idx + 1}">
-                    <div class="property-image">${prop.icon}</div>
-                    <div class="property-info">
-                        <h3>${prop.titulo}</h3>
-                        <div class="property-price">${prop.precio}</div>
-                        <div class="property-tags">
-                            <span class="tag">${prop.tipo}</span>
-                            <span class="tag zone">${prop.zona}</span>
+        // RED SUMA API INTEGRATION
+        const REDSUMA_API_KEY = 'rsk_live_xVtyNiHxabyCAZ4vF75HHARYD2ZesbNd';
+        const REDSUMA_API_BASE = 'https://app.redsuma.com.ar/api/v1';
+
+        async function renderPropiedades() {
+            try {
+                const response = await fetch(
+                    `${REDSUMA_API_BASE}/properties?status=ACTIVE&pageSize=12&include=agent,images`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${REDSUMA_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const json = await response.json();
+                const propiedades = json.data || [];
+                const container = document.getElementById('propiedadesContainer');
+                
+                if (propiedades.length === 0) {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #626970; padding: 40px;">No hay propiedades activas en este momento.</p>';
+                    return;
+                }
+
+                container.innerHTML = propiedades.map((prop, idx) => `
+                    <div class="property-card fade-in stagger-${(idx % 4) + 1}">
+                        <div class="property-image" style="background-image: url('${prop.images?.[0]?.url || 'https://via.placeholder.com/400x300?text=Propiedad'}'); background-size: cover; background-position: center; height: 250px; display: flex; align-items: flex-end; justify-content: flex-start; padding: 12px; background-color: #f0f0f0;">
+                            <span style="background: rgba(37, 60, 100, 0.9); color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">${prop.operationType === 'SALE' ? 'Venta' : prop.operationType === 'RENT' ? 'Alquiler' : 'Temporal'}</span>
+                        </div>
+                        <div class="property-info">
+                            <h3>${prop.title || prop.code}</h3>
+                            <p style="color: #626970; font-size: 13px; margin: 4px 0;">${prop.street ? prop.street + ' ' + prop.streetNumber + ', ' : ''}${prop.neighborhood || ''}</p>
+                            <div class="property-price">${new Intl.NumberFormat('es-AR', {
+                                style: 'currency',
+                                currency: prop.currency || 'USD',
+                                minimumFractionDigits: 0
+                            }).format(prop.price || 0)}</div>
+                            <div class="property-tags" style="display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0;">
+                                ${prop.bedrooms ? `<span class="tag">${prop.bedrooms} dorm</span>` : ''}
+                                ${prop.bathrooms ? `<span class="tag">${prop.bathrooms} baño</span>` : ''}
+                                ${prop.coveredArea ? `<span class="tag">${prop.coveredArea} m²</span>` : ''}
+                                <span class="tag zone">${prop.propertyType || 'Propiedad'}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch (error) {
+                console.error('Error trayendo propiedades de Red Suma:', error);
+                const container = document.getElementById('propiedadesContainer');
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #626970; padding: 40px;">Error al cargar propiedades. Por favor intenta más tarde.</p>';
+            }
         }
 
         // FORMULARIO
