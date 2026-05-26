@@ -23,13 +23,28 @@
             --dark-bg: #000000;
             --border: #e0e0e0;
             --text: #333333;
+            --bg-main: #ffffff;
+        }
+
+        /* Dark mode */
+        html.dark-mode {
+            --primary: #5da3ff;
+            --primary-dark: #7cb3ff;
+            --accent: #8b9aaa;
+            --secondary: #8b9aaa;
+            --light-bg: #1a1a1a;
+            --dark-bg: #ffffff;
+            --border: #333333;
+            --text: #e0e0e0;
+            --bg-main: #0f0f0f;
         }
 
         body {
             font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             color: var(--text);
             line-height: 1.6;
-            background: #ffffff;
+            background: var(--bg-main);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         html {
@@ -119,6 +134,21 @@
         }
 
         .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .theme-toggle {
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s;
+            color: var(--text);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg);
             color: var(--accent);
         }
 
@@ -296,7 +326,7 @@
             border: none;
             padding: 12px;
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.7);
+            color: #626970;
             transition: all 0.3s;
             display: flex;
             justify-content: center;
@@ -305,7 +335,7 @@
         }
 
         .scroll-indicator:hover {
-            color: rgba(255, 255, 255, 1);
+            color: #333333;
             transform: translateY(4px);
         }
 
@@ -728,6 +758,7 @@
             <a href="#contacto">Contacto</a>
         </nav-links>
         <div class="nav-contact">
+            <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
             <a href="https://instagram.com/teamscaglia" target="_blank" class="nav-link">Instagram</a>
             <a href="tel:+5491100000000" class="nav-link">+54 9 11 0000-0000</a>
         </div>
@@ -1032,6 +1063,60 @@
         }, observerOptions);
 
         document.querySelectorAll('.card').forEach(card => observer.observe(card));
+
+        // THEME TOGGLE - Día/Noche automático + manual
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Detectar preferencia del sistema (automático por defecto)
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                // Si el usuario cambió manualmente, usar esa preferencia
+                if (savedTheme === 'dark') {
+                    html.classList.add('dark-mode');
+                    themeToggle.textContent = '☀️';
+                } else {
+                    html.classList.remove('dark-mode');
+                    themeToggle.textContent = '🌙';
+                }
+            } else {
+                // Si no hay preferencia guardada, usar la del sistema
+                if (prefersDark) {
+                    html.classList.add('dark-mode');
+                    themeToggle.textContent = '☀️';
+                } else {
+                    html.classList.remove('dark-mode');
+                    themeToggle.textContent = '🌙';
+                }
+            }
+        }
+
+        // Toggle manual
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark-mode');
+            const isDark = html.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+        });
+
+        // Escuchar cambios en preferencias del sistema (si no hay preferencia guardada)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    html.classList.add('dark-mode');
+                    themeToggle.textContent = '☀️';
+                } else {
+                    html.classList.remove('dark-mode');
+                    themeToggle.textContent = '🌙';
+                }
+            }
+        });
+
+        // Inicializar tema al cargar
+        initTheme();
 
         // PARALLAX EFFECT - Scroll suave
         window.addEventListener('scroll', function() {
