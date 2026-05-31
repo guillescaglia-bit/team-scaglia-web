@@ -1,6 +1,7 @@
+const https = require('https');
+
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
 
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -8,33 +9,41 @@ module.exports = async function handler(req, res) {
 
     const apiKey = process.env.REDSUMA_API_KEY;
     if (!apiKey) {
-        return res.status(500).json({ error: 'API key no configurada' });
+        return res.status(500).json({ error: 'API key no configurada', hasKey: false });
     }
 
-    try {
-        const url = 'https://app.redsuma.com.ar/api/v1/properties?status=ACTIVE&include=agent,images&pageSize=50';
-
-        const response = await fetch(url, {
+    return new Promise((resolve) => {
+        const options = {
+            hostname: 'app.redsuma.com.ar',
+            path: '/api/v1/properties?status=ACTIVE&include=agent,images&pageSize=50',
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
             },
+        };
+
+        const req2 = https.request(options, (response) => {
+            let body = '';
+            response.on('data', (chunk) => { body += chunk; });
+            response.on('end', () => {
+                try {
+                    const data = JSON.parse(body);
+                    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+                    res.status(response.statusCode).json(data);
+                    resolve();
+                } catch (e) {
+                    res.status(500).json({ error: 'Error parseando respuesta', raw: body.substring(0, 200) });
+                    resolve();
+                }
+            });
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            return res.status(response.status).json(data);
-        }
-
-        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-        return res.status(200).json(data);
-
-    } catch (error) {
-        return res.status(500).json({
-            error: error.message,
-            type: error.constructor.name,
-            hasApiKey: !!process.env.REDSUMA_API_KEY,
-            keyPrefix: process.env.REDSUMA_API_KEY ? process.env.REDSUMA_API_KEY.substring(0, 12) + '...' : null
+        req2.on('error', (e) => {
+            res.status(500).json({ error: e.message, code: e.code });
+            resolve();
         });
-    }
+
+        req2.end();
+    });
 };
