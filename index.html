@@ -3,1264 +3,1379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Scaglia - Red Suma | Expertos en Inversión Inmobiliaria</title>
+    <title>Team Scaglia - Red Suma | Inversión Inmobiliaria</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --primary: #253C64;
+            --primary:      #253C64;
             --primary-dark: #1a2847;
-            --accent: #626970;
-            --secondary: #626970;
-            --light-bg: #f5f5f5;
-            --dark-bg: #000000;
-            --border: #e0e0e0;
-            --text: #333333;
-            --bg-main: #ffffff;
-            --card-bg: #ffffff;
-            --input-bg: #ffffff;
+            --accent:       #626970;
+            --border:       #e0e0e0;
+            --text:         #2a2a2a;
+            --text-light:   #626970;
+            --bg:           #ffffff;
+            --bg-off:       #f8f7f5;
+            --card-bg:      #ffffff;
+            --input-bg:     #ffffff;
         }
 
-        /* Dark mode */
         html.dark-mode {
-            --primary: #5da3ff;
-            --primary-dark: #7cb3ff;
-            --accent: #8b9aaa;
-            --secondary: #8b9aaa;
-            --light-bg: #1a1a1a;
-            --dark-bg: #ffffff;
-            --border: #333333;
-            --text: #e0e0e0;
-            --bg-main: #0f0f0f;
-            --card-bg: #1e1e1e;
-            --input-bg: #2a2a2a;
+            --primary:      #7cb3ff;
+            --primary-dark: #9dc5ff;
+            --accent:       #8b9aaa;
+            --border:       #2a2a2a;
+            --text:         #e8e8e8;
+            --text-light:   #8b9aaa;
+            --bg:           #0d0d0d;
+            --bg-off:       #141414;
+            --card-bg:      #1a1a1a;
+            --input-bg:     #1a1a1a;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             color: var(--text);
+            background: var(--bg);
             line-height: 1.6;
-            background: var(--bg-main);
-            transition: background-color 0.3s, color 0.3s;
+            transition: background 0.3s, color 0.3s;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* NAVBAR */
+        /* ─── NAVBAR ─── */
         nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 48px;
+            padding: 0 56px;
+            height: 72px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.3s;
+            justify-content: space-between;
+            transition: background 0.4s, box-shadow 0.4s;
         }
 
-        html.dark-mode nav {
-            background: rgba(15, 15, 15, 0.98);
+        nav.scrolled {
+            background: rgba(255,255,255,0.97);
+            box-shadow: 0 1px 0 var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        html.dark-mode nav.scrolled {
+            background: rgba(13,13,13,0.97);
         }
 
         .logo {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            min-width: 180px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: white;
+            text-decoration: none;
+            transition: color 0.4s;
         }
+
+        nav.scrolled .logo { color: var(--primary); }
 
         .nav-links {
             display: flex;
-            gap: 48px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: 'Montserrat', sans-serif;
+            gap: 40px;
         }
 
         .nav-links a {
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.3s;
-            position: relative;
-            padding: 4px 0;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-contact {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .nav-link {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.3s;
+            font-size: 11px;
             font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: color 0.3s;
         }
 
-        .nav-link:hover {
-            color: var(--accent);
+        nav.scrolled .nav-links a { color: var(--text-light); }
+
+        .nav-links a:hover { color: white; }
+        nav.scrolled .nav-links a:hover { color: var(--primary); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
         }
+
+        .nav-cta {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav.scrolled .nav-cta { color: var(--text-light); }
+        .nav-cta:hover { color: white !important; }
+        nav.scrolled .nav-cta:hover { color: var(--primary) !important; }
 
         .theme-toggle {
-            font-size: 18px;
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px;
-            transition: all 0.3s;
-            color: var(--text);
+            font-size: 16px;
+            padding: 4px;
+            transition: transform 0.3s;
+            line-height: 1;
         }
 
-        .theme-toggle:hover {
-            transform: rotate(20deg);
-            color: var(--accent);
-        }
+        .theme-toggle:hover { transform: rotate(20deg); }
 
         .menu-toggle {
             display: none;
             background: none;
             border: none;
-            font-size: 24px;
             cursor: pointer;
-            color: var(--text);
-            padding: 0;
-        }
-
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text);
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                padding: 12px 16px;
-            }
-
-            .logo {
-                font-size: 18px;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background: white;
-                border-bottom: 1px solid var(--border);
-                flex-direction: column;
-                gap: 0;
-                padding: 16px;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 12px 0;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-        }
-
-        /* HERO */
-        section.hero {
-            margin-top: 60px;
-            padding: 100px 24px;
-            text-align: center;
             color: white;
+            font-size: 22px;
+        }
+
+        nav.scrolled .menu-toggle { color: var(--text); }
+
+        @media (max-width: 900px) {
+            nav { padding: 0 24px; }
+            .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 16px 0; }
+            .nav-links.active { display: flex; }
+            .nav-links a { color: var(--text-light) !important; padding: 14px 24px; border-bottom: 1px solid var(--border); font-size: 12px; }
+            .nav-cta { display: none; }
+            .menu-toggle { display: block; }
+        }
+
+        /* ─── HERO ─── */
+        .hero {
             position: relative;
-            overflow: hidden;
-            min-height: 700px;
+            height: 100vh;
+            min-height: 640px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        /* Hero background - una sola imagen con filtros CSS */
         .hero-bg {
             position: absolute;
-            top: -20%;
-            left: 0;
-            right: 0;
-            bottom: -20%;
-            z-index: 0;
+            inset: -20%;
             will-change: transform;
+            z-index: 0;
         }
 
-        /* La foto — Obelisco y 9 de Julio desde drone */
         .hero-photo {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1600&auto=format&fit=crop');
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1800&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             will-change: filter;
         }
 
-        /* Overlay de color que cambia con el scroll */
         .hero-color-overlay {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0);
+            inset: 0;
+            background: rgba(0,0,0,0);
             will-change: background;
         }
 
-        /* Overlay oscuro base para legibilidad del texto */
-        .hero-overlay {
+        .hero-dim {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
+            inset: 0;
+            background: rgba(0,0,0,0.42);
             z-index: 1;
         }
 
-        section.hero > *:not(.hero-bg) {
+        .hero-content {
             position: relative;
             z-index: 2;
+            text-align: center;
+            padding: 0 24px;
         }
 
-        .hero-bg {
-            z-index: 0 !important;
-            position: absolute !important;
-        }
-
-        section.hero h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 72px;
-            font-weight: 900;
+        .hero-eyebrow {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
             margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(72px, 10vw, 140px);
+            font-weight: 300;
+            line-height: 0.95;
             color: white;
-            line-height: 1.1;
-            letter-spacing: -1px;
+            letter-spacing: -0.01em;
         }
 
-        section.hero h1 .highlight {
-            color: #626970;
-            font-weight: 900;
+        .hero-title em {
+            font-style: italic;
+            font-weight: 300;
         }
 
-        section.hero p {
-            font-size: 18px;
-            color: #e0e0e0;
-            margin-bottom: 32px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
+        .hero-sub {
+            margin-top: 32px;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
         }
 
-        .btn-group {
+        .hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
             display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 32px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        button.primary {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 12px rgba(152, 131, 85, 0.3);
-        }
-
-        button.primary:hover {
-            background: #a89368;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(152, 131, 85, 0.4);
-        }
-
-        button.secondary {
-            background: transparent;
-            color: var(--accent);
-            border: 2px solid var(--accent);
-        }
-
-        button.secondary:hover {
-            background: rgba(152, 131, 85, 0.1);
-            border-color: #a89368;
-        }
-
-        .scroll-indicator {
-            margin-top: 48px;
             background: none;
             border: none;
-            padding: 12px;
-            cursor: pointer;
-            color: #626970;
-            transition: all 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: bounce 2s infinite;
         }
 
-        .scroll-indicator:hover {
-            color: #333333;
-            transform: translateY(4px);
+        .hero-scroll span {
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
         }
 
-        .scroll-indicator svg {
-            display: block;
-            width: 24px;
-            height: 40px;
+        .hero-scroll-line {
+            width: 1px;
+            height: 48px;
+            background: rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
+        .hero-scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            animation: scrollLine 2s ease-in-out infinite;
         }
 
-        /* SECCIONES */
-        section {
-            padding: 80px 24px;
+        @keyframes scrollLine {
+            0%   { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        /* ─── STATS ─── */
+        .stats {
+            background: var(--primary);
+            padding: 64px 56px;
+        }
+
+        .stats-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0 32px;
+            border-right: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 64px;
+            font-weight: 300;
+            color: white;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+        }
+
+        @media (max-width: 768px) {
+            .stats { padding: 48px 24px; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 40px 0; }
+            .stat-item { border-right: none; padding: 0; }
+            .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.15); }
+        }
+
+        /* ─── SECCIONES BASE ─── */
+        .section {
+            padding: 120px 56px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        section h2 {
+        .section-full {
+            padding: 120px 56px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 56px;
-            font-weight: 800;
-            text-align: center;
+            font-size: clamp(40px, 5vw, 64px);
+            font-weight: 400;
+            line-height: 1.1;
+            color: var(--text);
             margin-bottom: 48px;
-            color: var(--dark-bg);
-            letter-spacing: -0.5px;
         }
 
-        section.alt {
-            background: var(--light-bg);
+        .section-title em {
+            font-style: italic;
+            color: var(--accent);
         }
 
-        /* BENEFICIOS */
-        .grid-4 {
+        @media (max-width: 768px) {
+            .section, .section-full { padding: 80px 24px; }
+        }
+
+        /* ─── POR QUÉ ELEGIRNOS ─── */
+        .why-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .why-item {
+            background: var(--bg);
+            padding: 48px 36px;
+            transition: background 0.3s;
+        }
+
+        .why-item:hover { background: var(--bg-off); }
+
+        .why-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 300;
+            color: var(--border);
+            line-height: 1;
             margin-bottom: 24px;
         }
 
-        .card {
-            background: var(--card-bg);
-            padding: 32px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transform: translateY(-4px);
-        }
-
-        .card .icon {
-            font-size: 40px;
+        .why-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text);
             margin-bottom: 12px;
         }
 
-        .card h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--dark-bg);
-        }
-
-        .card p {
-            font-size: 14px;
-            color: var(--secondary);
-        }
-
-        /* EQUIPO */
-        .team-card {
-            background: var(--card-bg);
-            padding: 28px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .team-card:hover {
-            box-shadow: 0 8px 24px rgba(37, 60, 100, 0.15);
-            transform: translateY(-6px);
-            border-color: var(--accent);
-        }
-
-        .team-card .avatar {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .team-card h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .team-card .role {
-            font-size: 14px;
-            color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .team-info {
+        .why-text {
             font-size: 13px;
-            color: var(--secondary);
-            space: 8px;
+            font-weight: 300;
+            color: var(--text-light);
+            line-height: 1.8;
         }
 
-        .team-info p {
-            margin: 4px 0;
+        @media (max-width: 900px) {
+            .why-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        .team-info a {
-            color: var(--primary);
-            text-decoration: none;
+        @media (max-width: 520px) {
+            .why-grid { grid-template-columns: 1fr; }
         }
 
-        .team-info a:hover {
+        /* ─── NOSOTROS ─── */
+        .about-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 96px;
+            align-items: center;
+        }
+
+        .about-text p {
+            font-size: 15px;
+            font-weight: 300;
+            color: var(--text-light);
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        .about-mision {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .about-mision-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
             color: var(--accent);
-            text-decoration: underline;
+            margin-bottom: 12px;
         }
 
-        /* PROPIEDADES */
-        .property-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+        .about-mision-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .about-image {
+            aspect-ratio: 3/4;
+            background: var(--bg-off);
             overflow: hidden;
-            transition: all 0.3s;
+            position: relative;
         }
 
-        .property-card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transform: translateY(-4px);
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%);
         }
 
-        .property-image {
-            background: linear-gradient(135deg, #253C64 0%, #1a2847 100%);
-            height: 160px;
+        .about-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 56px;
         }
 
-        .property-info {
-            padding: 16px;
-        }
-
-        .property-info h3 {
+        .about-image-placeholder span {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark-bg);
-            margin-bottom: 8px;
+            font-size: 80px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 0.05em;
         }
 
-        .property-price {
-            font-size: 20px;
-            font-weight: 700;
+        @media (max-width: 900px) {
+            .about-layout { grid-template-columns: 1fr; gap: 48px; }
+            .about-image { aspect-ratio: 16/9; }
+        }
+
+        /* ─── EQUIPO ─── */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .team-card {
+            background: var(--bg);
+            padding: 0;
+            overflow: hidden;
+            transition: background 0.3s;
+            cursor: default;
+        }
+
+        .team-card:hover { background: var(--bg-off); }
+
+        .team-avatar {
+            width: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: var(--bg-off);
+        }
+
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(15%);
+            transition: filter 0.4s, transform 0.6s;
+        }
+
+        .team-card:hover .team-avatar img {
+            filter: grayscale(0%);
+            transform: scale(1.03);
+        }
+
+        .team-avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-avatar-placeholder span {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .team-info {
+            padding: 28px 28px 32px;
+        }
+
+        .team-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
-        .property-tags {
+        .team-contacts {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .team-contact-link {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .team-contact-link:hover { color: var(--primary); }
+
+        /* ─── PROPIEDADES ─── */
+        .props-bg {
+            background: var(--bg-off);
+        }
+
+        .props-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .prop-card {
+            background: var(--bg);
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        .prop-card:hover { background: var(--bg-off); }
+
+        .prop-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: var(--bg-off);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .prop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .prop-card:hover .prop-image img { transform: scale(1.04); }
+
+        .prop-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .prop-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: white;
+            background: var(--primary);
+            padding: 5px 12px;
+        }
+
+        .prop-info {
+            padding: 24px 28px 28px;
+        }
+
+        .prop-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .prop-location {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .prop-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .prop-tags {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
 
-        .tag {
-            padding: 4px 12px;
+        .prop-tag {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+        }
+
+        /* ─── CTA BANDA ─── */
+        .cta-band {
+            background: var(--primary);
+            padding: 96px 56px;
+            text-align: center;
+        }
+
+        .cta-band-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(36px, 4vw, 56px);
+            font-weight: 300;
+            color: white;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .cta-band-title em {
+            font-style: italic;
+        }
+
+        .cta-band-sub {
             font-size: 12px;
-            font-weight: 600;
-            border-radius: 20px;
-            background: rgba(37, 60, 100, 0.1);
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
             color: var(--primary);
+            background: white;
+            padding: 16px 40px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.3s;
         }
 
-        .tag.zone {
-            background: var(--light-bg);
-            color: var(--secondary);
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-outline {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: white;
+            background: transparent;
+            padding: 16px 40px;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        /* CONTACTO */
-        .contact-container {
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        /* ─── CTA MINIMAL ─── */
+        .cta-minimal {
+            padding: 80px 56px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cta-minimal p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(28px, 3vw, 42px);
+            font-weight: 400;
+            color: var(--text);
+            margin-bottom: 32px;
+            line-height: 1.3;
+        }
+
+        .cta-minimal p em { font-style: italic; color: var(--accent); }
+
+        /* ─── EMPRENDIMIENTOS ─── */
+        .dev-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            margin-top: 48px;
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
         }
 
-        .contact-info {
-            space: 32px;
+        .dev-card {
+            background: var(--bg);
+            padding: 56px 48px;
+            transition: background 0.3s;
         }
 
-        .contact-item {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
+        .dev-card:hover { background: var(--bg-off); }
 
-        .contact-icon {
-            font-size: 28px;
+        .dev-tag {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
             color: var(--accent);
-            flex-shrink: 0;
+            margin-bottom: 20px;
         }
 
-        .contact-icon-text h4 {
+        .dev-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: var(--text);
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+
+        .dev-location {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            letter-spacing: 0.05em;
+        }
+
+        .dev-info-coming {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--border);
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 700px) {
+            .dev-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── CONTACTO ─── */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 96px;
+        }
+
+        .contact-left .section-title { margin-bottom: 32px; }
+
+        .contact-left p {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--text-light);
+            line-height: 2;
+            margin-bottom: 48px;
+        }
+
+        .contact-items { display: flex; flex-direction: column; gap: 24px; }
+
+        .contact-item { display: flex; flex-direction: column; gap: 4px; }
+
+        .contact-item-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .contact-item-value {
             font-family: 'Cormorant Garamond', serif;
             font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--dark-bg);
-        }
-
-        .contact-icon-text a {
-            color: var(--secondary);
+            font-weight: 400;
+            color: var(--text);
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .contact-icon-text a:hover {
-            color: var(--accent);
+        .contact-item-value:hover { color: var(--primary); }
+
+        .contact-form { display: flex; flex-direction: column; gap: 0; }
+
+        .form-field {
+            border-bottom: 1px solid var(--border);
+            transition: border-color 0.3s;
         }
 
-        .form-box {
-            background: var(--card-bg);
-            padding: 32px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 12px rgba(37, 60, 100, 0.08);
-        }
+        .form-field:focus-within { border-color: var(--primary); }
 
-        .form-box h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--primary);
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        input, textarea {
+        .form-field input,
+        .form-field textarea {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            color: var(--text);
-            transition: all 0.3s;
-        }
-
-        input:focus, textarea:focus {
+            padding: 20px 0;
+            background: transparent;
+            border: none;
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(152, 131, 85, 0.1);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 300;
+            color: var(--text);
+            resize: none;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 120px;
+        .form-field input::placeholder,
+        .form-field textarea::placeholder {
+            color: var(--text-light);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            font-size: 12px;
         }
 
-        .form-box button {
-            width: 100%;
-            margin-top: 8px;
-        }
+        .form-field textarea { min-height: 100px; }
 
-        .form-success {
-            display: none;
-            padding: 16px;
-            background: #dcfce7;
-            color: #166534;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .form-success.show {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                padding: 12px 16px;
-            }
-
-            .logo {
-                font-size: 18px;
-                min-width: auto;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background: white;
-                border-bottom: 1px solid var(--border);
-                flex-direction: column;
-                gap: 0;
-                padding: 16px;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 12px 0;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .nav-links a::after {
-                display: none;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .nav-contact {
-                gap: 8px;
-            }
-
-            .nav-icon {
-                width: 32px;
-                height: 32px;
-            }
-
-            section.hero h1 {
-                font-size: 48px;
-            }
-
-            section.hero p {
-                font-size: 16px;
-            }
-
-            section h2 {
-                font-size: 36px;
-                margin-bottom: 32px;
-            }
-
-            .contact-container {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            button {
-                padding: 10px 24px;
-                font-size: 14px;
-            }
-        }
-
-        /* FOOTER */
-        footer {
-            background: var(--dark-bg);
-            color: white;
-            text-align: center;
-            padding: 32px 24px;
+        .form-submit {
             margin-top: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        footer p {
-            margin: 8px 0;
-            color: #cbd5e1;
+        .form-submit-btn {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: white;
+            background: var(--primary);
+            border: none;
+            padding: 18px 48px;
+            cursor: pointer;
+            transition: opacity 0.3s;
         }
 
-        footer p:first-child {
-            margin-top: 0;
+        .form-submit-btn:hover { opacity: 0.85; }
+
+        .form-success-msg {
+            display: none;
+            font-size: 12px;
+            color: #2d7a4f;
+            font-weight: 500;
+            letter-spacing: 0.05em;
         }
 
-        /* ANIMACIONES */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .form-success-msg.show { display: block; }
+
+        @media (max-width: 900px) {
+            .contact-layout { grid-template-columns: 1fr; gap: 64px; }
         }
 
-        .fade-in {
-            animation: fadeInUp 0.6s ease-out forwards;
+        /* ─── DISCLAIMER ─── */
+        .disclaimer {
+            background: #111;
+            padding: 32px 56px;
         }
 
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
-        .stagger-4 { animation-delay: 0.4s; }
+        .disclaimer p {
+            max-width: 960px;
+            margin: 0 auto;
+            font-size: 10px;
+            font-weight: 300;
+            color: #555;
+            line-height: 1.9;
+            text-align: center;
+            letter-spacing: 0.03em;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            background: #0a0a0a;
+            padding: 40px 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: #333;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 600px) {
+            footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
+            .disclaimer { padding: 32px 24px; }
+        }
+
+        /* ─── FADE IN ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
+
     <!-- NAVBAR -->
-    <nav>
-        <div class="logo">Team Scaglia</div>
+    <nav id="navbar">
+        <a href="#inicio" class="logo">Team Scaglia</a>
         <div class="nav-links" id="navLinks">
-            <a href="#inicio">Inicio</a>
-            <a href="#propiedades">Propiedades</a>
             <a href="#nosotros">Nosotros</a>
+            <a href="#equipo">Equipo</a>
+            <a href="#propiedades">Propiedades</a>
             <a href="#emprendimientos">Emprendimientos</a>
             <a href="#contacto">Contacto</a>
         </div>
-        <div class="nav-contact">
+        <div class="nav-right">
+            <a href="https://wa.me/541130977868" target="_blank" class="nav-cta">WhatsApp</a>
             <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
-            <a href="https://instagram.com/teamscaglia" target="_blank" class="nav-link">Instagram</a>
-            <a href="https://wa.me/541130977868" class="nav-link">+54 (11) 3097-7868</a>
+            <button class="menu-toggle" id="menuToggle">☰</button>
         </div>
-        <button class="menu-toggle" id="menuToggle">☰</button>
     </nav>
 
     <!-- HERO -->
-    <section id="inicio" class="hero">
+    <section class="hero" id="inicio">
         <div class="hero-bg" id="heroBg">
             <div class="hero-photo" id="heroPhoto"></div>
             <div class="hero-color-overlay" id="heroColorOverlay"></div>
-            <div class="hero-overlay"></div>
+            <div class="hero-dim"></div>
         </div>
-        <h1>Expertos en <span class="highlight">inversión inmobiliaria</span></h1>
-        <p>13 años de experiencia, procesos comprobados y un equipo dedicado a hacer realidad tus proyectos inmobiliarios.</p>
-        <div class="btn-group">
-            <button class="primary" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})">Consultar ahora</button>
-            <button class="secondary" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})">Ver propiedades</button>
+        <div class="hero-content">
+            <p class="hero-eyebrow">Red Suma · Buenos Aires</p>
+            <h1 class="hero-title">Team<br><em>Scaglia</em></h1>
+            <p class="hero-sub">Inversión Inmobiliaria</p>
         </div>
-        <button class="scroll-indicator" onclick="document.getElementById('propiedades').scrollIntoView({behavior: 'smooth'})" title="Ir a propiedades">
-            <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2V35M2 20L12 35L22 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <button class="hero-scroll" onclick="document.getElementById('stats').scrollIntoView({behavior:'smooth'})">
+            <span>Scroll</span>
+            <div class="hero-scroll-line"></div>
         </button>
     </section>
 
-    <!-- POR QUÉ ELEGIRNOS -->
-    <section class="alt" id="beneficios">
-        <h2>Por qué elegirnos</h2>
-        <div class="grid-4">
-            <div class="card fade-in stagger-1">
-                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
-                <h3>Experiencia</h3>
-                <p>13 años operando en el mercado inmobiliario</p>
+    <!-- STATS -->
+    <div class="stats" id="stats">
+        <div class="stats-inner">
+            <div class="stat-item reveal">
+                <div class="stat-number">13</div>
+                <div class="stat-label">Años de experiencia</div>
             </div>
-            <div class="card fade-in stagger-2">
-                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
-                <h3>Procesos</h3>
-                <p>Metodología probada y sistemática</p>
+            <div class="stat-item reveal">
+                <div class="stat-number">+800</div>
+                <div class="stat-label">Operaciones concretadas</div>
             </div>
-            <div class="card fade-in stagger-3">
-                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
-                <h3>Equipo</h3>
-                <p>Profesionales especializados y dedicados</p>
+            <div class="stat-item reveal">
+                <div class="stat-number">+1100</div>
+                <div class="stat-label">Clientes satisfechos</div>
             </div>
-            <div class="card fade-in stagger-4">
-                <div class="icon" style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; margin: 0 auto 12px;"></div>
-                <h3>Resultados</h3>
-                <p>Posicionamiento y crecimiento constante</p>
+            <div class="stat-item reveal">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Agentes especializados</div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- EQUIPO -->
-    <section id="nosotros">
-        <h2>Nosotros</h2>
-        <div style="max-width: 900px; margin: 0 auto; text-align: center;">
-            <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; color: #626970; line-height: 1.8; margin-bottom: 24px;">
-                Team Scaglia es parte de Red Suma, una red inmobiliaria con más de una década de trayectoria en Buenos Aires. Somos un equipo de profesionales especializados en venta, alquiler y desarrollo inmobiliario, con una cultura de excelencia y procesos probados que garantizan resultados.
-            </p>
-            <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; color: #626970; line-height: 1.8; margin-bottom: 24px;">
-                Nuestra metodología combina análisis de mercado riguroso, atención personalizada y tecnología avanzada para posicionar a nuestros clientes en el mejor lugar dentro del mercado inmobiliario bonaerense.
-            </p>
-            <div style="background: rgba(37, 60, 100, 0.05); padding: 24px; border-radius: 12px; border-left: 4px solid #626970;">
-                <p style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: #253C64; margin: 0;">Misión</p>
-                <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 8px 0 0;">Brindar soluciones inmobiliarias estratégicas que generen valor genuino para nuestros clientes, basadas en experiencia, integridad y profesionalismo.</p>
+    <!-- POR QUÉ ELEGIRNOS -->
+    <section class="section" id="porque">
+        <p class="section-label reveal">Por qué elegirnos</p>
+        <div class="why-grid reveal">
+            <div class="why-item">
+                <div class="why-number">01</div>
+                <div class="why-title">Experiencia</div>
+                <div class="why-text">Más de 13 años operando en el mercado inmobiliario de Buenos Aires con resultados consistentes.</div>
+            </div>
+            <div class="why-item">
+                <div class="why-number">02</div>
+                <div class="why-title">Metodología</div>
+                <div class="why-text">Procesos probados y sistemáticos que maximizan el valor de cada operación.</div>
+            </div>
+            <div class="why-item">
+                <div class="why-number">03</div>
+                <div class="why-title">Equipo</div>
+                <div class="why-text">Profesionales especializados con dedicación exclusiva a cada cliente.</div>
+            </div>
+            <div class="why-item">
+                <div class="why-number">04</div>
+                <div class="why-title">Excelencia</div>
+                <div class="why-text">Compromiso con los más altos estándares en cada etapa de la operación.</div>
             </div>
         </div>
     </section>
 
     <!-- CTA 1 -->
-    <section style="padding: 48px 24px; text-align: center; max-width: 1200px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #253C64 0%, #1a2847 100%); border-radius: 16px; padding: 48px 32px; color: white;">
-            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 800; margin-bottom: 12px;">¿Necesitás vender o alquilar tu propiedad?</h3>
-            <p style="font-size: 16px; color: #cbd5e1; margin-bottom: 28px; max-width: 520px; margin-left: auto; margin-right: auto;">Contamos con más de 13 años de experiencia y un equipo dedicado a conseguir el mejor resultado para vos.</p>
-            <button class="primary" onclick="document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})" style="background: #626970; font-size: 16px; padding: 14px 36px;">Quiero que me contacten</button>
+    <div class="cta-band">
+        <h2 class="cta-band-title reveal">¿Necesitás vender<br><em>tu propiedad?</em></h2>
+        <p class="cta-band-sub reveal">Más de 800 operaciones avalan nuestro método.</p>
+        <button class="btn-primary reveal" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Quiero que me contacten</button>
+    </div>
+
+    <!-- NOSOTROS -->
+    <section class="section" id="nosotros">
+        <div class="about-layout">
+            <div class="about-text reveal">
+                <p class="section-label">Nosotros</p>
+                <h2 class="section-title">Una <em>década</em><br>de trayectoria</h2>
+                <p>Team Scaglia es parte de Red Suma, una red inmobiliaria con más de una década de trayectoria en Buenos Aires. Somos un equipo de profesionales especializados en venta, alquiler y desarrollo inmobiliario.</p>
+                <p>Nuestra metodología combina análisis de mercado riguroso, atención personalizada y tecnología avanzada para posicionar a nuestros clientes en el mejor lugar del mercado.</p>
+                <div class="about-mision">
+                    <div class="about-mision-label">Misión</div>
+                    <div class="about-mision-text">"Brindar soluciones inmobiliarias estratégicas que generen valor genuino, basadas en experiencia, integridad y profesionalismo."</div>
+                </div>
+            </div>
+            <div class="about-image reveal">
+                <div class="about-image-placeholder">
+                    <span>TS</span>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- EQUIPO -->
-    <section id="equipo">
-        <h2>Nuestro equipo</h2>
-        <div class="grid-4" id="equipoContainer">
-            <!-- Se llena dinámicamente con JS -->
+    <div class="section-full" style="background: var(--bg-off);" id="equipo">
+        <div style="max-width:1200px; margin:0 auto;">
+            <p class="section-label reveal">El equipo</p>
+            <h2 class="section-title reveal">Profesionales<br><em>dedicados</em></h2>
+            <div class="team-grid" id="teamGrid"></div>
         </div>
-    </section>
+    </div>
 
     <!-- CTA 2 -->
-    <section style="padding: 24px 24px 64px; text-align: center; max-width: 1200px; margin: 0 auto;">
-        <div style="background: var(--light-bg); border: 2px dashed var(--border); border-radius: 16px; padding: 40px 32px;">
-            <p style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--dark-bg); margin-bottom: 8px;">¿Tu propiedad podría estar acá?</p>
-            <p style="font-size: 15px; color: var(--secondary); margin-bottom: 24px;">Sumamos nuevas propiedades cada semana. Contactanos y te asesoramos sin compromiso.</p>
-            <button class="primary" onclick="document.getElementById('contacto').scrollIntoView({behavior: 'smooth'})">Publicar mi propiedad</button>
-        </div>
-    </section>
+    <div class="cta-minimal">
+        <p class="reveal">¿Tu propiedad podría estar <em>en mejores manos?</em></p>
+        <button class="btn-primary" style="background: var(--primary); color: white;" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Publicar mi propiedad</button>
+    </div>
 
     <!-- PROPIEDADES -->
-    <section class="alt" id="propiedades">
-        <h2>Propiedades destacadas</h2>
-        <div class="grid-4" id="propiedadesContainer">
-            <!-- Se llena dinámicamente con JS -->
+    <div class="section-full props-bg" id="propiedades">
+        <div style="max-width:1200px; margin:0 auto;">
+            <p class="section-label reveal">Propiedades</p>
+            <h2 class="section-title reveal">Selección<br><em>destacada</em></h2>
+            <div class="props-grid" id="propsGrid"></div>
         </div>
-    </section>
+    </div>
 
-    <!-- CTA 3 -->
-    <section style="padding: 48px 24px; text-align: center; max-width: 700px; margin: 0 auto;">
-        <p style="font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700; color: var(--dark-bg); margin-bottom: 12px;">¿Preferís hablar directamente con el equipo?</p>
-        <p style="font-size: 15px; color: var(--secondary); margin-bottom: 24px;">Escribinos por WhatsApp y te respondemos a la brevedad.</p>
-        <a href="https://wa.me/541130977868" target="_blank">
-            <button class="primary" style="background: #25D366; display: inline-flex; align-items: center; gap: 10px; font-size: 16px; padding: 14px 36px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
-                Escribinos por WhatsApp
-            </button>
+    <!-- CTA 3 WHATSAPP -->
+    <div class="cta-minimal">
+        <p class="reveal">¿Preferís hablar<br><em>directamente?</em></p>
+        <a href="https://wa.me/541130977868" target="_blank" style="display:inline-flex; align-items:center; gap:10px; font-size:11px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:white; background:#25D366; padding:18px 40px; text-decoration:none; transition:opacity 0.3s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
+            Escribinos por WhatsApp
         </a>
-    </section>
+    </div>
 
     <!-- EMPRENDIMIENTOS -->
-    <section id="emprendimientos">
-        <h2>Desarrollos inmobiliarios</h2>
-        <div style="max-width: 900px; margin: 0 auto;">
-            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
-                <div style="display: flex; gap: 24px; align-items: start;">
-                    <div style="font-size: 48px; flex-shrink: 0;">🏗️</div>
-                    <div>
-                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Desarrollo Premium - La Boca</h3>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
-                            Proyecto de desarrollo residencial de alta gama con 12 unidades, ubicado en zona de crecimiento de La Boca. Unidades de 2 y 3 dormitorios con amenities exclusivas.
-                        </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En pre-venta • Consultar detalles</p>
-                    </div>
-                </div>
+    <section class="section" id="emprendimientos">
+        <p class="section-label reveal">Desarrollos</p>
+        <h2 class="section-title reveal">Emprendimientos<br><em>seleccionados</em></h2>
+        <div class="dev-grid reveal">
+            <div class="dev-card">
+                <div class="dev-tag">Desarrollo residencial</div>
+                <div class="dev-name">Quintaglia</div>
+                <div class="dev-location">3 de Febrero, Buenos Aires</div>
+                <div class="dev-info-coming">Información disponible próximamente</div>
             </div>
-
-            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
-                <div style="display: flex; gap: 24px; align-items: start;">
-                    <div style="font-size: 48px; flex-shrink: 0;">🏢</div>
-                    <div>
-                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Complejo Mixto - San Telmo</h3>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
-                            Desarrollo mixto con espacios comerciales, departamentos para inversión y oficinas premium. Ubicación estratégica en pleno San Telmo con acceso a servicios de categoría.
-                        </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En construcción • Consultar disponibilidad</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid var(--border);">
-                <div style="display: flex; gap: 24px; align-items: start;">
-                    <div style="font-size: 48px; flex-shrink: 0;">🏘️</div>
-                    <div>
-                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: #253C64; margin: 0 0 12px;">Barrio Cerrado - Zona Norte</h3>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #626970; margin: 0 0 12px; line-height: 1.8;">
-                            Proyecto de barrio cerrado con 24 lotes premium en Zona Norte. Diseño moderno, seguridad 24/7 y acceso a infraestructura de clase mundial.
-                        </p>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #626970; font-weight: 600; margin: 0;">En comercialización • Consultar lotes disponibles</p>
-                    </div>
-                </div>
+            <div class="dev-card">
+                <div class="dev-tag">Desarrollo residencial</div>
+                <div class="dev-name">Wood</div>
+                <div class="dev-location">Recoleta, Buenos Aires</div>
+                <div class="dev-info-coming">Información disponible próximamente</div>
             </div>
         </div>
     </section>
 
     <!-- CONTACTO -->
-    <section id="contacto">
-        <h2>Contactanos</h2>
-        <div class="contact-container">
-            <!-- DATOS DE CONTACTO -->
-            <div class="contact-info">
-                <p>Estamos aquí para ayudarte con tus consultas inmobiliarias. Comunícate con nosotros y te responderemos a la brevedad.</p>
-                
-                <div class="contact-item">
-                    <div class="contact-icon">📞</div>
-                    <div class="contact-icon-text">
-                        <h4>Teléfono</h4>
-                        <a href="https://wa.me/541130977868">+54 (11) 3097-7868</a>
+    <div class="section-full" style="background: var(--bg-off);" id="contacto">
+        <div class="section contact-layout" style="padding-top:0; padding-bottom:0;">
+            <div class="contact-left">
+                <p class="section-label reveal">Contacto</p>
+                <h2 class="section-title reveal">Hablemos de<br><em>tu propiedad</em></h2>
+                <p class="reveal">Estamos aquí para asesorarte. Completá el formulario o contactanos directamente.</p>
+                <div class="contact-items reveal">
+                    <div class="contact-item">
+                        <span class="contact-item-label">Teléfono / WhatsApp</span>
+                        <a href="https://wa.me/541130977868" class="contact-item-value">+54 (11) 3097-7868</a>
                     </div>
-                </div>
-
-                <div class="contact-item">
-                    <div class="contact-icon">📧</div>
-                    <div class="contact-icon-text">
-                        <h4>Email</h4>
-                        <a href="mailto:gscaglia@redsuma.com.ar">gscaglia@redsuma.com.ar</a>
+                    <div class="contact-item">
+                        <span class="contact-item-label">Email</span>
+                        <a href="mailto:gscaglia@redsuma.com.ar" class="contact-item-value">gscaglia@redsuma.com.ar</a>
                     </div>
-                </div>
-
-                <div class="contact-item">
-                    <div class="contact-icon">📱</div>
-                    <div class="contact-icon-text">
-                        <h4>Instagram</h4>
-                        <a href="https://instagram.com/teamscaglia" target="_blank">@teamscaglia</a>
+                    <div class="contact-item">
+                        <span class="contact-item-label">Instagram</span>
+                        <a href="https://instagram.com/guillermoscaglia" target="_blank" class="contact-item-value">@guillermoscaglia</a>
                     </div>
                 </div>
             </div>
-
-            <!-- FORMULARIO -->
-            <div class="form-box">
-                <h3>Envianos tu consulta</h3>
-                <form id="contactForm">
-                    <div class="form-group">
-                        <input type="text" id="nombre" placeholder="Tu nombre" required>
+            <div class="reveal">
+                <form class="contact-form" id="contactForm">
+                    <div class="form-field">
+                        <input type="text" id="nombre" placeholder="Nombre completo" required>
                     </div>
-                    <div class="form-group">
-                        <input type="email" id="email" placeholder="Tu email" required>
+                    <div class="form-field">
+                        <input type="email" id="email" placeholder="Email" required>
                     </div>
-                    <div class="form-group">
-                        <input type="tel" id="telefono" placeholder="Tu teléfono">
+                    <div class="form-field">
+                        <input type="tel" id="telefono" placeholder="Teléfono">
                     </div>
-                    <div class="form-group">
+                    <div class="form-field">
                         <textarea id="consulta" placeholder="Tu consulta" required></textarea>
                     </div>
-                    <button type="submit" class="primary">Enviar consulta</button>
-                    <div class="form-success" id="formSuccess">✓ Consulta enviada exitosamente</div>
+                    <div class="form-submit">
+                        <button type="submit" class="form-submit-btn">Enviar consulta</button>
+                        <span class="form-success-msg" id="formSuccess">✓ Enviado correctamente</span>
+                    </div>
                 </form>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- DISCLAIMER -->
-    <div style="background: #1a1a1a; padding: 32px 24px;">
-        <p style="max-width: 900px; margin: 0 auto; font-size: 11px; color: #888; line-height: 1.8; text-align: center;">
-            Somos parte del equipo REMAX SUMA. Martillero responsable: Diego Mastrangelo CPI 7615 CSI 6609. En cumplimiento de las leyes vigentes que regulan el corretaje inmobiliario, Ley 25.028, Ley 22.802 de Lealtad Comercial, Ley 24.240 de Defensa al Consumidor, las normas del Código Civil y Comercial de la Nación y Constitucionales, los agentes NO ejercen el corretaje inmobiliario. Todas las operaciones inmobiliarias son objeto de intermediación y conclusión por parte de los martilleros y corredores colegiados, cuyos datos se exhiben debajo del nombre de la inmobiliaria.
-        </p>
+    <div class="disclaimer">
+        <p>Somos parte del equipo REMAX SUMA. Martillero responsable: Diego Mastrangelo CPI 7615 CSI 6609. En cumplimiento de las leyes vigentes que regulan el corretaje inmobiliario, Ley 25.028, Ley 22.802 de Lealtad Comercial, Ley 24.240 de Defensa al Consumidor, las normas del Código Civil y Comercial de la Nación y Constitucionales, los agentes NO ejercen el corretaje inmobiliario. Todas las operaciones inmobiliarias son objeto de intermediación y conclusión por parte de los martilleros y corredores colegiados, cuyos datos se exhiben debajo del nombre de la inmobiliaria.</p>
     </div>
 
     <!-- FOOTER -->
     <footer>
-        <p>© 2026 Team Scaglia - Red Suma. Todos los derechos reservados.</p>
-        <p>Buenos Aires, Argentina</p>
+        <span class="footer-logo">Team Scaglia</span>
+        <span class="footer-copy">© 2026 · Red Suma · Buenos Aires</span>
     </footer>
 
     <script>
-        // DATOS
+        // ─── DATOS EQUIPO ───
         const equipo = [
-            { nombre: 'Guillermo Scaglia', rol: 'Broker Partner', email: 'gscaglia@redsuma.com.ar', telefono: '+54 (11) 3097-7868', whatsapp: '541130977868', ig: '@guillermoscaglia', avatar: null },
-            { nombre: 'Giuliano Larroca', rol: 'Agente Inmobiliario', email: 'glarroca@redsuma.com.ar', telefono: '+54 (11) 5843-3676', whatsapp: '541158433676', ig: null, avatar: 'https://0dihwhumgqhgj14n.public.blob.vercel-storage.com/agents/5600b94a-aae2-4b59-99a5-7b5ab12b2d72/avatar.jpg' },
-            { nombre: 'Luciano Pérez', rol: 'Agente Inmobiliario', email: 'lperezmango@redsuma.com.ar', telefono: '+54 (11) 6987-6997', whatsapp: '541169876997', ig: null, avatar: 'https://0dihwhumgqhgj14n.public.blob.vercel-storage.com/agents/e7492f1b-b5d9-4f3b-8b48-8d083cfd49dc/avatar.jpg' },
+            { nombre: 'Guillermo Scaglia', rol: 'Broker Partner', email: 'gscaglia@redsuma.com.ar', telefono: '+54 (11) 3097-7868', whatsapp: '541130977868', ig: 'guillermoscaglia', avatar: null },
+            { nombre: 'Giuliano Larroca',  rol: 'Agente Inmobiliario', email: 'glarroca@redsuma.com.ar', telefono: '+54 (11) 5843-3676', whatsapp: '541158433676', ig: null, avatar: 'https://0dihwhumgqhgj14n.public.blob.vercel-storage.com/agents/5600b94a-aae2-4b59-99a5-7b5ab12b2d72/avatar.jpg' },
+            { nombre: 'Luciano Pérez',     rol: 'Agente Inmobiliario', email: 'lperezmango@redsuma.com.ar', telefono: '+54 (11) 6987-6997', whatsapp: '541169876997', ig: null, avatar: 'https://0dihwhumgqhgj14n.public.blob.vercel-storage.com/agents/e7492f1b-b5d9-4f3b-8b48-8d083cfd49dc/avatar.jpg' },
             { nombre: 'Carolina Klachko', rol: 'Agente Inmobiliario', email: 'carolinak@redsuma.com.ar', telefono: '+54 (11) 5859-8204', whatsapp: '541158598204', ig: null, avatar: 'https://0dihwhumgqhgj14n.public.blob.vercel-storage.com/agents/d49c2893-aaaf-49e2-b2be-c71bfa38d4d5/avatar.jpeg' },
         ];
 
-        const propiedades = [
-            { titulo: 'PH Moderno - Palermo', precio: '$450.000', tipo: 'Venta', zona: 'CABA', icon: '🏠' },
-            { titulo: 'Depto Inversión - San Telmo', precio: '$35.000/mes', tipo: 'Alquiler', zona: 'CABA', icon: '🏢' },
-            { titulo: 'Desarrollo - La Boca', precio: 'Consultar', tipo: 'Desarrollo', zona: 'CABA', icon: '🏗️' },
-            { titulo: 'Casa Quinta - Zona Norte', precio: '$750.000', tipo: 'Venta', zona: 'GBA', icon: '🏡' },
-        ];
-
-        // RENDERIZAR EQUIPO
         function renderEquipo() {
-            const container = document.getElementById('equipoContainer');
-            container.innerHTML = equipo.map((agent, idx) => `
-                <div class="team-card fade-in stagger-${idx + 1}">
-                    ${agent.avatar
-                        ? `<img src="${agent.avatar}" alt="${agent.nombre}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:16px;">`
-                        : `<div class="avatar">👤</div>`
-                    }
-                    <h3>${agent.nombre}</h3>
-                    <div class="role">${agent.rol}</div>
+            document.getElementById('teamGrid').innerHTML = equipo.map(a => `
+                <div class="team-card">
+                    <div class="team-avatar">
+                        ${a.avatar
+                            ? `<img src="${a.avatar}" alt="${a.nombre}">`
+                            : `<div class="team-avatar-placeholder"><span>${a.nombre.split(' ').map(w=>w[0]).join('')}</span></div>`
+                        }
+                    </div>
                     <div class="team-info">
-                        <p>📧 <a href="mailto:${agent.email}">${agent.email}</a></p>
-                        <p>📞 <a href="https://wa.me/${agent.whatsapp}" target="_blank">${agent.telefono}</a></p>
-                        ${agent.ig ? `<p>📱 <a href="https://instagram.com/${agent.ig.replace('@', '')}" target="_blank">${agent.ig}</a></p>` : ''}
+                        <div class="team-name">${a.nombre}</div>
+                        <div class="team-role">${a.rol}</div>
+                        <div class="team-contacts">
+                            <a href="https://wa.me/${a.whatsapp}" target="_blank" class="team-contact-link">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
+                                ${a.telefono}
+                            </a>
+                            <a href="mailto:${a.email}" class="team-contact-link">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                ${a.email}
+                            </a>
+                            ${a.ig ? `<a href="https://instagram.com/${a.ig}" target="_blank" class="team-contact-link">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+                                @${a.ig}
+                            </a>` : ''}
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // RENDERIZAR PROPIEDADES
-        // RED SUMA API INTEGRATION
-        const REDSUMA_API_KEY = 'rsk_live_xVtyNiHxabyCAZ4vF75HHARYD2ZesbNd';
-        const REDSUMA_API_BASE = 'https://app.redsuma.com.ar/api/v1';
-
-        async function renderPropiedades() {
+        // ─── PROPIEDADES ───
+        async function renderProps() {
+            const container = document.getElementById('propsGrid');
             try {
-                const response = await fetch(
-                    `${REDSUMA_API_BASE}/properties?status=ACTIVE&pageSize=12&include=agent,images`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${REDSUMA_API_KEY}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-
-                const json = await response.json();
-                const propiedades = json.data || [];
-                const container = document.getElementById('propiedadesContainer');
-                
-                if (propiedades.length === 0) {
-                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #626970; padding: 40px;">No hay propiedades activas en este momento.</p>';
+                const res = await fetch('/api/properties');
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                const props = json.data || [];
+                if (!props.length) {
+                    container.innerHTML = '<p style="padding:48px;color:var(--text-light);font-size:13px;grid-column:1/-1;">No hay propiedades disponibles en este momento.</p>';
                     return;
                 }
-
-                container.innerHTML = propiedades.map((prop, idx) => `
-                    <div class="property-card fade-in stagger-${(idx % 4) + 1}">
-                        <div class="property-image" style="background-image: url('${prop.images?.[0]?.url || 'https://via.placeholder.com/400x300?text=Propiedad'}'); background-size: cover; background-position: center; height: 250px; display: flex; align-items: flex-end; justify-content: flex-start; padding: 12px; background-color: #f0f0f0;">
-                            <span style="background: rgba(37, 60, 100, 0.9); color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">${prop.operationType === 'SALE' ? 'Venta' : prop.operationType === 'RENT' ? 'Alquiler' : 'Temporal'}</span>
+                container.innerHTML = props.map(p => `
+                    <div class="prop-card">
+                        <div class="prop-image">
+                            ${p.images?.[0]?.url
+                                ? `<img src="${p.images[0].url}" alt="${p.title || ''}">`
+                                : `<div class="prop-image-placeholder"></div>`
+                            }
+                            <span class="prop-badge">${p.operationType === 'SALE' ? 'Venta' : p.operationType === 'RENT' ? 'Alquiler' : 'Temporal'}</span>
                         </div>
-                        <div class="property-info">
-                            <h3>${prop.title || prop.code}</h3>
-                            <p style="color: #626970; font-size: 13px; margin: 4px 0;">${prop.street ? prop.street + ' ' + prop.streetNumber + ', ' : ''}${prop.neighborhood || ''}</p>
-                            <div class="property-price">${new Intl.NumberFormat('es-AR', {
-                                style: 'currency',
-                                currency: prop.currency || 'USD',
-                                minimumFractionDigits: 0
-                            }).format(prop.price || 0)}</div>
-                            <div class="property-tags" style="display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0;">
-                                ${prop.bedrooms ? `<span class="tag">${prop.bedrooms} dorm</span>` : ''}
-                                ${prop.bathrooms ? `<span class="tag">${prop.bathrooms} baño</span>` : ''}
-                                ${prop.coveredArea ? `<span class="tag">${prop.coveredArea} m²</span>` : ''}
-                                <span class="tag zone">${prop.propertyType || 'Propiedad'}</span>
+                        <div class="prop-info">
+                            <div class="prop-title">${p.title || p.code}</div>
+                            <div class="prop-location">${[p.street, p.neighborhood].filter(Boolean).join(', ')}</div>
+                            <div class="prop-price">${new Intl.NumberFormat('es-AR',{style:'currency',currency:p.currency||'USD',minimumFractionDigits:0}).format(p.price||0)}</div>
+                            <div class="prop-tags">
+                                ${p.bedrooms ? `<span class="prop-tag">${p.bedrooms} dorm.</span>` : ''}
+                                ${p.bathrooms ? `<span class="prop-tag">${p.bathrooms} baños</span>` : ''}
+                                ${p.coveredArea ? `<span class="prop-tag">${p.coveredArea} m²</span>` : ''}
                             </div>
                         </div>
                     </div>
                 `).join('');
-            } catch (error) {
-                console.error('Error trayendo propiedades de Red Suma:', error);
-                const container = document.getElementById('propiedadesContainer');
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #626970; padding: 40px;">Error al cargar propiedades. Por favor intenta más tarde.</p>';
+            } catch {
+                container.innerHTML = '<p style="padding:48px;color:var(--text-light);font-size:13px;grid-column:1/-1;">Las propiedades se cargarán próximamente.</p>';
             }
         }
 
-        // FORMULARIO
+        // ─── FORMULARIO ───
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
-            const telefono = document.getElementById('telefono').value;
+            const nombre  = document.getElementById('nombre').value;
+            const email   = document.getElementById('email').value;
+            const tel     = document.getElementById('telefono').value;
             const consulta = document.getElementById('consulta').value;
-
-            const mensaje = `Hola Team Scaglia! Mi nombre es ${nombre}. ${consulta} Mi email: ${email}${telefono ? '. Tel: ' + telefono : ''}.`;
-            window.open(`https://wa.me/541130977868?text=${encodeURIComponent(mensaje)}`, '_blank');
-            const successMsg = document.getElementById('formSuccess');
-            successMsg.classList.add('show');
+            const msg = `Hola Team Scaglia! Soy ${nombre}. ${consulta} Email: ${email}${tel ? '. Tel: '+tel : ''}.`;
+            window.open(`https://wa.me/541130977868?text=${encodeURIComponent(msg)}`, '_blank');
+            document.getElementById('formSuccess').classList.add('show');
             this.reset();
-            setTimeout(() => successMsg.classList.remove('show'), 3000);
+            setTimeout(() => document.getElementById('formSuccess').classList.remove('show'), 4000);
         });
 
-        // MENU MOBILE
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
+        // ─── NAVBAR SCROLL ───
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.pageYOffset > 60);
+        }, { passive: true });
 
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+        // ─── HERO PARALLAX + DÍA/NOCHE ───
+        const heroBg           = document.getElementById('heroBg');
+        const heroPhoto        = document.getElementById('heroPhoto');
+        const heroColorOverlay = document.getElementById('heroColorOverlay');
+        const heroSection      = document.getElementById('inicio');
+
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        window.addEventListener('scroll', function() {
+            const scrollY  = window.pageYOffset;
+            if (heroBg) heroBg.style.transform = `translateY(${scrollY * 0.25}px)`;
+            const heroH    = heroSection ? heroSection.offsetHeight : window.innerHeight;
+            const progress = Math.min(scrollY / heroH, 1);
+
+            if (progress < 0.5) {
+                const t = progress / 0.5;
+                heroPhoto.style.filter = `brightness(${lerp(1,.75,t)}) sepia(${lerp(0,.4,t)}) saturate(${lerp(1,1.3,t)})`;
+                heroColorOverlay.style.background = `rgba(${Math.round(lerp(0,180,t))},${Math.round(lerp(0,80,t))},0,${lerp(0,.35,t)})`;
+            } else {
+                const t = (progress - 0.5) / 0.5;
+                heroPhoto.style.filter = `brightness(${lerp(.75,.25,t)}) sepia(${lerp(.4,0,t)}) saturate(${lerp(1.3,.6,t)})`;
+                heroColorOverlay.style.background = `rgba(${Math.round(lerp(180,10,t))},${Math.round(lerp(80,20,t))},${Math.round(lerp(0,60,t))},${lerp(.35,.6,t)})`;
+            }
+        }, { passive: true });
+
+        // ─── MENU MOBILE ───
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(a => {
+            a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('active'));
         });
 
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-            });
-        });
-
-        // INICIALIZAR
-        renderEquipo();
-        renderPropiedades();
-
-        // SCROLL ANIMATIONS
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.card').forEach(card => observer.observe(card));
-
-        // THEME TOGGLE - Día/Noche automático + manual
+        // ─── THEME TOGGLE ───
         const themeToggle = document.getElementById('themeToggle');
         const html = document.documentElement;
-
-        // Detectar preferencia del sistema (automático por defecto)
         function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
+            const saved = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (savedTheme) {
-                // Si el usuario cambió manualmente, usar esa preferencia
-                if (savedTheme === 'dark') {
-                    html.classList.add('dark-mode');
-                    themeToggle.textContent = '☀️';
-                } else {
-                    html.classList.remove('dark-mode');
-                    themeToggle.textContent = '🌙';
-                }
-            } else {
-                // Si no hay preferencia guardada, usar la del sistema
-                if (prefersDark) {
-                    html.classList.add('dark-mode');
-                    themeToggle.textContent = '☀️';
-                } else {
-                    html.classList.remove('dark-mode');
-                    themeToggle.textContent = '🌙';
-                }
-            }
+            const isDark = saved ? saved === 'dark' : prefersDark;
+            html.classList.toggle('dark-mode', isDark);
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
         }
-
-        // Toggle manual
         themeToggle.addEventListener('click', () => {
             html.classList.toggle('dark-mode');
             const isDark = html.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             themeToggle.textContent = isDark ? '☀️' : '🌙';
         });
-
-        // Escuchar cambios en preferencias del sistema (si no hay preferencia guardada)
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                if (e.matches) {
-                    html.classList.add('dark-mode');
-                    themeToggle.textContent = '☀️';
-                } else {
-                    html.classList.remove('dark-mode');
-                    themeToggle.textContent = '🌙';
-                }
-            }
-        });
-
-        // Inicializar tema al cargar
         initTheme();
 
-        // PARALLAX + DÍA → ATARDECER → NOCHE sobre la misma imagen
-        const heroBg          = document.getElementById('heroBg');
-        const heroPhoto       = document.getElementById('heroPhoto');
-        const heroColorOverlay = document.getElementById('heroColorOverlay');
-        const heroSection     = document.getElementById('inicio');
+        // ─── REVEAL ON SCROLL ───
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-        function lerp(a, b, t) { return a + (b - a) * t; }
-
-        window.addEventListener('scroll', function() {
-            const scrollY = window.pageYOffset;
-
-            // Parallax suave
-            if (heroBg) heroBg.style.transform = `translateY(${scrollY * 0.25}px)`;
-
-            const heroH = heroSection ? heroSection.offsetHeight : 700;
-            const progress = Math.min(scrollY / heroH, 1);
-
-            if (progress < 0.5) {
-                // DÍA → ATARDECER
-                const t = progress / 0.5;
-
-                // Imagen: de colores normales a cálidos y más oscuro
-                const brightness = lerp(1, 0.75, t);
-                const sepia      = lerp(0, 0.4, t);
-                const saturate   = lerp(1, 1.3, t);
-                heroPhoto.style.filter = `brightness(${brightness}) sepia(${sepia}) saturate(${saturate})`;
-
-                // Overlay: transparente → naranja cálido
-                const r = Math.round(lerp(0, 180, t));
-                const g = Math.round(lerp(0, 80, t));
-                const b = Math.round(lerp(0, 0, t));
-                const a = lerp(0, 0.35, t);
-                heroColorOverlay.style.background = `rgba(${r},${g},${b},${a})`;
-
-            } else {
-                // ATARDECER → NOCHE
-                const t = (progress - 0.5) / 0.5;
-
-                // Imagen: cálida → muy oscura con tinte azul
-                const brightness = lerp(0.75, 0.25, t);
-                const sepia      = lerp(0.4, 0, t);
-                const saturate   = lerp(1.3, 0.6, t);
-                heroPhoto.style.filter = `brightness(${brightness}) sepia(${sepia}) saturate(${saturate})`;
-
-                // Overlay: naranja → azul noche
-                const r = Math.round(lerp(180, 10, t));
-                const g = Math.round(lerp(80, 20, t));
-                const b = Math.round(lerp(0, 60, t));
-                const a = lerp(0.35, 0.6, t);
-                heroColorOverlay.style.background = `rgba(${r},${g},${b},${a})`;
-            }
-        }, { passive: true });
+        // ─── INIT ───
+        renderEquipo();
+        renderProps();
     </script>
 </body>
 </html>
