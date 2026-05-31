@@ -30,6 +30,11 @@ module.exports = async function handler(req, res) {
         return res.status(200).json(data);
 
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({
+            error: error.message,
+            type: error.constructor.name,
+            hasApiKey: !!process.env.REDSUMA_API_KEY,
+            keyPrefix: process.env.REDSUMA_API_KEY ? process.env.REDSUMA_API_KEY.substring(0, 12) + '...' : null
+        });
     }
 };
