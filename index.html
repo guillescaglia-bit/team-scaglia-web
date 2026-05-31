@@ -273,9 +273,14 @@
             z-index: 1;
         }
 
-        section.hero > * {
+        section.hero > *:not(.hero-bg) {
             position: relative;
             z-index: 2;
+        }
+
+        .hero-bg {
+            z-index: 0 !important;
+            position: absolute !important;
         }
 
         section.hero h1 {
