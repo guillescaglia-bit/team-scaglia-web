@@ -227,7 +227,7 @@
             align-items: center;
         }
 
-        /* Hero background - 3 capas día/atardecer/noche */
+        /* Hero background - una sola imagen con filtros CSS */
         .hero-bg {
             position: absolute;
             top: -20%;
@@ -238,38 +238,29 @@
             will-change: transform;
         }
 
-        .hero-layer {
+        /* La foto — Obelisco y 9 de Julio desde drone */
+        .hero-photo {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1600&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            transition: opacity 0.1s linear;
+            will-change: filter;
         }
 
-        /* Día — Obelisco y 9 de Julio desde drone, cielo azul */
-        .hero-layer-day {
-            background-image: url('https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1600&auto=format&fit=crop');
-            opacity: 1;
+        /* Overlay de color que cambia con el scroll */
+        .hero-color-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            will-change: background;
         }
 
-        /* Atardecer — Obelisco con cielo dramático */
-        .hero-layer-sunset {
-            background-image: url('https://images.unsplash.com/photo-1678838033018-7b4651ceb604?w=1600&auto=format&fit=crop');
-            opacity: 0;
-        }
-
-        /* Noche — Obelisco con luces de la ciudad */
-        .hero-layer-night {
-            background-image: url('https://images.unsplash.com/photo-1686530489698-d74e6f165b87?w=1600&auto=format&fit=crop');
-            opacity: 0;
-        }
-
-        /* Overlay para legibilidad */
+        /* Overlay oscuro base para legibilidad del texto */
         .hero-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(0, 0, 0, 0.3);
             z-index: 1;
         }
 
@@ -796,9 +787,8 @@
     <!-- HERO -->
     <section id="inicio" class="hero">
         <div class="hero-bg" id="heroBg">
-            <div class="hero-layer hero-layer-day" id="layerDay"></div>
-            <div class="hero-layer hero-layer-sunset" id="layerSunset"></div>
-            <div class="hero-layer hero-layer-night" id="layerNight"></div>
+            <div class="hero-photo" id="heroPhoto"></div>
+            <div class="hero-color-overlay" id="heroColorOverlay"></div>
             <div class="hero-overlay"></div>
         </div>
         <h1>Expertos en <span class="highlight">inversión inmobiliaria</span></h1>
@@ -1219,36 +1209,56 @@
         // Inicializar tema al cargar
         initTheme();
 
-        // PARALLAX + DÍA → ATARDECER → NOCHE al scrollear
-        const heroBg    = document.getElementById('heroBg');
-        const layerDay    = document.getElementById('layerDay');
-        const layerSunset = document.getElementById('layerSunset');
-        const layerNight  = document.getElementById('layerNight');
-        const heroSection = document.getElementById('inicio');
+        // PARALLAX + DÍA → ATARDECER → NOCHE sobre la misma imagen
+        const heroBg          = document.getElementById('heroBg');
+        const heroPhoto       = document.getElementById('heroPhoto');
+        const heroColorOverlay = document.getElementById('heroColorOverlay');
+        const heroSection     = document.getElementById('inicio');
+
+        function lerp(a, b, t) { return a + (b - a) * t; }
 
         window.addEventListener('scroll', function() {
             const scrollY = window.pageYOffset;
 
-            // Parallax: mueve el fondo más lento que el scroll
+            // Parallax suave
             if (heroBg) heroBg.style.transform = `translateY(${scrollY * 0.25}px)`;
 
-            // Transición día → atardecer → noche
-            // Se completa en la altura del hero (aprox 700px)
             const heroH = heroSection ? heroSection.offsetHeight : 700;
-            const progress = Math.min(scrollY / heroH, 1); // 0 a 1
+            const progress = Math.min(scrollY / heroH, 1);
 
             if (progress < 0.5) {
-                // Fase 1: día → atardecer (scroll 0% a 50%)
-                const t = progress / 0.5; // 0 a 1
-                layerDay.style.opacity    = 1 - t;
-                layerSunset.style.opacity = t;
-                layerNight.style.opacity  = 0;
+                // DÍA → ATARDECER
+                const t = progress / 0.5;
+
+                // Imagen: de colores normales a cálidos y más oscuro
+                const brightness = lerp(1, 0.75, t);
+                const sepia      = lerp(0, 0.4, t);
+                const saturate   = lerp(1, 1.3, t);
+                heroPhoto.style.filter = `brightness(${brightness}) sepia(${sepia}) saturate(${saturate})`;
+
+                // Overlay: transparente → naranja cálido
+                const r = Math.round(lerp(0, 180, t));
+                const g = Math.round(lerp(0, 80, t));
+                const b = Math.round(lerp(0, 0, t));
+                const a = lerp(0, 0.35, t);
+                heroColorOverlay.style.background = `rgba(${r},${g},${b},${a})`;
+
             } else {
-                // Fase 2: atardecer → noche (scroll 50% a 100%)
-                const t = (progress - 0.5) / 0.5; // 0 a 1
-                layerDay.style.opacity    = 0;
-                layerSunset.style.opacity = 1 - t;
-                layerNight.style.opacity  = t;
+                // ATARDECER → NOCHE
+                const t = (progress - 0.5) / 0.5;
+
+                // Imagen: cálida → muy oscura con tinte azul
+                const brightness = lerp(0.75, 0.25, t);
+                const sepia      = lerp(0.4, 0, t);
+                const saturate   = lerp(1.3, 0.6, t);
+                heroPhoto.style.filter = `brightness(${brightness}) sepia(${sepia}) saturate(${saturate})`;
+
+                // Overlay: naranja → azul noche
+                const r = Math.round(lerp(180, 10, t));
+                const g = Math.round(lerp(80, 20, t));
+                const b = Math.round(lerp(0, 60, t));
+                const a = lerp(0.35, 0.6, t);
+                heroColorOverlay.style.background = `rgba(${r},${g},${b},${a})`;
             }
         }, { passive: true });
     </script>
