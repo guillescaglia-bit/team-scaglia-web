@@ -227,31 +227,49 @@
             align-items: center;
         }
 
-        /* Background parallax image - Solo imagen */
+        /* Hero background - 3 capas día/atardecer/noche */
         .hero-bg {
             position: absolute;
-            top: 0;
+            top: -20%;
             left: 0;
             right: 0;
-            bottom: 0;
-            background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&h=900&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 1;
+            bottom: -20%;
             z-index: 0;
             will-change: transform;
         }
 
-        /* Overlay oscuro para legibilidad */
-        .hero-bg::after {
-            content: '';
+        .hero-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.1s linear;
+        }
+
+        /* Día — Buenos Aires aéreo de día */
+        .hero-layer-day {
+            background-image: url('https://images.unsplash.com/photo-1612294037637-ec328d0e075e?w=1600&h=900&fit=crop');
+            opacity: 1;
+        }
+
+        /* Atardecer */
+        .hero-layer-sunset {
+            background-image: url('https://images.unsplash.com/photo-1600011689032-8b628b8a8747?w=1600&h=900&fit=crop');
+            opacity: 0;
+        }
+
+        /* Noche */
+        .hero-layer-night {
+            background-image: url('https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1600&h=900&fit=crop');
+            opacity: 0;
+        }
+
+        /* Overlay para legibilidad */
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
             z-index: 1;
         }
 
@@ -772,7 +790,12 @@
 
     <!-- HERO -->
     <section id="inicio" class="hero">
-        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-bg" id="heroBg">
+            <div class="hero-layer hero-layer-day" id="layerDay"></div>
+            <div class="hero-layer hero-layer-sunset" id="layerSunset"></div>
+            <div class="hero-layer hero-layer-night" id="layerNight"></div>
+            <div class="hero-overlay"></div>
+        </div>
         <h1>Expertos en <span class="highlight">inversión inmobiliaria</span></h1>
         <p>13 años de experiencia, procesos comprobados y un equipo dedicado a hacer realidad tus proyectos inmobiliarios.</p>
         <div class="btn-group">
@@ -1191,12 +1214,36 @@
         // Inicializar tema al cargar
         initTheme();
 
-        // PARALLAX EFFECT - Scroll suave
+        // PARALLAX + DÍA → ATARDECER → NOCHE al scrollear
+        const heroBg    = document.getElementById('heroBg');
+        const layerDay    = document.getElementById('layerDay');
+        const layerSunset = document.getElementById('layerSunset');
+        const layerNight  = document.getElementById('layerNight');
+        const heroSection = document.getElementById('inicio');
+
         window.addEventListener('scroll', function() {
-            const heroBg = document.getElementById('heroBg');
-            if (heroBg) {
-                const scrollY = window.pageYOffset;
-                heroBg.style.transform = `translateY(${scrollY * 0.3}px)`;
+            const scrollY = window.pageYOffset;
+
+            // Parallax: mueve el fondo más lento que el scroll
+            if (heroBg) heroBg.style.transform = `translateY(${scrollY * 0.25}px)`;
+
+            // Transición día → atardecer → noche
+            // Se completa en la altura del hero (aprox 700px)
+            const heroH = heroSection ? heroSection.offsetHeight : 700;
+            const progress = Math.min(scrollY / heroH, 1); // 0 a 1
+
+            if (progress < 0.5) {
+                // Fase 1: día → atardecer (scroll 0% a 50%)
+                const t = progress / 0.5; // 0 a 1
+                layerDay.style.opacity    = 1 - t;
+                layerSunset.style.opacity = t;
+                layerNight.style.opacity  = 0;
+            } else {
+                // Fase 2: atardecer → noche (scroll 50% a 100%)
+                const t = (progress - 0.5) / 0.5; // 0 a 1
+                layerDay.style.opacity    = 0;
+                layerSunset.style.opacity = 1 - t;
+                layerNight.style.opacity  = t;
             }
         }, { passive: true });
     </script>
