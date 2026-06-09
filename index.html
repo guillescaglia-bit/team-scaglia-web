@@ -70,16 +70,20 @@
         }
 
         .logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            color: white;
+            display: flex;
+            align-items: center;
             text-decoration: none;
-            transition: color 0.4s;
         }
 
-        nav.scrolled .logo { color: var(--primary); }
+        .logo img {
+            height: 46px;
+            width: auto;
+            display: block;
+        }
+
+        .logo .logo-color { display: none; }
+        nav.scrolled .logo .logo-white { display: none; }
+        nav.scrolled .logo .logo-color { display: block; }
 
         .nav-links {
             display: flex;
@@ -964,12 +968,11 @@
             justify-content: space-between;
         }
 
-        .footer-logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            color: rgba(255,255,255,0.4);
+        .footer-logo img {
+            height: 52px;
+            width: auto;
+            display: block;
+            opacity: 0.85;
         }
 
         .footer-copy {
@@ -1000,7 +1003,10 @@
 
     <!-- NAVBAR -->
     <nav id="navbar">
-        <a href="#inicio" class="logo">Team Scaglia</a>
+        <a href="#inicio" class="logo">
+            <img src="/logos/logo-team-blanco-trim.png" class="logo-white" alt="Team Scaglia">
+            <img src="/logos/logo-team-color-trim.png" class="logo-color" alt="Team Scaglia">
+        </a>
         <div class="nav-links" id="navLinks">
             <a href="#nosotros">Nosotros</a>
             <a href="#equipo">Equipo</a>
@@ -1223,7 +1229,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <span class="footer-logo">Team Scaglia</span>
+        <span class="footer-logo"><img src="/logos/logo-teamsuma-blanco-trim.png" alt="Team Scaglia · Red Suma"></span>
         <span class="footer-copy">© 2026 · Red Suma · Buenos Aires</span>
     </footer>
 
