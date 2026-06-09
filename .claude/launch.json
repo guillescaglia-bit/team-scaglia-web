@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bio-ig",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["/Users/guillescaglia/Desktop/Bio-ig/server.py"],
+      "port": 3000,
+      "cwd": "/Users/guillescaglia/Desktop/Bio-ig"
+    }
+  ]
+}
