@@ -1044,14 +1044,12 @@
                     <div class="user-name" id="userNameDisplay"></div>
                     <small style="opacity: 0.7; display: block; font-size: 12px;" id="userRoleDisplay"></small>
                 </div>
-                <div style="width: 1px; height: 30px; background: rgba(255, 255, 255, 0.2);"></div>
-                <a href="/" class="btn-logout" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="Volver al sitio Team Scaglia">← Sitio</a>
-                <div style="width: 1px; height: 30px; background: rgba(255, 255, 255, 0.2);"></div>
-                <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleThemeManual()" title="Cambiar tema">
+                <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
+                <a href="/" style="background:none; border:none; color:#fff; text-decoration:none; font-size:12px; font-weight:500; letter-spacing:0.08em; cursor:pointer; opacity:0.85; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85" title="Volver al sitio Team Scaglia">Volver a inicio</a>
+                <button id="themeToggleBtn" onclick="toggleThemeManual()" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer; padding:0; line-height:1; opacity:0.85; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85" title="Cambiar tema">
                     <span id="themeIcon">🌙</span>
                 </button>
-                <div style="width: 1px; height: 30px; background: rgba(255, 255, 255, 0.2);"></div>
-                <button class="btn-logout" onclick="logout()">🚪 Salir</button>
+                <button onclick="logout()" style="background:none; border:none; color:#fff; font-size:12px; font-weight:500; letter-spacing:0.08em; cursor:pointer; opacity:0.85; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">Salir</button>
             </div>
         </div>
     </header>
