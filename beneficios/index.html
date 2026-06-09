@@ -1027,15 +1027,10 @@
     <header id="header" style="display: none;">
         <div class="container">
             <div class="logo">
-                <a href="https://www.instagram.com/teamscaglia" target="_blank" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <circle cx="17.5" cy="6.5" r="1.5"></circle>
-                    </svg>
+                <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;" title="Volver al sitio Team Scaglia">
                     <div>
-                        <div style="font-size: 16px; font-weight: 700; line-height: 1;">Beneficios</div>
-                        <div style="font-size: 12px; opacity: 0.8;">@teamscaglia</div>
+                        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: 0.05em;">Team Scaglia</div>
+                        <div style="font-size: 11px; opacity: 0.7; letter-spacing: 0.1em; margin-top: 2px;">Portal de beneficios</div>
                     </div>
                 </a>
             </div>
@@ -1044,6 +1039,8 @@
                     <div class="user-name" id="userNameDisplay"></div>
                     <small style="opacity: 0.7; display: block; font-size: 12px;" id="userRoleDisplay"></small>
                 </div>
+                <div style="width: 1px; height: 30px; background: rgba(255, 255, 255, 0.2);"></div>
+                <a href="/" class="btn-logout" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="Volver al sitio Team Scaglia">← Sitio</a>
                 <div style="width: 1px; height: 30px; background: rgba(255, 255, 255, 0.2);"></div>
                 <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleThemeManual()" title="Cambiar tema">
                     <span id="themeIcon">🌙</span>
@@ -1147,6 +1144,11 @@
 
                     <div class="cupones-grid" id="cuponesGrid">
                         <!-- Se llena dinámicamente -->
+                    </div>
+
+                    <div style="text-align: center; margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border-color);">
+                        <p style="font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; color: var(--text-primary); margin-bottom: 20px;">¿Querés ver nuestras propiedades y novedades?</p>
+                        <a href="/" style="display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); background: var(--primary); padding: 16px 40px; text-decoration: none; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Volver al sitio Team Scaglia</a>
                     </div>
                 </div>
             </div>
