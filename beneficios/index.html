@@ -1801,7 +1801,7 @@
                                 </div>
                                 ${tieneActivo ? `<p style="font-size: 12px; color: #999; margin-top: 15px;">Mostrá este código al prestador para canjear</p>` : ''}
                                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    ${tieneActivo ? `<button class="btn btn-primary btn-sm" onclick="crearCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>` : ''}
+                                    ${tieneActivo ? `<button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>` : ''}
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                 </div>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
@@ -1809,7 +1809,7 @@
                                 <div style="text-align: center; padding: 20px 0; color: #999;">
                                     <p style="margin-bottom: 10px;">No tenés cupón de este prestador</p>
                                     <div style="display: flex; gap: 10px;">
-                                        <button class="btn btn-primary btn-sm" onclick="crearCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>
+                                        <button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>
                                         <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                     </div>
                                     <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
@@ -1823,10 +1823,66 @@
             document.getElementById('cuponesGrid').innerHTML = html;
         }
 
+        function solicitarCupon(prestadorId, prestadorNombre) {
+            const prestador = appState.prestadores.find(p => p.id === prestadorId);
+            if (!prestador) return;
+
+            const previo = document.getElementById('modalConfirmCupon');
+            if (previo) previo.remove();
+
+            const tycTexto = (prestador.tyc || 'Sin términos especificados.');
+            window._tycPendiente = tycTexto;
+
+            const html = `
+                <div class="modal activo" id="modalConfirmCupon" style="display:flex;">
+                    <div class="modal-content" style="max-width:480px;">
+                        <div class="modal-header">
+                            <h3>Confirmar cupón</h3>
+                            <button class="btn-close" onclick="cerrarConfirmCupon()">×</button>
+                        </div>
+                        <div style="padding:8px 4px;">
+                            <p style="font-size:11px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-bottom:10px;">${prestador.nombre}</p>
+                            <p style="font-size:14px; color:var(--text-primary); line-height:1.6; margin-bottom:20px;">Leí y acepto los términos y condiciones de canje de este cupón.</p>
+
+                            <button onclick="toggleTyCInline()" id="btnVerTyC" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; padding:0; margin-bottom:16px;">Ver términos y condiciones ▾</button>
+
+                            <div id="tycInline" style="display:none; max-height:240px; overflow-y:auto; background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:16px; margin-bottom:20px;">
+                                <p id="tycInlineTexto" style="color:var(--text-primary); line-height:1.6; font-size:13px; white-space:pre-wrap;"></p>
+                            </div>
+
+                            <div style="display:flex; gap:12px;">
+                                <button class="btn btn-secondary" onclick="cerrarConfirmCupon()" style="flex:1;">Cancelar</button>
+                                <button class="btn btn-primary" onclick="cerrarConfirmCupon(); crearCupon('${prestadorId}', '${prestadorNombre.replace(/'/g, "\\'")}')" style="flex:1;">Acepto</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+            document.getElementById('tycInlineTexto').textContent = tycTexto;
+        }
+
+        function toggleTyCInline() {
+            const box = document.getElementById('tycInline');
+            const btn = document.getElementById('btnVerTyC');
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+                btn.innerHTML = 'Ocultar términos y condiciones ▴';
+            } else {
+                box.style.display = 'none';
+                btn.innerHTML = 'Ver términos y condiciones ▾';
+            }
+        }
+
+        function cerrarConfirmCupon() {
+            const m = document.getElementById('modalConfirmCupon');
+            if (m) m.remove();
+        }
+
         function crearCupon(prestadorId, prestadorNombre) {
             const clienteId = appState.usuarioActual.clienteId;
             const prestador = appState.prestadores.find(p => p.id === prestadorId);
-            
+
             // Si es cupón único (como Anna Rosatti), verificar si ya existe CUALQUIER cupón
             if (prestador.tipoLimite === 'unico') {
                 const cuponUnico = appState.cupones.find(c => 
