@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Backups y temporales
+*.backup
+*.bak
+index.html.backup
+
+# Logs
+*.log
