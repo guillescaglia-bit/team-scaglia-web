@@ -1093,7 +1093,7 @@
     <div class="cta-band">
         <h2 class="cta-band-title reveal">¿Necesitás vender<br><em>tu propiedad?</em></h2>
         <p class="cta-band-sub reveal">Más de 800 operaciones avalan nuestro método.</p>
-        <button class="btn-primary reveal" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Quiero que me contacten</button>
+        <button class="btn-primary reveal" onclick="abrirModalPublicar()">Quiero publicar mi propiedad</button>
     </div>
 
     <!-- NOSOTROS -->
@@ -1129,7 +1129,7 @@
     <!-- CTA 2 -->
     <div class="cta-minimal">
         <p class="reveal">¿Tu propiedad podría estar <em>en mejores manos?</em></p>
-        <button class="btn-primary" style="background: var(--primary); color: white;" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Publicar mi propiedad</button>
+        <button class="btn-primary" style="background: var(--primary); color: white;" onclick="abrirModalPublicar()">Publicar mi propiedad</button>
     </div>
 
     <!-- PROPIEDADES -->
@@ -1225,6 +1225,48 @@
         <span class="footer-logo">Team Scaglia</span>
         <span class="footer-copy">© 2026 · Red Suma · Buenos Aires</span>
     </footer>
+
+    <!-- MODAL PUBLICAR PROPIEDAD -->
+    <div id="modalPublicar" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:24px;">
+        <div style="background:var(--bg); max-width:520px; width:100%; max-height:90vh; overflow-y:auto; position:relative; padding:48px 44px;">
+            <button onclick="cerrarModalPublicar()" style="position:absolute; top:20px; right:20px; background:none; border:none; cursor:pointer; font-size:24px; line-height:1; color:var(--text-light);">&times;</button>
+
+            <p style="font-size:10px; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--accent); margin-bottom:14px;">Publicá con nosotros</p>
+            <h3 style="font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:400; color:var(--text); line-height:1.1; margin-bottom:32px;">Contanos sobre<br><em style="font-style:italic; color:var(--accent);">tu propiedad</em></h3>
+
+            <form id="formPublicar">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-field"><input type="text" id="pubNombre" placeholder="Nombre" required></div>
+                    <div class="form-field"><input type="text" id="pubApellido" placeholder="Apellido" required></div>
+                </div>
+                <div class="form-field">
+                    <select id="pubOperacion" required style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
+                        <option value="" disabled selected>Tipo de operación</option>
+                        <option value="Venta">Venta</option>
+                        <option value="Alquiler">Alquiler</option>
+                        <option value="Alquiler temporal">Alquiler temporal</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <select id="pubTipo" required style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
+                        <option value="" disabled selected>Tipo de propiedad</option>
+                        <option value="Departamento">Departamento</option>
+                        <option value="Casa">Casa</option>
+                        <option value="PH">PH</option>
+                        <option value="Local comercial">Local comercial</option>
+                        <option value="Oficina">Oficina</option>
+                        <option value="Terreno / Lote">Terreno / Lote</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-field"><input type="text" id="pubUbicacion" placeholder="¿Dónde se encuentra? (barrio, ciudad)" required></div>
+                <div class="form-field"><input type="tel" id="pubTelefono" placeholder="Teléfono de contacto" required></div>
+                <div class="form-submit" style="margin-top:32px;">
+                    <button type="submit" class="form-submit-btn" style="width:100%;">Enviar consulta</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         // ─── DATOS EQUIPO ───
@@ -1322,6 +1364,34 @@
             document.getElementById('formSuccess').classList.add('show');
             this.reset();
             setTimeout(() => document.getElementById('formSuccess').classList.remove('show'), 4000);
+        });
+
+        // ─── MODAL PUBLICAR PROPIEDAD ───
+        function abrirModalPublicar() {
+            document.getElementById('modalPublicar').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function cerrarModalPublicar() {
+            document.getElementById('modalPublicar').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        // Cerrar al clickear fuera
+        document.getElementById('modalPublicar').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalPublicar();
+        });
+        // Submit del modal
+        document.getElementById('formPublicar').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre    = document.getElementById('pubNombre').value;
+            const apellido  = document.getElementById('pubApellido').value;
+            const operacion = document.getElementById('pubOperacion').value;
+            const tipo      = document.getElementById('pubTipo').value;
+            const ubicacion = document.getElementById('pubUbicacion').value;
+            const telefono  = document.getElementById('pubTelefono').value;
+            const msg = `Hola Team Scaglia! Quiero publicar mi propiedad.\n\nNombre: ${nombre} ${apellido}\nOperación: ${operacion}\nTipo: ${tipo}\nUbicación: ${ubicacion}\nTeléfono: ${telefono}`;
+            window.open(`https://wa.me/541130977868?text=${encodeURIComponent(msg)}`, '_blank');
+            this.reset();
+            cerrarModalPublicar();
         });
 
         // ─── NAVBAR SCROLL ───
