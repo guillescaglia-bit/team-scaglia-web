@@ -8,3 +8,6 @@ index.html.backup
 
 # Logs
 *.log
+
+# Documentos generados (no van al deploy)
+manual-de-marca-team-scaglia.pdf
