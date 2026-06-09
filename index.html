@@ -1242,7 +1242,7 @@
 
         function renderEquipo() {
             document.getElementById('teamGrid').innerHTML = equipo.map(a => `
-                <div class="team-card" style="cursor:pointer;" onclick="window.open('https://propiedades.redsuma.com.ar/a/${a.slug}','_blank')">
+                <div class="team-card">
                     <div class="team-avatar">
                         ${a.avatar
                             ? `<img src="${a.avatar}" alt="${a.nombre}">`
