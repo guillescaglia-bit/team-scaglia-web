@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Beneficios Team Scaglia - v2.1</title>
+    <title>Beneficios · Team Scaglia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -20,7 +23,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-main);
             color: var(--text-primary);
             transition: background 0.3s, color 0.3s;
@@ -28,30 +31,32 @@
 
         /* Variables de color */
         :root {
-            --primary: #324a70;
-            --primary-light: #4a6fa5;
+            --primary: #253C64;
+            --primary-light: #1a2847;
+            --accent: #626970;
             --white: #ffffff;
-            --gray-light: #f5f5f5;
-            --gray-dark: #666;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --bg-main: #f5f5f5;
+            --gray-light: #f8f7f5;
+            --gray-dark: #626970;
+            --success: #2d7a4f;
+            --danger: #c0392b;
+            --warning: #b8860b;
+            --bg-main: #f8f7f5;
             --bg-secondary: #ffffff;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: #e5e5e5;
+            --text-primary: #2a2a2a;
+            --text-secondary: #626970;
+            --border-color: #e0e0e0;
         }
 
         /* Modo oscuro (6PM a 6AM) */
         body.dark-mode {
-            --bg-main: #0f0f0f;
+            --bg-main: #0d0d0d;
             --bg-secondary: #1a1a1a;
             --text-primary: #e8e8e8;
-            --text-secondary: #a8a8a8;
-            --border-color: #303030;
-            --primary: #5a8db8;
-            --gray-dark: #b0b0b0;
+            --text-secondary: #8b9aaa;
+            --border-color: #2a2a2a;
+            --primary: #7cb3ff;
+            --accent: #8b9aaa;
+            --gray-dark: #8b9aaa;
         }
 
         body.dark-mode body {
@@ -123,20 +128,20 @@
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, #2a5a8a 100%);
+            background: var(--primary);
             color: var(--white);
             padding: 16px 0;
-            border-bottom: 4px solid #1e3f5a;
-            box-shadow: 0 4px 12px rgba(50, 74, 112, 0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 1px 8px rgba(37, 60, 100, 0.12);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         body.dark-mode header {
-            background: linear-gradient(135deg, #1a3a5a 0%, #0f2540 100%);
-            border-bottom-color: #0a1a2e;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            background: #141414;
+            border-bottom-color: #2a2a2a;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
         }
 
         header .container {
@@ -146,9 +151,10 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: -0.5px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -284,9 +290,12 @@
         }
 
         .login-box h1 {
+            font-family: 'Cormorant Garamond', serif;
             color: var(--primary);
             margin-bottom: 10px;
-            font-size: 28px;
+            font-size: 38px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
         }
 
         .login-box p {
@@ -333,7 +342,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(50, 74, 112, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 60, 100, 0.1);
         }
 
         body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus {
@@ -359,7 +368,7 @@
         .btn-primary:hover {
             background: var(--primary-light);
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(50, 74, 112, 0.3);
+            box-shadow: 0 5px 20px rgba(37, 60, 100, 0.3);
         }
 
         .btn-secondary {
@@ -438,9 +447,12 @@
         }
 
         .dashboard-header h2 {
+            font-family: 'Cormorant Garamond', serif;
             color: var(--primary);
             margin-bottom: 10px;
-            font-size: 28px;
+            font-size: 40px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
         }
 
         .dashboard-header p {
@@ -458,7 +470,10 @@
         }
 
         .admin-section h3 {
+            font-family: 'Cormorant Garamond', serif;
             color: var(--primary);
+            font-size: 26px;
+            font-weight: 500;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -787,8 +802,10 @@
         }
 
         .modal-header h3 {
+            font-family: 'Cormorant Garamond', serif;
             color: var(--primary);
-            font-size: 20px;
+            font-size: 26px;
+            font-weight: 500;
         }
 
         .btn-close {
@@ -1043,8 +1060,9 @@
         <div id="vistaLogin" class="vista activa">
             <div class="login-container">
                 <div class="login-box">
-                    <h1>Beneficios</h1>
-                    <p>Team Scaglia</p>
+                    <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Acceso a clientes</p>
+                    <h1>Team Scaglia</h1>
+                    <p>Portal de beneficios exclusivos</p>
 
                     <!-- BOTONES DE PRUEBA - REMOVER DESPUÉS -->
                     <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
@@ -1077,6 +1095,10 @@
                         <div style="text-align: center;">
                             <p style="font-size: 12px; color: var(--gray-dark); margin-bottom: 10px;">¿Sos prestador?</p>
                             <button onclick="showVista('vistaValidarCupon'); document.getElementById('header').style.display = 'none';" style="background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; font-weight: 600;">Validar cupones aquí</button>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 24px;">
+                            <a href="/" style="font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray-dark); text-decoration: none;">← Volver al sitio</a>
                         </div>
                     </div>
 
