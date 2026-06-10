@@ -1119,8 +1119,25 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Tipo de operación</label>
+                            <select id="regOperacion">
+                                <option value="">-- Elegí una opción --</option>
+                                <option value="Vendí">Vendí</option>
+                                <option value="Compré">Compré</option>
+                                <option value="Alquilé">Alquilé</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección de la propiedad</label>
+                            <input type="text" id="regDireccion" placeholder="Calle, número, barrio">
+                        </div>
+                        <div class="form-group">
                             <label>Contraseña</label>
                             <input type="password" id="regPassword" placeholder="••••••••">
+                        </div>
+                        <div class="form-group" style="display:flex; align-items:flex-start; gap:8px;">
+                            <input type="checkbox" id="regTyC" style="width:auto; margin-top:3px; flex-shrink:0;">
+                            <label for="regTyC" style="font-weight:400; font-size:12px; color:var(--text-secondary); cursor:pointer;">Leí y acepto los <a href="#" onclick="openModalTyCPrograma(); return false;" style="color:var(--primary); text-decoration:underline;">términos y condiciones</a> del programa de beneficios.</label>
                         </div>
                         <button class="btn btn-primary" onclick="handleRegistro()">Crear cuenta</button>
                         <div class="toggle-form">
@@ -1465,15 +1482,50 @@
             }
         }
 
+        function openModalTyCPrograma() {
+            const prev = document.getElementById('modalTyCPrograma');
+            if (prev) prev.remove();
+            const html = `
+                <div class="modal activo" id="modalTyCPrograma" style="display:flex;">
+                    <div class="modal-content" style="max-width:600px;">
+                        <div class="modal-header">
+                            <h3>Términos y condiciones del programa</h3>
+                            <button class="btn-close" onclick="document.getElementById('modalTyCPrograma').remove()">×</button>
+                        </div>
+                        <div style="padding:10px 4px; max-height:420px; overflow-y:auto;">
+                            <p style="color:var(--text-primary); line-height:1.7; font-size:13px; white-space:pre-wrap;">El Programa de Beneficios Team Scaglia es un beneficio exclusivo para clientes que realizaron una operación inmobiliaria con el equipo.
+
+Los descuentos y beneficios son ofrecidos por comercios y prestadores externos, sujetos a sus propios términos, condiciones, disponibilidad, stock y vigencia. Team Scaglia y Red Suma actúan únicamente como facilitadores y no comercializan los productos ni servicios, ni se responsabilizan por su calidad, entrega, cumplimiento o continuidad.
+
+Los beneficios pueden modificarse, suspenderse o discontinuarse en cualquier momento sin previo aviso. Cada cupón está sujeto a los términos del prestador correspondiente.
+
+Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, teléfono y datos de la operación) con el fin de gestionar el programa de beneficios, conforme a la Ley 25.326 de Protección de Datos Personales. Podés solicitar la baja o rectificación de tus datos en cualquier momento.</p>
+                            <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border-color);">
+                                <button class="btn btn-primary" onclick="document.getElementById('modalTyCPrograma').remove()" style="width:100%;">Entendido</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
         function handleRegistro() {
             const nombre = document.getElementById('regNombre').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const telefono = document.getElementById('regTelefono').value.trim();
             const agenteId = document.getElementById('regAgente').value;
+            const operacion = document.getElementById('regOperacion').value;
+            const direccion = document.getElementById('regDireccion').value.trim();
             const password = document.getElementById('regPassword').value;
+            const aceptaTyC = document.getElementById('regTyC').checked;
 
-            if (!nombre || !email || !telefono || !agenteId || !password) {
+            if (!nombre || !email || !telefono || !agenteId || !operacion || !direccion || !password) {
                 showAlert('vistaLogin', 'Completa todos los campos', 'error');
+                return;
+            }
+
+            if (!aceptaTyC) {
+                showAlert('vistaLogin', 'Debés aceptar los términos y condiciones para registrarte.', 'error');
                 return;
             }
 
@@ -1484,6 +1536,8 @@
                 email,
                 telefono,
                 agenteId,
+                operacion,
+                direccion,
                 validado: false // Pendiente de validación por admin
             };
 
@@ -1508,6 +1562,9 @@
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
             document.getElementById('regPassword').value = '';
+            if (document.getElementById('regOperacion')) document.getElementById('regOperacion').value = '';
+            if (document.getElementById('regDireccion')) document.getElementById('regDireccion').value = '';
+            if (document.getElementById('regTyC')) document.getElementById('regTyC').checked = false;
 
             if (!cliente.validado) {
                 showVistaPendienteValidacion();
