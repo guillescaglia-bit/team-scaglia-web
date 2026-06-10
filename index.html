@@ -1365,17 +1365,35 @@
         }
 
         // ─── FORMULARIO ───
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const form = this;
+            const btn = form.querySelector('button[type="submit"]');
             const nombre  = document.getElementById('nombre').value;
             const email   = document.getElementById('email').value;
             const tel     = document.getElementById('telefono').value;
             const consulta = document.getElementById('consulta').value;
-            const msg = `Hola Team Scaglia! Soy ${nombre}. ${consulta} Email: ${email}${tel ? '. Tel: '+tel : ''}.`;
-            window.open(`https://wa.me/541130977868?text=${encodeURIComponent(msg)}`, '_blank');
-            document.getElementById('formSuccess').classList.add('show');
-            this.reset();
-            setTimeout(() => document.getElementById('formSuccess').classList.remove('show'), 4000);
+
+            const btnTxt = btn.textContent;
+            btn.disabled = true; btn.textContent = 'Enviando…';
+
+            try {
+                const resp = await fetch('/api/lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, email, telefono: tel, consulta, origen: 'Formulario de contacto' })
+                });
+                if (!resp.ok) throw new Error('fail');
+                document.getElementById('formSuccess').classList.add('show');
+                form.reset();
+                setTimeout(() => document.getElementById('formSuccess').classList.remove('show'), 4000);
+            } catch {
+                // Fallback: si el mail falla, abrir WhatsApp con la consulta
+                const msg = `Hola Team Scaglia! Soy ${nombre}. ${consulta} Email: ${email}${tel ? '. Tel: '+tel : ''}.`;
+                window.open(`https://wa.me/541130977868?text=${encodeURIComponent(msg)}`, '_blank');
+            } finally {
+                btn.disabled = false; btn.textContent = btnTxt;
+            }
         });
 
         // ─── MODAL PUBLICAR PROPIEDAD ───
