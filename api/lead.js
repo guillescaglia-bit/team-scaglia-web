@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
         return res.status(422).json({ error: 'Faltan datos (nombre y consulta)' });
     }
 
-    const FROM = process.env.MAIL_FROM || 'Team Scaglia <web@teamscaglia.com>';
+    const FROM = process.env.MAIL_FROM || 'Team Scaglia <info@teamscaglia.com>';
     const TO   = process.env.MAIL_TO   || 'info@teamscaglia.com';
 
     const esc = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
