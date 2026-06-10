@@ -1270,6 +1270,7 @@
                 </div>
                 <div class="form-field"><input type="text" id="pubUbicacion" placeholder="¿Dónde se encuentra? (barrio, ciudad)" required></div>
                 <div class="form-field"><input type="tel" id="pubTelefono" placeholder="Teléfono de contacto" required></div>
+                <div class="form-field"><input type="email" id="pubEmail" placeholder="Email de contacto" required></div>
                 <div class="form-submit" style="margin-top:32px;">
                     <button type="submit" class="form-submit-btn" style="width:100%;">Enviar consulta</button>
                 </div>
@@ -1420,6 +1421,7 @@
             const tipo      = document.getElementById('pubTipo').value;
             const ubicacion = document.getElementById('pubUbicacion').value;
             const telefono  = document.getElementById('pubTelefono').value;
+            const email     = document.getElementById('pubEmail').value;
 
             const consulta = `Quiere publicar su propiedad.\nOperación: ${operacion}\nTipo: ${tipo}\nUbicación: ${ubicacion}`;
             const btnTxt = btn.textContent;
@@ -1429,7 +1431,7 @@
                 const resp = await fetch('/api/lead', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre: `${nombre} ${apellido}`, email: '', telefono, consulta, origen: 'Publicar propiedad' })
+                    body: JSON.stringify({ nombre: `${nombre} ${apellido}`, email, telefono, consulta, origen: 'Publicar propiedad' })
                 });
                 if (!resp.ok) throw new Error('fail');
                 form.reset();
