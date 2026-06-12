@@ -375,6 +375,27 @@
             color: var(--accent);
         }
 
+        /* ─── TESTIMONIOS ─── */
+        .t-head { text-align: center; max-width: 760px; margin: 0 auto 60px; }
+        .t-head .section-title { margin-bottom: 0; }
+        .t-rating { display: inline-flex; align-items: center; gap: 14px; margin-top: 24px; padding: 12px 26px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; }
+        .t-rating .num { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: var(--primary); line-height: 1; }
+        .t-rating .stars { color: #e0a92e; letter-spacing: 2px; font-size: 15px; }
+        .t-rating .meta { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; text-decoration: none; transition: color 0.2s; }
+        a.t-link:hover { color: var(--primary); text-decoration: underline; }
+        .t-marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+        .t-track { display: flex; width: max-content; animation: tScroll 60s linear infinite; }
+        .t-marquee:hover .t-track { animation-play-state: paused; }
+        @keyframes tScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .t-card { flex: 0 0 380px; max-width: 84vw; margin-right: 28px; background: var(--card-bg); border: 1px solid var(--border); padding: 38px 32px; display: flex; flex-direction: column; }
+        .t-card .stars { color: #e0a92e; letter-spacing: 2px; font-size: 13px; margin-bottom: 20px; }
+        .t-card .quote { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic; font-weight: 400; line-height: 1.55; color: var(--text); flex: 1; }
+        .t-card .who { margin-top: 26px; display: flex; align-items: center; gap: 13px; }
+        .t-card .ava { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 18px; flex-shrink: 0; }
+        .t-card .nm { font-size: 13px; font-weight: 500; color: var(--text); }
+        .t-card .src { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+        @media (max-width: 900px) { .t-card { flex-basis: 300px; } }
+
         @media (max-width: 768px) {
             .section, .section-full { padding: 80px 24px; }
         }
@@ -485,18 +506,72 @@
         .about-image-placeholder {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(150deg, var(--primary) 0%, var(--primary-dark) 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
-
-        .about-image-placeholder span {
+        /* monograma gigante de fondo, muy tenue */
+        .about-image-placeholder::before {
+            content: 'TS';
+            position: absolute;
+            bottom: -0.28em;
+            right: 0.05em;
             font-family: 'Cormorant Garamond', serif;
-            font-size: 80px;
+            font-size: 300px;
             font-weight: 300;
-            color: rgba(255,255,255,0.15);
-            letter-spacing: 0.05em;
+            line-height: 1;
+            color: rgba(255,255,255,0.04);
+            pointer-events: none;
+        }
+        /* marco fino interior */
+        .about-image-placeholder::after {
+            content: '';
+            position: absolute;
+            inset: 22px;
+            border: 1px solid rgba(255,255,255,0.18);
+            pointer-events: none;
+        }
+        .about-panel-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 32px;
+        }
+        .about-panel-inner img {
+            width: 200px;
+            max-width: 70%;
+            height: auto;
+            filter: none;
+        }
+        .about-panel-divider {
+            width: 40px;
+            height: 1px;
+            background: rgba(255,255,255,0.4);
+            margin: 26px 0;
+        }
+        .about-panel-tag {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.75);
+        }
+        .about-panel-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-style: italic;
+            font-weight: 400;
+            color: rgba(255,255,255,0.92);
+            margin-top: 14px;
+            line-height: 1.4;
         }
 
         @media (max-width: 900px) {
@@ -1016,6 +1091,7 @@
             <a href="#nosotros">Nosotros</a>
             <a href="#equipo">Equipo</a>
             <a href="#propiedades">Propiedades</a>
+            <a href="#testimonios">Opiniones</a>
             <a href="#emprendimientos">Emprendimientos</a>
             <a href="#contacto">Contacto</a>
             <a href="/beneficios">Acceso a clientes</a>
@@ -1119,7 +1195,12 @@
             </div>
             <div class="about-image reveal">
                 <div class="about-image-placeholder">
-                    <span>TS</span>
+                    <div class="about-panel-inner">
+                        <img src="/logos/logo-team-blanco-trim.png" alt="Team Scaglia">
+                        <div class="about-panel-divider"></div>
+                        <div class="about-panel-tag">Inversión Inmobiliaria</div>
+                        <div class="about-panel-sub">Dos décadas<br>de trayectoria</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1147,6 +1228,85 @@
             <h2 class="section-title reveal">Selección<br><em>destacada</em></h2>
             <div class="props-grid" id="propsGrid"></div>
             <p style="margin-top:40px; font-size:11px; font-weight:300; color:var(--text-light); letter-spacing:0.03em; line-height:1.7;">VL Realtor SRL · Martillero responsable: Diego Mastrangelo · CPI 7615 · CSI 6609.</p>
+        </div>
+    </div>
+
+    <!-- TESTIMONIOS -->
+    <div class="section-full testimonials" id="testimonios" style="background: var(--bg-off);">
+        <div class="t-head reveal">
+            <p class="section-label">Testimonios</p>
+            <h2 class="section-title">Lo que dicen<br><em>nuestros clientes</em></h2>
+            <div class="t-rating">
+                <span class="num">5.0</span>
+                <span class="stars">★★★★★</span>
+                <a class="meta t-link" href="https://maps.app.goo.gl/G9VxEy35H1uLsXcX6" target="_blank" rel="noopener" title="Ver todas las reseñas en Google">en Google · 130 reseñas</a>
+            </div>
+        </div>
+        <div class="t-marquee">
+            <div class="t-track">
+                <!-- set 1 -->
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Excelente, una sola palabra que expresa toda la experiencia. Luciano Pérez Mango nos acompañó desde el primer momento, en cada duda y cada visita. La operación no fue sencilla, pero fue un éxito. Muy agradecidos al equipo."</div>
+                    <div class="who"><div class="ava">C</div><div><div class="nm">Cristian R.</div><div class="src">Google · Local Guide</div></div></div>
+                </div>
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Quiero agradecer especialmente a Giuliano por el acompañamiento impecable durante toda la búsqueda y compra de nuestra casa. Escuchó lo que necesitábamos como familia y nos ayudó a encontrar el lugar ideal. Profesional, dedicado y siempre disponible."</div>
+                    <div class="who"><div class="ava">M</div><div><div class="nm">Mercedes L.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Tuve una excelente experiencia con Romina Garfunkel y Guillermo. Desde el primer momento mostraron gran profesionalismo y un trato muy cercano. Me sentí escuchado en cada sugerencia, lo que me dio mucha confianza. No dudaría en recomendarlos."</div>
+                    <div class="who"><div class="ava">F</div><div><div class="nm">Fernando B.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Muy contentos con el servicio del Team Scaglia. Desde el primer día su trabajo fue muy profesional, atentos a cada detalle y con el respaldo de un gran equipo, especialmente Luciano, que nos acompañó con paciencia y dedicación. ¡Sin dudas volvemos a contactarlos!"</div>
+                    <div class="who"><div class="ava">B</div><div><div class="nm">Bradley C.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Buena atención desde el principio por parte de Talía Larroca, muy atenta y predispuesta. Nos acompañó en todo el proceso y nos ayudó a encontrar, a mi pareja y a mí, un lindo hogar."</div>
+                    <div class="who"><div class="ava">G</div><div><div class="nm">Gonzalo G.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Gracias a Giuliano Larroca del Team Scaglia pude vender y comprar mi primera propiedad. Tuve una excelente experiencia en todo el proceso: muy atento y ágil en toda la gestión."</div>
+                    <div class="who"><div class="ava">C</div><div><div class="nm">Carlos C.</div><div class="src">Google</div></div></div>
+                </div>
+                <!-- set 2 (duplicado para loop continuo) -->
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Excelente, una sola palabra que expresa toda la experiencia. Luciano Pérez Mango nos acompañó desde el primer momento, en cada duda y cada visita. La operación no fue sencilla, pero fue un éxito. Muy agradecidos al equipo."</div>
+                    <div class="who"><div class="ava">C</div><div><div class="nm">Cristian R.</div><div class="src">Google · Local Guide</div></div></div>
+                </div>
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Quiero agradecer especialmente a Giuliano por el acompañamiento impecable durante toda la búsqueda y compra de nuestra casa. Escuchó lo que necesitábamos como familia y nos ayudó a encontrar el lugar ideal. Profesional, dedicado y siempre disponible."</div>
+                    <div class="who"><div class="ava">M</div><div><div class="nm">Mercedes L.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Tuve una excelente experiencia con Romina Garfunkel y Guillermo. Desde el primer momento mostraron gran profesionalismo y un trato muy cercano. Me sentí escuchado en cada sugerencia, lo que me dio mucha confianza. No dudaría en recomendarlos."</div>
+                    <div class="who"><div class="ava">F</div><div><div class="nm">Fernando B.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Muy contentos con el servicio del Team Scaglia. Desde el primer día su trabajo fue muy profesional, atentos a cada detalle y con el respaldo de un gran equipo, especialmente Luciano, que nos acompañó con paciencia y dedicación. ¡Sin dudas volvemos a contactarlos!"</div>
+                    <div class="who"><div class="ava">B</div><div><div class="nm">Bradley C.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Buena atención desde el principio por parte de Talía Larroca, muy atenta y predispuesta. Nos acompañó en todo el proceso y nos ayudó a encontrar, a mi pareja y a mí, un lindo hogar."</div>
+                    <div class="who"><div class="ava">G</div><div><div class="nm">Gonzalo G.</div><div class="src">Google</div></div></div>
+                </div>
+                <div class="t-card" aria-hidden="true">
+                    <div class="stars">★★★★★</div>
+                    <div class="quote">"Gracias a Giuliano Larroca del Team Scaglia pude vender y comprar mi primera propiedad. Tuve una excelente experiencia en todo el proceso: muy atento y ágil en toda la gestión."</div>
+                    <div class="who"><div class="ava">C</div><div><div class="nm">Carlos C.</div><div class="src">Google</div></div></div>
+                </div>
+            </div>
         </div>
     </div>
 
