@@ -280,9 +280,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 88vh;
+            padding: 50px 20px;
+            box-sizing: border-box;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         }
+
+        /* Vidriera de beneficios (visible sin loguearse) */
+        .vidriera { background: var(--bg-secondary); padding: 70px 20px 80px; }
+        .vidriera-inner { max-width: 1100px; margin: 0 auto; }
+        .vidriera-head { text-align: center; max-width: 640px; margin: 0 auto 44px; }
+        .vidriera-head .v-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+        .vidriera-head h2 { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 400; color: var(--text-primary); line-height: 1.15; margin-bottom: 16px; }
+        .vidriera-head p { font-size: 14px; color: var(--gray-dark); line-height: 1.7; }
+        .vidriera .cupones-grid { margin-bottom: 0; }
+        .v-lock { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--gray-dark); background: transparent; border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; }
+        .vidriera-cta { text-align: center; margin-top: 48px; }
+        .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; }
 
         .login-box {
             background: var(--white);
@@ -1064,9 +1078,9 @@
         <div id="vistaLogin" class="vista activa">
             <div class="login-container">
                 <div class="login-box">
-                    <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Acceso a clientes</p>
+                    <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Beneficios a clientes</p>
                     <h1>Team Scaglia</h1>
-                    <p>Portal de beneficios exclusivos</p>
+                    <p>Portal de beneficios exclusivos<br><span class="login-scroll-hint">↓ Mirá todos los descuentos disponibles</span></p>
 
                     <!-- ACCESO DE PRUEBA CLIENTE -->
                     <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
@@ -1147,6 +1161,23 @@
                         <div class="toggle-form">
                             ¿Ya tenés cuenta? <button onclick="toggleForm()">Ingresá</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vidriera de beneficios (visible sin loguearse) -->
+            <div class="vidriera">
+                <div class="vidriera-inner">
+                    <div class="vidriera-head">
+                        <p class="v-label">Beneficios exclusivos</p>
+                        <h2>Descuentos que disfrutan<br>nuestros clientes</h2>
+                        <p>Al operar con Team Scaglia accedés a un programa de beneficios con descuentos en marcas seleccionadas. Registrate para empezar a canjearlos.</p>
+                    </div>
+                    <div class="cupones-grid" id="vidrieraGrid">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                    <div class="vidriera-cta">
+                        <button class="btn btn-primary" onclick="irARegistro()">Quiero ser cliente</button>
                     </div>
                 </div>
             </div>
@@ -1815,6 +1846,40 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             renderAgentes();
             renderPrestadores();
             showVista('vistaAdmin');
+        }
+
+        // Vidriera: muestra todos los beneficios en el login, bloqueados (sin canjear)
+        function renderVidriera() {
+            const grid = document.getElementById('vidrieraGrid');
+            if (!grid) return;
+            let html = '';
+            appState.prestadores.forEach(p => {
+                html += `
+                    <div class="cupone-card" style="border-left-color: ${p.color}; position: relative; overflow: hidden; padding: 0;">
+                        <div style="background: ${p.banner ? `url('${p.banner}') left/cover` : p.color}; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; min-height: 120px; display: flex; align-items: center; justify-content: flex-end; padding-right: 24px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
+                                <span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${p.descuento ? p.descuento + '%' : '★'}</span>
+                                <span style="color: rgba(255,255,255,0.95); font-size: 11px; font-weight: 500; margin-top: 2px;">${p.descuento ? 'descuento' : 'beneficio'}</span>
+                            </div>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="margin-bottom: 16px;">
+                                <div style="color: var(--primary); font-weight: 700; font-size: 18px; margin-bottom: 4px;">${p.nombre}</div>
+                                <div style="color: var(--gray-dark); font-size: 13px; line-height: 1.4;">${p.descripcion}</div>
+                            </div>
+                            <div class="v-lock">🔒 Exclusivo para clientes</div>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // Lleva al formulario de registro desde la vidriera
+        function irARegistro() {
+            document.getElementById('formLoginContainer').style.display = 'none';
+            document.getElementById('formRegistroContainer').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function renderCuponesCliente() {
@@ -2675,9 +2740,12 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function init() {
             // Aplicar tema automático
             applyTheme();
-            
+
             // Revisar tema cada hora
             setInterval(applyTheme, 3600000);
+
+            // Mostrar la vidriera de beneficios en el login
+            renderVidriera();
 
             // Llenar dropdown de agentes en registro
             const select = document.getElementById('regAgente');
