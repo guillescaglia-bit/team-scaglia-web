@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Scaglia - Red Suma | Inversión Inmobiliaria</title>
+    <meta name="description" content="Team Scaglia · Inversión inmobiliaria en Buenos Aires. Más de 13 años acompañando la compra, venta, alquiler y desarrollo de propiedades, con el respaldo de Red Suma. Asesoramiento profesional y resultados.">
+    <meta name="theme-color" content="#253C64">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Team Scaglia">
+    <meta property="og:title" content="Team Scaglia · Inversión Inmobiliaria">
+    <meta property="og:description" content="Más de 13 años en el mercado inmobiliario de Buenos Aires, con el respaldo de Red Suma. Compra, venta, alquiler, desarrollos e inversiones.">
+    <meta property="og:url" content="https://team-scaglia-web.vercel.app/">
+    <meta property="og:image" content="https://team-scaglia-web.vercel.app/og-cover.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://team-scaglia-web.vercel.app/og-cover.jpg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -963,6 +976,9 @@
 
         .contact-item-value:hover { color: var(--primary); }
 
+        .contact-map { margin-top: 32px; border: 1px solid var(--border); overflow: hidden; line-height: 0; }
+        .contact-map iframe { width: 100%; height: 240px; border: 0; display: block; filter: grayscale(15%); }
+
         .contact-form { display: flex; flex-direction: column; gap: 0; }
 
         .form-field {
@@ -1196,8 +1212,8 @@
         <div class="about-layout">
             <div class="about-text reveal">
                 <p class="section-label">Nosotros</p>
-                <h2 class="section-title">Dos <em>décadas</em><br>de trayectoria</h2>
-                <p>Team Scaglia es parte de Red Suma, una red inmobiliaria con más de dos décadas de trayectoria en Buenos Aires. Somos un equipo de profesionales especializados en venta, alquiler y desarrollo inmobiliario.</p>
+                <h2 class="section-title">Más de una <em>década</em><br>de trayectoria</h2>
+                <p>Con más de 13 años de experiencia, Team Scaglia es parte de Red Suma, una red inmobiliaria con más de dos décadas de trayectoria en Buenos Aires. Somos un equipo de profesionales especializados en venta, alquiler y desarrollo inmobiliario.</p>
                 <p>Nuestra metodología combina análisis de mercado, atención personalizada, marketing y tecnología avanzada para posicionar a nuestros clientes en el mejor lugar del mercado.</p>
                 <div class="about-mision">
                     <div class="about-mision-label">Misión</div>
@@ -1423,21 +1439,28 @@
                         <span class="contact-item-label">Instagram</span>
                         <a href="https://instagram.com/teamscaglia" target="_blank" class="contact-item-value">@teamscaglia</a>
                     </div>
+                    <div class="contact-item">
+                        <span class="contact-item-label">Ubicación</span>
+                        <a href="https://maps.app.goo.gl/G9VxEy35H1uLsXcX6" target="_blank" rel="noopener" class="contact-item-value">Ver en Google Maps →</a>
+                    </div>
+                </div>
+                <div class="contact-map reveal">
+                    <iframe src="https://maps.google.com/maps?q=-34.5205111,-58.4720032&z=16&hl=es&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación de Team Scaglia en Google Maps"></iframe>
                 </div>
             </div>
             <div class="reveal">
                 <form class="contact-form" id="contactForm">
                     <div class="form-field">
-                        <input type="text" id="nombre" placeholder="Nombre completo" required>
+                        <input type="text" id="nombre" placeholder="Nombre completo" aria-label="Nombre completo" required>
                     </div>
                     <div class="form-field">
-                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="email" id="email" placeholder="Email" aria-label="Email" required>
                     </div>
                     <div class="form-field">
-                        <input type="tel" id="telefono" placeholder="Teléfono">
+                        <input type="tel" id="telefono" placeholder="Teléfono" aria-label="Teléfono">
                     </div>
                     <div class="form-field">
-                        <textarea id="consulta" placeholder="Tu consulta" required></textarea>
+                        <textarea id="consulta" placeholder="Tu consulta" aria-label="Tu consulta" required></textarea>
                     </div>
                     <div class="form-submit">
                         <button type="submit" class="form-submit-btn">Enviar consulta</button>
@@ -1456,7 +1479,7 @@
     <!-- FOOTER -->
     <footer>
         <span class="footer-logo"><img src="/logos/logo-teamsuma-blanco-trim.png" alt="Team Scaglia · Red Suma"></span>
-        <span class="footer-copy">© 2026 · Red Suma · Buenos Aires</span>
+        <span class="footer-copy">© 2026 · Team Scaglia · Red Suma · Buenos Aires</span>
     </footer>
 
     <!-- MODAL PUBLICAR PROPIEDAD -->
@@ -1469,11 +1492,11 @@
 
             <form id="formPublicar">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                    <div class="form-field"><input type="text" id="pubNombre" placeholder="Nombre" required></div>
-                    <div class="form-field"><input type="text" id="pubApellido" placeholder="Apellido" required></div>
+                    <div class="form-field"><input type="text" id="pubNombre" placeholder="Nombre" aria-label="Nombre" required></div>
+                    <div class="form-field"><input type="text" id="pubApellido" placeholder="Apellido" aria-label="Apellido" required></div>
                 </div>
                 <div class="form-field">
-                    <select id="pubOperacion" required style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
+                    <select id="pubOperacion" required aria-label="Tipo de operación" style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
                         <option value="" disabled selected>Tipo de operación</option>
                         <option value="Venta">Venta</option>
                         <option value="Alquiler">Alquiler</option>
@@ -1481,7 +1504,7 @@
                     </select>
                 </div>
                 <div class="form-field">
-                    <select id="pubTipo" required style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
+                    <select id="pubTipo" required aria-label="Tipo de propiedad" style="width:100%; padding:20px 0; background:transparent; border:none; outline:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:300; color:var(--text-light);">
                         <option value="" disabled selected>Tipo de propiedad</option>
                         <option value="Departamento">Departamento</option>
                         <option value="Casa">Casa</option>
@@ -1492,9 +1515,9 @@
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
-                <div class="form-field"><input type="text" id="pubUbicacion" placeholder="¿Dónde se encuentra? (barrio, ciudad)" required></div>
-                <div class="form-field"><input type="tel" id="pubTelefono" placeholder="Teléfono de contacto" required></div>
-                <div class="form-field"><input type="email" id="pubEmail" placeholder="Email de contacto" required></div>
+                <div class="form-field"><input type="text" id="pubUbicacion" placeholder="¿Dónde se encuentra? (barrio, ciudad)" aria-label="Ubicación de la propiedad" required></div>
+                <div class="form-field"><input type="tel" id="pubTelefono" placeholder="Teléfono de contacto" aria-label="Teléfono de contacto" required></div>
+                <div class="form-field"><input type="email" id="pubEmail" placeholder="Email de contacto" aria-label="Email de contacto" required></div>
                 <div class="form-submit" style="margin-top:32px;">
                     <button type="submit" class="form-submit-btn" style="width:100%;">Enviar consulta</button>
                 </div>
@@ -1522,7 +1545,7 @@
                 <div class="team-card">
                     <div class="team-avatar">
                         ${a.avatar
-                            ? `<img src="${a.avatar}" alt="${a.nombre}">`
+                            ? `<img src="${a.avatar}" alt="${a.nombre}" loading="lazy">`
                             : `<div class="team-avatar-placeholder"><span>${a.nombre.split(' ').map(w=>w[0]).join('')}</span></div>`
                         }
                     </div>
