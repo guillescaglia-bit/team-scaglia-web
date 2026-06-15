@@ -299,6 +299,17 @@
         .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; cursor: pointer; display: inline-block; transition: opacity 0.2s; }
         .login-scroll-hint:hover { opacity: 0.7; }
 
+        /* Cartel PRÓXIMAMENTE (tarjeta frosted sobre el navy) */
+        .login-box.login-box--proxi { background: rgba(255,255,255,0.10); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.22); box-shadow: 0 24px 70px rgba(0,0,0,0.28); text-align: center; }
+        .login-box--proxi .lb-label { font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+        .login-box--proxi h1 { color: #fff; }
+        .login-box--proxi .lb-sub { color: rgba(255,255,255,0.82); margin-bottom: 0; }
+        .login-box--proxi .login-scroll-hint { color: #fff; }
+        .proxi-badge { display: inline-block; margin: 28px 0 18px; padding: 9px 24px; border: 1px solid rgba(255,255,255,0.45); border-radius: 50px; font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: #fff; }
+        .proxi-text { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.85); margin-bottom: 26px; }
+        .proxi-back { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.2s; }
+        .proxi-back:hover { color: #fff; }
+
         /* Navbar del sitio (idéntico a la home) en la pantalla de beneficios */
         #homeNav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0 56px; height: 72px; display: flex; align-items: center; justify-content: space-between; transition: background 0.4s, box-shadow 0.4s; }
         #homeNav.scrolled { background: rgba(255,255,255,0.97); box-shadow: 0 1px 0 var(--border-color); backdrop-filter: blur(12px); }
@@ -1134,90 +1145,15 @@
                 </div>
             </nav>
             <div class="login-container">
-                <div class="login-box">
-                    <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Beneficios a clientes</p>
+                <div class="login-box login-box--proxi">
+                    <p class="lb-label">Beneficios a clientes</p>
                     <h1>Team Scaglia</h1>
-                    <p>Portal de beneficios exclusivos<br><span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})">↓ Mirá todos los descuentos disponibles</span></p>
-
-                    <!-- ACCESO DE PRUEBA CLIENTE -->
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
-                        <button class="btn btn-primary btn-sm" onclick="quickLogin('cliente')" style="width: 100%;">Ingresar como cliente (demo)</button>
-                    </div>
-
-                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
-
-                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">O logueate manualmente:</p>
-
-                    <div id="formLoginContainer">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="loginEmail" placeholder="tu@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label>Contraseña</label>
-                            <input type="password" id="loginPassword" placeholder="••••••••">
-                        </div>
-                        <button class="btn btn-primary" onclick="handleLogin()">Ingresar</button>
-                        <div class="toggle-form">
-                            ¿No tenés cuenta? <button onclick="toggleForm()">Registrate</button>
-                        </div>
-
-                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
-
-                        <div style="text-align: center;">
-                            <p style="font-size: 12px; color: var(--gray-dark); margin-bottom: 10px;">¿Sos prestador?</p>
-                            <button onclick="showVista('vistaValidarCupon'); document.getElementById('header').style.display = 'none';" style="background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; font-weight: 600;">Validar cupones aquí</button>
-                        </div>
-
-                        <div style="text-align: center; margin-top: 24px;">
-                            <a href="/" style="font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray-dark); text-decoration: none;">← Volver al sitio</a>
-                        </div>
-                    </div>
-
-                    <div id="formRegistroContainer" style="display: none;">
-                        <div class="form-group">
-                            <label>Nombre completo</label>
-                            <input type="text" id="regNombre" placeholder="Juan García">
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="regEmail" placeholder="tu@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label>Teléfono</label>
-                            <input type="tel" id="regTelefono" placeholder="+54 9 11 1234-5678">
-                        </div>
-                        <div class="form-group">
-                            <label>Seleccioná tu agente</label>
-                            <select id="regAgente">
-                                <option value="">-- Elige un agente --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo de operación</label>
-                            <select id="regOperacion">
-                                <option value="">-- Elegí una opción --</option>
-                                <option value="Vendí">Vendí</option>
-                                <option value="Compré">Compré</option>
-                                <option value="Alquilé">Alquilé</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Dirección de la propiedad</label>
-                            <input type="text" id="regDireccion" placeholder="Calle, número, barrio">
-                        </div>
-                        <div class="form-group">
-                            <label>Contraseña</label>
-                            <input type="password" id="regPassword" placeholder="••••••••">
-                        </div>
-                        <div class="form-group" style="display:flex; align-items:flex-start; gap:8px;">
-                            <input type="checkbox" id="regTyC" style="width:auto; margin-top:3px; flex-shrink:0;">
-                            <label for="regTyC" style="font-weight:400; font-size:12px; color:var(--text-secondary); cursor:pointer;">Leí y acepto los <a href="#" onclick="openModalTyCPrograma(); return false;" style="color:var(--primary); text-decoration:underline;">términos y condiciones</a> del programa de beneficios.</label>
-                        </div>
-                        <button class="btn btn-primary" onclick="handleRegistro()">Crear cuenta</button>
-                        <div class="toggle-form">
-                            ¿Ya tenés cuenta? <button onclick="toggleForm()">Ingresá</button>
-                        </div>
+                    <p class="lb-sub">Portal de beneficios exclusivos</p>
+                    <div class="proxi-badge">Próximamente</div>
+                    <p class="proxi-text">Estamos terminando de preparar tu portal. Muy pronto vas a poder registrarte, generar cupones y canjear tus descuentos exclusivos.</p>
+                    <span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})">↓ Mientras tanto, mirá todos los descuentos disponibles</span>
+                    <div style="margin-top: 24px;">
+                        <a href="/" class="proxi-back">← Volver al sitio</a>
                     </div>
                 </div>
             </div>
@@ -2830,14 +2766,16 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             setupHomeNav();
             syncNavTheme();
 
-            // Llenar dropdown de agentes en registro
+            // Llenar dropdown de agentes en registro (si existe el formulario)
             const select = document.getElementById('regAgente');
-            appState.agentes.forEach(agente => {
-                const option = document.createElement('option');
-                option.value = agente.id;
-                option.textContent = agente.nombre;
-                select.appendChild(option);
-            });
+            if (select) {
+                appState.agentes.forEach(agente => {
+                    const option = document.createElement('option');
+                    option.value = agente.id;
+                    option.textContent = agente.nombre;
+                    select.appendChild(option);
+                });
+            }
 
             // Mensajes de login de prueba
             console.log('🔐 Credenciales de prueba:');
