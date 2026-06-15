@@ -863,18 +863,23 @@
         .dev-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2px;
-            background: var(--border);
-            border: 1px solid var(--border);
+            gap: 28px;
         }
 
         .dev-card {
-            background: var(--bg);
-            padding: 56px 48px;
-            transition: background 0.3s;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s, transform 0.3s;
         }
 
-        .dev-card:hover { background: var(--bg-off); }
+        .dev-card:hover { box-shadow: 0 16px 44px rgba(0,0,0,0.10); transform: translateY(-3px); }
+
+        .dev-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+
+        .dev-body { padding: 36px 40px 40px; display: flex; flex-direction: column; flex: 1; }
 
         .dev-tag {
             font-size: 9px;
@@ -882,35 +887,40 @@
             letter-spacing: 0.25em;
             text-transform: uppercase;
             color: var(--accent);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .dev-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 400;
             color: var(--text);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             line-height: 1.1;
         }
 
         .dev-location {
             font-size: 12px;
             color: var(--text-light);
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             letter-spacing: 0.05em;
         }
 
-        .dev-info-coming {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--border);
-            font-style: italic;
-            letter-spacing: 0.05em;
-        }
+        .dev-specs { list-style: none; margin: 0 0 28px; padding: 0; }
+        .dev-spec { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; padding: 11px 0; border-top: 1px solid var(--border); }
+        .dev-spec:last-child { border-bottom: 1px solid var(--border); }
+        .dev-spec .k { color: var(--text-light); letter-spacing: 0.03em; }
+        .dev-spec .v { color: var(--text); font-weight: 500; text-align: right; }
+
+        .dev-actions { margin-top: auto; display: flex; gap: 12px; flex-wrap: wrap; }
+        .dev-cta { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); border: 1px solid var(--primary); padding: 14px 26px; background: none; cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif; text-decoration: none; }
+        .dev-cta:hover { background: var(--primary); color: #fff; }
+        .dev-cta.filled { background: var(--primary); color: #fff; }
+        .dev-cta.filled:hover { opacity: 0.88; }
 
         @media (max-width: 700px) {
             .dev-grid { grid-template-columns: 1fr; }
+            .dev-body { padding: 28px 24px 32px; }
         }
 
         /* ─── CONTACTO ─── */
@@ -1238,16 +1248,39 @@
         <h2 class="section-title reveal">Emprendimientos<br><em>seleccionados</em></h2>
         <div class="dev-grid reveal">
             <div class="dev-card">
-                <div class="dev-tag">Desarrollo residencial</div>
-                <div class="dev-name">Quintaglia</div>
-                <div class="dev-location">3 de Febrero, Buenos Aires</div>
-                <div class="dev-info-coming">Información disponible próximamente</div>
+                <img class="dev-img" src="/desarrollos/quintaglia.jpg" alt="Render del edificio Quintaglia" loading="lazy">
+                <div class="dev-body">
+                    <div class="dev-tag">Desarrollo residencial</div>
+                    <div class="dev-name">Quintaglia</div>
+                    <div class="dev-location">3 de Febrero 2781 · Núñez / Belgrano, CABA</div>
+                    <ul class="dev-specs">
+                        <li class="dev-spec"><span class="k">Edificio</span><span class="v">12 pisos + local comercial en esquina</span></li>
+                        <li class="dev-spec"><span class="k">Tipologías</span><span class="v">1, 2, 3 y 4 ambientes</span></li>
+                        <li class="dev-spec"><span class="k">Amenities</span><span class="v">Piscina, solárium, parrilla y laundry</span></li>
+                        <li class="dev-spec"><span class="k">Entrega</span><span class="v">Segundo semestre 2028</span></li>
+                    </ul>
+                    <div class="dev-actions">
+                        <a class="dev-cta filled" href="/desarrollos/brochure-quintaglia.pdf" target="_blank" rel="noopener">Ver brochure</a>
+                        <button class="dev-cta" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Solicitar información</button>
+                    </div>
+                </div>
             </div>
             <div class="dev-card">
-                <div class="dev-tag">Desarrollo residencial</div>
-                <div class="dev-name">Wood</div>
-                <div class="dev-location">Recoleta, Buenos Aires</div>
-                <div class="dev-info-coming">Información disponible próximamente</div>
+                <img class="dev-img" src="/desarrollos/wood.jpg" alt="Render del edificio Wood Recoleta" loading="lazy">
+                <div class="dev-body">
+                    <div class="dev-tag">Desarrollo residencial</div>
+                    <div class="dev-name">Wood Recoleta</div>
+                    <div class="dev-location">Larrea 1180 · Recoleta, CABA</div>
+                    <ul class="dev-specs">
+                        <li class="dev-spec"><span class="k">Edificio</span><span class="v">12 pisos + local comercial</span></li>
+                        <li class="dev-spec"><span class="k">Tipologías</span><span class="v">Estudios, 1 y 2 ambientes</span></li>
+                        <li class="dev-spec"><span class="k">Entrega</span><span class="v">Segundo semestre 2028</span></li>
+                    </ul>
+                    <div class="dev-actions">
+                        <a class="dev-cta filled" href="/desarrollos/brochure-wood.pdf" target="_blank" rel="noopener">Ver brochure</a>
+                        <button class="dev-cta" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Solicitar información</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
