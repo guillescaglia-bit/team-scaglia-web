@@ -692,13 +692,12 @@
             background: var(--bg-off);
         }
 
-        .props-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2px;
-            background: var(--border);
-            border: 1px solid var(--border);
-        }
+        .props-carousel { position: relative; }
+        .props-track { display: flex; gap: 24px; overflow-x: auto; cursor: grab; padding-bottom: 6px; user-select: none; scrollbar-width: none; -ms-overflow-style: none; }
+        .props-track::-webkit-scrollbar { display: none; }
+        .props-track.dragging { cursor: grabbing; }
+        .props-track .prop-card { flex: 0 0 340px; max-width: 80vw; border: 1px solid var(--border); }
+        .props-track img { -webkit-user-drag: none; pointer-events: none; }
 
         .prop-card {
             background: var(--bg);
@@ -787,6 +786,13 @@
             border: 1px solid var(--border);
             padding: 4px 10px;
         }
+
+        a.prop-card { display: block; text-decoration: none; color: inherit; }
+        .prop-link { margin-top: 16px; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary); }
+
+        .props-more { text-align: center; margin-top: 48px; }
+        .props-more a { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; background: var(--primary); padding: 18px 40px; text-decoration: none; transition: opacity 0.3s; }
+        .props-more a:hover { opacity: 0.88; }
 
         /* ─── CTA BANDA ─── */
         .cta-band {
@@ -1250,7 +1256,12 @@
         <div style="max-width:1200px; margin:0 auto;">
             <p class="section-label reveal">Propiedades</p>
             <h2 class="section-title reveal">Selección<br><em>destacada</em></h2>
-            <div class="props-grid" id="propsGrid"></div>
+            <div class="props-carousel reveal">
+                <div class="props-track" id="propsTrack"></div>
+            </div>
+            <div class="props-more reveal">
+                <a href="https://propiedades.redsuma.com.ar/buscar" target="_blank" rel="noopener">Ver las 1.400+ propiedades en Red Suma</a>
+            </div>
             <p style="margin-top:40px; font-size:11px; font-weight:300; color:var(--text-light); letter-spacing:0.03em; line-height:1.7;">VL Realtor SRL · Martillero responsable: Diego Mastrangelo · CPI 7615 · CSI 6609.</p>
         </div>
     </div>
@@ -1574,42 +1585,83 @@
             `).join('');
         }
 
-        // ─── PROPIEDADES ───
-        async function renderProps() {
-            const container = document.getElementById('propsGrid');
-            try {
-                const res = await fetch('/api/properties');
-                if (!res.ok) throw new Error();
-                const json = await res.json();
-                const props = json.data || [];
-                if (!props.length) {
-                    container.innerHTML = '<p style="padding:48px;color:var(--text-light);font-size:13px;grid-column:1/-1;">No hay propiedades disponibles en este momento.</p>';
-                    return;
-                }
-                container.innerHTML = props.map(p => `
-                    <div class="prop-card">
-                        <div class="prop-image">
-                            ${p.images?.[0]?.url
-                                ? `<img src="${p.images[0].url}" alt="${p.title || ''}">`
-                                : `<div class="prop-image-placeholder"></div>`
-                            }
-                            <span class="prop-badge">${p.operationType === 'SALE' ? 'Venta' : p.operationType === 'RENT' ? 'Alquiler' : 'Temporal'}</span>
-                        </div>
-                        <div class="prop-info">
-                            <div class="prop-title">${p.title || p.code}</div>
-                            <div class="prop-location">${[p.street, p.neighborhood].filter(Boolean).join(', ')}</div>
-                            <div class="prop-price">${new Intl.NumberFormat('es-AR',{style:'currency',currency:p.currency||'USD',minimumFractionDigits:0}).format(p.price||0)}</div>
-                            <div class="prop-tags">
-                                ${p.bedrooms ? `<span class="prop-tag">${p.bedrooms} dorm.</span>` : ''}
-                                ${p.bathrooms ? `<span class="prop-tag">${p.bathrooms} baños</span>` : ''}
-                                ${p.coveredArea ? `<span class="prop-tag">${p.coveredArea} m²</span>` : ''}
-                            </div>
-                        </div>
+        // ─── PROPIEDADES DESTACADAS (selección curada a mano) ───
+        const propiedades = [
+            { titulo: 'PH 4 ambientes con terraza', barrio: 'Villa Crespo, CABA', precio: 'USD 229.000', op: 'Venta', amb: '4 amb', m2: '161 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/37685321-7cce-497c-d260-e42206e1be00/public', url: 'https://propiedades.redsuma.com.ar/venta-ph-4-ambientes-con-terraza-en-villa-crespo' },
+            { titulo: 'Semipiso 5 amb. con 2 balcones', barrio: 'Belgrano, CABA', precio: 'USD 550.000', op: 'Venta', amb: '5 amb', m2: '164 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/3041799f-d8b4-47d4-c4b0-6681d2f18c00/public', url: 'https://propiedades.redsuma.com.ar/venta-semipiso-5-amb-con-2-balcones-en-belgrano' },
+            { titulo: 'Casa 6 ambientes con pileta', barrio: 'Ayres Plaza, Pilar', precio: 'USD 570.000', op: 'Venta', amb: '6 amb', m2: '199 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/1e21e81a-4a95-46d7-6721-1d8b4794bb00/public', url: 'https://propiedades.redsuma.com.ar/venta-casa-6-ambientes-con-pileta-en-ayres-plaza' },
+            { titulo: 'Departamento en dúplex', barrio: 'Belgrano, CABA', precio: 'USD 685.000', op: 'Venta', amb: '6 amb', m2: '282 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/b11ea6ab-984e-4b0f-b9a2-b333e1cdd300/public', url: 'https://propiedades.redsuma.com.ar/departamento-en-duplex-venta-belgrano' },
+            { titulo: 'Depto 4 amb. con cochera y baulera', barrio: 'Villa del Parque, CABA', precio: 'USD 369.700', op: 'Venta', amb: '4 amb', m2: '120 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/41226417-80a7-4c14-85fe-a698fa72bd00/public', url: 'https://propiedades.redsuma.com.ar/venta-depto-villa-del-parque-4-amb-con-cochera-y-baulera' },
+            { titulo: 'Departamento 4 amb. con balcón terraza', barrio: 'Palermo Soho, CABA', precio: 'USD 265.000', op: 'Venta', amb: '4 amb', m2: '73 m²', img: 'https://imagedelivery.net/wZKwAPiXsru4cg1fQnVInQ/3a80ee0c-4cee-494c-7717-4a0501d57900/public', url: 'https://propiedades.redsuma.com.ar/venta-departamento-4-ambientes-palermo-balcon-terreaza' },
+        ];
+
+        function renderProps() {
+            const track = document.getElementById('propsTrack');
+            const card = p => `
+                <a class="prop-card" href="${p.url}" target="_blank" rel="noopener">
+                    <div class="prop-image">
+                        <img src="${p.img}" alt="${p.titulo}" loading="lazy">
+                        <span class="prop-badge">${p.op}</span>
                     </div>
-                `).join('');
-            } catch {
-                container.innerHTML = '<p style="padding:48px;color:var(--text-light);font-size:13px;grid-column:1/-1;">Las propiedades se cargarán próximamente.</p>';
+                    <div class="prop-info">
+                        <div class="prop-title">${p.titulo}</div>
+                        <div class="prop-location">${p.barrio}</div>
+                        <div class="prop-price">${p.precio}</div>
+                        <div class="prop-tags">
+                            <span class="prop-tag">${p.amb}</span>
+                            <span class="prop-tag">${p.m2}</span>
+                        </div>
+                        <div class="prop-link">Ver propiedad →</div>
+                    </div>
+                </a>`;
+            // duplicado para loop continuo
+            track.innerHTML = propiedades.map(card).join('') + propiedades.map(card).join('');
+            setupPropsCarousel(track);
+        }
+
+        function setupPropsCarousel(track) {
+            let auto = true, isDown = false, startX = 0, startScroll = 0, moved = 0;
+
+            // movimiento automático
+            function tick() {
+                if (auto && !isDown) track.scrollLeft += 0.6;
+                requestAnimationFrame(tick);
             }
+            requestAnimationFrame(tick);
+
+            // loop continuo (vuelve sin cortes)
+            track.addEventListener('scroll', () => {
+                const setW = track.scrollWidth / 2;
+                if (track.scrollLeft >= setW) track.scrollLeft -= setW;
+                else if (track.scrollLeft <= 0) track.scrollLeft += setW;
+            }, { passive: true });
+
+            // pausa al pasar el mouse
+            track.addEventListener('mouseenter', () => { auto = false; });
+            track.addEventListener('mouseleave', () => { auto = true; });
+
+            // arrastrar con el mouse (adelantar/volver a tu ritmo)
+            track.addEventListener('pointerdown', e => {
+                if (e.pointerType && e.pointerType !== 'mouse') return; // táctil/trackpad: scroll nativo
+                isDown = true; moved = 0; startX = e.clientX; startScroll = track.scrollLeft;
+                track.classList.add('dragging');
+            });
+            window.addEventListener('pointermove', e => {
+                if (!isDown) return;
+                const dx = e.clientX - startX;
+                moved = Math.max(moved, Math.abs(dx));
+                track.scrollLeft = startScroll - dx;
+            });
+            window.addEventListener('pointerup', () => {
+                if (!isDown) return;
+                isDown = false;
+                track.classList.remove('dragging');
+            });
+
+            // si arrastró, no abrir el link (evita clics accidentales)
+            track.addEventListener('click', e => {
+                if (moved > 6) { e.preventDefault(); e.stopPropagation(); }
+            }, true);
         }
 
         // ─── FORMULARIO ───
