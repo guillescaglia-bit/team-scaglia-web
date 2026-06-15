@@ -58,7 +58,8 @@
             --text-primary: #e8e8e8;
             --text-secondary: #8b9aaa;
             --border-color: #2a2a2a;
-            --primary: #7cb3ff;
+            --primary: #8b9aaa;
+            --primary-light: #1a2847;
             --accent: #8b9aaa;
             --gray-dark: #8b9aaa;
         }
@@ -2799,9 +2800,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function setupHomeNav() {
             const nav = document.getElementById('homeNav');
             if (!nav) return;
-            window.addEventListener('scroll', () => {
-                nav.classList.toggle('scrolled', window.pageYOffset > 60);
-            }, { passive: true });
+            // En beneficios el scroll ocurre en el body (height:100% + overflow), no en window.
+            const onScroll = () => {
+                const y = document.body.scrollTop || document.documentElement.scrollTop || window.pageYOffset || 0;
+                nav.classList.toggle('scrolled', y > 60);
+            };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+            onScroll();
             const menu = document.getElementById('hnMenu');
             const links = document.getElementById('hnLinks');
             if (menu && links) {
