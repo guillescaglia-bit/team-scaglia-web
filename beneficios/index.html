@@ -281,7 +281,7 @@
             justify-content: center;
             align-items: center;
             min-height: 88vh;
-            padding: 50px 20px;
+            padding: 100px 20px 50px;
             box-sizing: border-box;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         }
@@ -298,17 +298,36 @@
         .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; cursor: pointer; display: inline-block; transition: opacity 0.2s; }
         .login-scroll-hint:hover { opacity: 0.7; }
 
-        /* Navbar del sitio en la pantalla de beneficios */
-        .site-nav { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 28px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
-        .site-nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--primary); text-decoration: none; letter-spacing: 0.03em; }
-        .site-nav-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-        .site-nav-links a { font-size: 12px; font-weight: 500; letter-spacing: 0.05em; color: var(--gray-dark); text-decoration: none; transition: color 0.2s; }
-        .site-nav-links a:hover { color: var(--primary); }
-        .site-nav-links a.nav-back { color: var(--primary); font-weight: 600; }
-        @media (max-width: 600px) {
-            .site-nav { padding: 12px 16px; }
-            .site-nav-links { gap: 14px; }
-            .site-nav-links a { font-size: 11px; }
+        /* Navbar del sitio (idéntico a la home) en la pantalla de beneficios */
+        #homeNav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0 56px; height: 72px; display: flex; align-items: center; justify-content: space-between; transition: background 0.4s, box-shadow 0.4s; }
+        #homeNav.scrolled { background: rgba(255,255,255,0.97); box-shadow: 0 1px 0 var(--border-color); backdrop-filter: blur(12px); }
+        body.dark-mode #homeNav.scrolled { background: rgba(13,13,13,0.97); }
+        #homeNav .hn-logo { display: flex; align-items: center; text-decoration: none; }
+        #homeNav .hn-logo img { height: 46px; width: auto; display: block; }
+        #homeNav .hn-logo .logo-color { display: none; }
+        #homeNav.scrolled .hn-logo .logo-white { display: none; }
+        #homeNav.scrolled .hn-logo .logo-color { display: block; }
+        #homeNav .hn-links { display: flex; gap: 40px; }
+        #homeNav .hn-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.3s; }
+        #homeNav.scrolled .hn-links a { color: var(--text-secondary); }
+        #homeNav .hn-links a:hover { color: #fff; }
+        #homeNav.scrolled .hn-links a:hover { color: var(--primary); }
+        #homeNav .hn-right { display: flex; align-items: center; gap: 24px; }
+        #homeNav .hn-cta { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.3s; display: flex; align-items: center; }
+        #homeNav.scrolled .hn-cta { color: var(--text-secondary); }
+        #homeNav .hn-cta:hover { color: #fff !important; }
+        #homeNav.scrolled .hn-cta:hover { color: var(--primary) !important; }
+        #homeNav .hn-theme { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; transition: transform 0.3s; line-height: 1; color: inherit; }
+        #homeNav .hn-theme:hover { transform: rotate(20deg); }
+        #homeNav .hn-menu { display: none; background: none; border: none; cursor: pointer; color: #fff; font-size: 22px; }
+        #homeNav.scrolled .hn-menu { color: var(--text-primary); }
+        @media (max-width: 900px) {
+            #homeNav { padding: 0 24px; }
+            #homeNav .hn-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 16px 0; }
+            #homeNav .hn-links.active { display: flex; }
+            #homeNav .hn-links a { color: var(--text-secondary) !important; padding: 14px 24px; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+            #homeNav .hn-cta { display: none; }
+            #homeNav .hn-menu { display: block; }
         }
 
         .login-box {
@@ -1089,16 +1108,28 @@
     <div id="appContent">
         <!-- Vista: Login -->
         <div id="vistaLogin" class="vista activa">
-            <!-- Navbar del sitio principal -->
-            <nav class="site-nav">
-                <a href="/" class="site-nav-logo">Team Scaglia</a>
-                <div class="site-nav-links">
+            <!-- Navbar del sitio principal (idéntico a la home) -->
+            <nav id="homeNav">
+                <a href="/" class="hn-logo">
+                    <img src="/logos/logo-team-blanco-trim.png" class="logo-white" alt="Team Scaglia">
+                    <img src="/logos/logo-team-color-trim.png" class="logo-color" alt="Team Scaglia">
+                </a>
+                <div class="hn-links" id="hnLinks">
+                    <a href="/#nosotros">Nosotros</a>
+                    <a href="/#equipo">Equipo</a>
                     <a href="/#propiedades">Propiedades</a>
                     <a href="/#emprendimientos">Emprendimientos</a>
                     <a href="/#inversiones">Inversiones</a>
                     <a href="/#testimonios">Opiniones</a>
                     <a href="/#contacto">Contacto</a>
-                    <a href="/" class="nav-back">← Volver al inicio</a>
+                    <a href="/beneficios">Beneficios a clientes</a>
+                </div>
+                <div class="hn-right">
+                    <a href="https://wa.me/541130977868" target="_blank" class="hn-cta" title="WhatsApp">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
+                    </a>
+                    <button class="hn-theme" onclick="toggleThemeBeneficios()" title="Cambiar tema"><span id="hnThemeIcon">🌙</span></button>
+                    <button class="hn-menu" id="hnMenu">☰</button>
                 </div>
             </nav>
             <div class="login-container">
@@ -2752,6 +2783,33 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         }
 
+        // Sincroniza el ícono del navbar con el tema actual
+        function syncNavTheme() {
+            const ic = document.getElementById('hnThemeIcon');
+            if (ic) ic.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        // Botón de tema del navbar (usa el sistema de tema de beneficios)
+        function toggleThemeBeneficios() {
+            toggleThemeManual();
+            syncNavTheme();
+        }
+
+        // Comportamiento del navbar: scroll (fondo blanco) + menú móvil
+        function setupHomeNav() {
+            const nav = document.getElementById('homeNav');
+            if (!nav) return;
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.pageYOffset > 60);
+            }, { passive: true });
+            const menu = document.getElementById('hnMenu');
+            const links = document.getElementById('hnLinks');
+            if (menu && links) {
+                menu.addEventListener('click', () => links.classList.toggle('active'));
+                links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('active')));
+            }
+        }
+
         function init() {
             // Aplicar tema automático
             applyTheme();
@@ -2761,6 +2819,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Mostrar la vidriera de beneficios en el login
             renderVidriera();
+
+            // Navbar del sitio (scroll, menú móvil, ícono de tema)
+            setupHomeNav();
+            syncNavTheme();
 
             // Llenar dropdown de agentes en registro
             const select = document.getElementById('regAgente');
