@@ -295,7 +295,6 @@
         .vidriera-head p { font-size: 14px; color: var(--gray-dark); line-height: 1.7; }
         .vidriera .cupones-grid { margin-bottom: 0; }
         .v-lock { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--gray-dark); background: transparent; border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; }
-        .vidriera-cta { text-align: center; margin-top: 48px; }
         .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; }
 
         .login-box {
@@ -1176,9 +1175,6 @@
                     <div class="cupones-grid" id="vidrieraGrid">
                         <!-- Se llena dinámicamente -->
                     </div>
-                    <div class="vidriera-cta">
-                        <button class="btn btn-primary" onclick="irARegistro()">Quiero ser cliente</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1873,13 +1869,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 `;
             });
             grid.innerHTML = html;
-        }
-
-        // Lleva al formulario de registro desde la vidriera
-        function irARegistro() {
-            document.getElementById('formLoginContainer').style.display = 'none';
-            document.getElementById('formRegistroContainer').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function renderCuponesCliente() {
