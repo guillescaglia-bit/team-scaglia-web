@@ -295,7 +295,8 @@
         .vidriera-head p { font-size: 14px; color: var(--gray-dark); line-height: 1.7; }
         .vidriera .cupones-grid { margin-bottom: 0; }
         .v-lock { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--gray-dark); background: transparent; border: 1px dashed var(--border-color); border-radius: 8px; padding: 12px; }
-        .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; }
+        .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; cursor: pointer; display: inline-block; transition: opacity 0.2s; }
+        .login-scroll-hint:hover { opacity: 0.7; }
 
         .login-box {
             background: var(--white);
@@ -1079,7 +1080,7 @@
                 <div class="login-box">
                     <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Beneficios a clientes</p>
                     <h1>Team Scaglia</h1>
-                    <p>Portal de beneficios exclusivos<br><span class="login-scroll-hint">↓ Mirá todos los descuentos disponibles</span></p>
+                    <p>Portal de beneficios exclusivos<br><span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})">↓ Mirá todos los descuentos disponibles</span></p>
 
                     <!-- ACCESO DE PRUEBA CLIENTE -->
                     <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
@@ -1165,7 +1166,7 @@
             </div>
 
             <!-- Vidriera de beneficios (visible sin loguearse) -->
-            <div class="vidriera">
+            <div class="vidriera" id="vidriera">
                 <div class="vidriera-inner">
                     <div class="vidriera-head">
                         <p class="v-label">Beneficios exclusivos</p>
