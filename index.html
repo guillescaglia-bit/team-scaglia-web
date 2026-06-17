@@ -396,10 +396,10 @@
         .t-rating .stars { color: #e0a92e; letter-spacing: 2px; font-size: 15px; }
         .t-rating .meta { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; text-decoration: none; transition: color 0.2s; }
         a.t-link:hover { color: var(--primary); text-decoration: underline; }
-        .t-marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
-        .t-track { display: flex; width: max-content; animation: tScroll 60s linear infinite; }
-        .t-marquee:hover .t-track { animation-play-state: paused; }
-        @keyframes tScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .t-marquee { overflow-x: auto; overflow-y: hidden; cursor: grab; user-select: none; scrollbar-width: none; -ms-overflow-style: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+        .t-marquee::-webkit-scrollbar { display: none; }
+        .t-marquee.dragging { cursor: grabbing; }
+        .t-track { display: flex; width: max-content; }
         .t-card { flex: 0 0 380px; max-width: 84vw; margin-right: 28px; background: var(--card-bg); border: 1px solid var(--border); padding: 38px 32px; display: flex; flex-direction: column; }
         .t-card .stars { color: #e0a92e; letter-spacing: 2px; font-size: 13px; margin-bottom: 20px; }
         .t-card .quote { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-style: italic; font-weight: 400; line-height: 1.55; color: var(--text); flex: 1; }
@@ -1616,15 +1616,17 @@
                 </a>`;
             // duplicado para loop continuo
             track.innerHTML = propiedades.map(card).join('') + propiedades.map(card).join('');
-            setupPropsCarousel(track);
+            setupDragCarousel(track);
         }
 
-        function setupPropsCarousel(track) {
+        // Carrusel arrastrable: se mueve solo; con mouse (desktop) o dedo (mobile) se mueve y se frena
+        function setupDragCarousel(track, speed = 0.6) {
+            if (!track) return;
             let auto = true, isDown = false, startX = 0, startScroll = 0, moved = 0;
 
             // movimiento automático
             function tick() {
-                if (auto && !isDown) track.scrollLeft += 0.6;
+                if (auto && !isDown) track.scrollLeft += speed;
                 requestAnimationFrame(tick);
             }
             requestAnimationFrame(tick);
@@ -1636,13 +1638,14 @@
                 else if (track.scrollLeft <= 0) track.scrollLeft += setW;
             }, { passive: true });
 
-            // pausa al pasar el mouse
+            // pausa al pasar el mouse (desktop)
             track.addEventListener('mouseenter', () => { auto = false; });
-            track.addEventListener('mouseleave', () => { auto = true; });
+            track.addEventListener('mouseleave', () => { if (!isDown) auto = true; });
 
-            // arrastrar con el mouse (adelantar/volver a tu ritmo)
+            // tocar/agarrar pausa (mouse o dedo)
             track.addEventListener('pointerdown', e => {
-                if (e.pointerType && e.pointerType !== 'mouse') return; // táctil/trackpad: scroll nativo
+                auto = false;
+                if (e.pointerType && e.pointerType !== 'mouse') return; // dedo/trackpad: scroll nativo
                 isDown = true; moved = 0; startX = e.clientX; startScroll = track.scrollLeft;
                 track.classList.add('dragging');
             });
@@ -1652,10 +1655,10 @@
                 moved = Math.max(moved, Math.abs(dx));
                 track.scrollLeft = startScroll - dx;
             });
-            window.addEventListener('pointerup', () => {
-                if (!isDown) return;
+            window.addEventListener('pointerup', e => {
                 isDown = false;
                 track.classList.remove('dragging');
+                if (e.pointerType !== 'mouse') auto = true; // en mobile reanuda al soltar; en desktop, al salir el mouse
             });
 
             // si arrastró, no abrir el link (evita clics accidentales)
@@ -1798,6 +1801,7 @@
         // ─── INIT ───
         renderEquipo();
         renderProps();
+        setupDragCarousel(document.querySelector('.t-marquee')); // carrusel de reseñas
     </script>
 </body>
 </html>
