@@ -659,6 +659,10 @@
             margin-bottom: 4px;
         }
 
+        .team-avatar-link { display: block; }
+        a.team-name-link { text-decoration: none; color: inherit; display: inline-block; transition: color 0.2s; }
+        a.team-name-link:hover .team-name { color: var(--primary); }
+
         .team-role {
             font-size: 10px;
             font-weight: 500;
@@ -1552,16 +1556,21 @@
         ];
 
         function renderEquipo() {
-            document.getElementById('teamGrid').innerHTML = equipo.map(a => `
+            document.getElementById('teamGrid').innerHTML = equipo.map(a => {
+                const url = '/' + a.slug;
+                const linkable = !a.descripcion; // Diego (martillero) no tiene página propia
+                const avatarInner = a.avatar
+                    ? `<img src="${a.avatar}" alt="${a.nombre}" loading="lazy">`
+                    : `<div class="team-avatar-placeholder"><span>${a.nombre.split(' ').map(w=>w[0]).join('')}</span></div>`;
+                return `
                 <div class="team-card">
-                    <div class="team-avatar">
-                        ${a.avatar
-                            ? `<img src="${a.avatar}" alt="${a.nombre}" loading="lazy">`
-                            : `<div class="team-avatar-placeholder"><span>${a.nombre.split(' ').map(w=>w[0]).join('')}</span></div>`
-                        }
-                    </div>
+                    ${linkable
+                        ? `<a href="${url}" class="team-avatar-link"><div class="team-avatar">${avatarInner}</div></a>`
+                        : `<div class="team-avatar">${avatarInner}</div>`}
                     <div class="team-info">
-                        <div class="team-name">${a.nombre}</div>
+                        ${linkable
+                            ? `<a href="${url}" class="team-name-link"><div class="team-name">${a.nombre}</div></a>`
+                            : `<div class="team-name">${a.nombre}</div>`}
                         <div class="team-role">${a.rol}</div>
                         ${a.descripcion ? `<div class="team-info" style="font-size:13px;font-weight:300;color:var(--text-light);line-height:1.7;">${a.descripcion}</div>` : `
                         <div class="team-contacts">
@@ -1582,7 +1591,8 @@
                         `}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // ─── PROPIEDADES DESTACADAS (selección curada a mano) ───
