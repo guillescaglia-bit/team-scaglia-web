@@ -1565,11 +1565,11 @@
                 return `
                 <div class="team-card">
                     ${linkable
-                        ? `<a href="${url}" class="team-avatar-link"><div class="team-avatar">${avatarInner}</div></a>`
+                        ? `<a href="${url}" target="_blank" rel="noopener" class="team-avatar-link"><div class="team-avatar">${avatarInner}</div></a>`
                         : `<div class="team-avatar">${avatarInner}</div>`}
                     <div class="team-info">
                         ${linkable
-                            ? `<a href="${url}" class="team-name-link"><div class="team-name">${a.nombre}</div></a>`
+                            ? `<a href="${url}" target="_blank" rel="noopener" class="team-name-link"><div class="team-name">${a.nombre}</div></a>`
                             : `<div class="team-name">${a.nombre}</div>`}
                         <div class="team-role">${a.rol}</div>
                         ${a.descripcion ? `<div class="team-info" style="font-size:13px;font-weight:300;color:var(--text-light);line-height:1.7;">${a.descripcion}</div>` : `
