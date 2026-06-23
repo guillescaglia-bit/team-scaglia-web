@@ -1191,7 +1191,11 @@
                         </div>
                         <div class="form-group">
                             <label>Fecha de cumpleaños</label>
-                            <input type="date" id="regCumple">
+                            <div style="display:flex; gap:8px;">
+                                <select id="regCumpleDia" style="flex:1;"><option value="">Día</option></select>
+                                <select id="regCumpleMes" style="flex:1.5;"><option value="">Mes</option></select>
+                                <select id="regCumpleAnio" style="flex:1.2;"><option value="">Año</option></select>
+                            </div>
                         </div>
                         <div class="form-group" style="display:flex; align-items:flex-start; gap:8px;">
                             <input type="checkbox" id="regTyC" style="width:auto; margin-top:3px; flex-shrink:0;">
@@ -1585,7 +1589,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const nombre = document.getElementById('regNombre').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const telefono = document.getElementById('regTelefono').value.trim();
-            const cumple = document.getElementById('regCumple').value;
+            const cDia = document.getElementById('regCumpleDia').value;
+            const cMes = document.getElementById('regCumpleMes').value;
+            const cAnio = document.getElementById('regCumpleAnio').value;
+            const cumple = (cDia && cMes && cAnio) ? `${cAnio}-${cMes}-${cDia}` : '';
             const aceptaTyC = document.getElementById('regTyC').checked;
 
             if (!nombre || !email || !telefono || !cumple) {
@@ -2212,6 +2219,19 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (!f) return '—';
             const p = f.split('-');
             return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
+        }
+
+        // Llena los desplegables de cumpleaños: Día / Mes / Año
+        function popularCumple() {
+            const dia = document.getElementById('regCumpleDia');
+            const mes = document.getElementById('regCumpleMes');
+            const anio = document.getElementById('regCumpleAnio');
+            if (!dia || !mes || !anio) return;
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            for (let d = 1; d <= 31; d++) dia.innerHTML += `<option value="${String(d).padStart(2,'0')}">${d}</option>`;
+            meses.forEach((m, i) => mes.innerHTML += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
+            const hoy = new Date().getFullYear();
+            for (let y = hoy - 16; y >= 1940; y--) anio.innerHTML += `<option value="${y}">${y}</option>`;
         }
 
         // Lista completa de clientes registrados (todos los datos) para el agente
@@ -2856,6 +2876,9 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             // Navbar del sitio (scroll, menú móvil, ícono de tema)
             setupHomeNav();
             syncNavTheme();
+
+            // Cargar desplegables de cumpleaños (Día / Mes / Año)
+            popularCumple();
 
             // Llenar dropdown de agentes en registro (si existe el selector)
             const select = document.getElementById('regAgente');
