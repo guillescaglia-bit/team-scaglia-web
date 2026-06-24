@@ -2001,9 +2001,9 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                         ${tieneActivo ? '✓ Disponible' : '✓ Canjeado'}
                                     </span>
                                 </div>
-                                ${tieneActivo ? `<p style="font-size: 12px; color: #999; margin-top: 15px;">Mostrá este código al prestador para canjear</p>` : ''}
+                                ${tieneActivo ? `<p style="font-size: 12px; color: #999; margin-top: 15px;">⏳ Cupón activo · mostrá este código al prestador para canjearlo.</p>` : ''}
                                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    ${tieneActivo ? `<button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>` : ''}
+                                    ${(tieneUsado && prestador.tipoLimite !== 'unico') ? `<button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear nuevo cupón</button>` : ''}
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                 </div>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
@@ -2048,9 +2048,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
                             <button onclick="toggleTyCInline()" id="btnVerTyC" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; padding:0; margin-bottom:16px;">Ver términos y condiciones ▾</button>
 
-                            <div id="tycInline" style="display:none; max-height:240px; overflow-y:auto; background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:16px; margin-bottom:20px;">
+                            <div id="tycInline" style="display:none; max-height:240px; overflow-y:auto; background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:16px; margin-bottom:8px; box-shadow: inset 0 -20px 16px -16px rgba(0,0,0,0.22);">
                                 <p id="tycInlineTexto" style="color:var(--text-primary); line-height:1.6; font-size:13px; white-space:pre-wrap;"></p>
                             </div>
+                            <p id="tycHint" style="display:none; text-align:center; font-size:11px; font-weight:600; letter-spacing:0.03em; color:var(--primary); margin:0 0 18px;">↓ Deslizá para leer todos los términos</p>
 
                             <div style="display:flex; gap:12px;">
                                 <button class="btn btn-secondary" onclick="cerrarConfirmCupon()" style="flex:1;">Cancelar</button>
@@ -2067,12 +2068,21 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function toggleTyCInline() {
             const box = document.getElementById('tycInline');
             const btn = document.getElementById('btnVerTyC');
+            const hint = document.getElementById('tycHint');
             if (box.style.display === 'none') {
                 box.style.display = 'block';
                 btn.innerHTML = 'Ocultar términos y condiciones ▴';
+                // Mostrar el cartel solo si hay contenido para scrollear
+                const hayScroll = box.scrollHeight > box.clientHeight + 4;
+                if (hint) hint.style.display = hayScroll ? 'block' : 'none';
+                box.onscroll = () => {
+                    const alFinal = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+                    if (hint) hint.style.display = alFinal ? 'none' : 'block';
+                };
             } else {
                 box.style.display = 'none';
                 btn.innerHTML = 'Ver términos y condiciones ▾';
+                if (hint) hint.style.display = 'none';
             }
         }
 
