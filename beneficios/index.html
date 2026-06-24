@@ -1164,13 +1164,6 @@
                             ¿No tenés cuenta? <button onclick="toggleForm()">Registrate</button>
                         </div>
 
-                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
-
-                        <div style="text-align: center;">
-                            <p style="font-size: 12px; color: var(--gray-dark); margin-bottom: 10px;">¿Sos prestador?</p>
-                            <button onclick="showVista('vistaValidarCupon'); document.getElementById('header').style.display = 'none';" style="background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; font-weight: 600;">Validar cupones aquí</button>
-                        </div>
-
                         <div style="text-align: center; margin-top: 24px;">
                             <a href="/" style="font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray-dark); text-decoration: none;">← Volver al sitio</a>
                         </div>
@@ -1209,7 +1202,8 @@
                                 <option value="">-- Elegí una opción --</option>
                                 <option value="Vendí">Vendí</option>
                                 <option value="Compré">Compré</option>
-                                <option value="Alquilé">Alquilé</option>
+                                <option value="Alquilé (propietario)">Alquilé (propietario)</option>
+                                <option value="Alquilé (inquilino)">Alquilé (inquilino)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1292,25 +1286,41 @@
         <div id="vistaValidarCupon" class="vista">
             <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
                 <div style="background: var(--white); border-radius: 12px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; margin: 20px;">
-                    <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Validar Cupón</h2>
-                    <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá el código para validar el descuento</p>
-
-                    <div id="validadorAlertContainer"></div>
-
-                    <div class="form-group">
-                        <label>Código del cupón</label>
-                        <input type="text" id="inputCodigoValidador" placeholder="Ej: SCGL-IBATH-AB12CD" style="text-transform: uppercase; font-size: 18px; text-align: center; letter-spacing: 2px;">
+                    <!-- Acceso con contraseña (solo prestadores) -->
+                    <div id="validadorGate">
+                        <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Acceso prestadores</h2>
+                        <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá la contraseña para validar cupones.</p>
+                        <div id="gateAlert"></div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="inputClaveValidador" placeholder="••••••••" onkeydown="if(event.key==='Enter'){desbloquearValidador();}">
+                        </div>
+                        <button class="btn btn-primary" onclick="desbloquearValidador()" style="margin-bottom: 15px;">Ingresar</button>
+                        <button class="btn btn-secondary" onclick="volverDelValidador()" style="width:100%;">Volver al sitio</button>
                     </div>
 
-                    <button class="btn btn-primary" onclick="validarCodigoPrestador()" style="margin-bottom: 15px;">Validar Código</button>
+                    <!-- Validar cupón (oculto hasta ingresar la contraseña) -->
+                    <div id="validadorContenido" style="display:none;">
+                        <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Validar Cupón</h2>
+                        <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá el código para validar el descuento</p>
 
-                    <div id="resultadoValidacion"></div>
+                        <div id="validadorAlertContainer"></div>
 
-                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
+                        <div class="form-group">
+                            <label>Código del cupón</label>
+                            <input type="text" id="inputCodigoValidador" placeholder="Ej: SCGL-IBATH-AB12CD" style="text-transform: uppercase; font-size: 18px; text-align: center; letter-spacing: 2px;">
+                        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="limpiarValidador()" style="flex: 1;">Limpiar</button>
-                        <button class="btn btn-secondary" onclick="volverDelValidador()" style="flex: 1;">Volver</button>
+                        <button class="btn btn-primary" onclick="validarCodigoPrestador()" style="margin-bottom: 15px;">Validar Código</button>
+
+                        <div id="resultadoValidacion"></div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="limpiarValidador()" style="flex: 1;">Limpiar</button>
+                            <button class="btn btn-secondary" onclick="volverDelValidador()" style="flex: 1;">Salir</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2153,6 +2163,33 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }, 500);
         }
 
+        // Contraseña de prestadores (demo; con Supabase será real y por prestador)
+        const CLAVE_PRESTADOR = 'teamscaglia';
+
+        // Abre el validador en estado bloqueado (pide contraseña)
+        function abrirValidador() {
+            const gate = document.getElementById('validadorGate');
+            const cont = document.getElementById('validadorContenido');
+            if (gate) gate.style.display = 'block';
+            if (cont) cont.style.display = 'none';
+            const ga = document.getElementById('gateAlert'); if (ga) ga.innerHTML = '';
+            const ci = document.getElementById('inputClaveValidador'); if (ci) ci.value = '';
+            const header = document.getElementById('header'); if (header) header.style.display = 'none';
+            showVista('vistaValidarCupon');
+        }
+
+        function desbloquearValidador() {
+            const clave = document.getElementById('inputClaveValidador').value;
+            if (clave === CLAVE_PRESTADOR) {
+                document.getElementById('validadorGate').style.display = 'none';
+                document.getElementById('validadorContenido').style.display = 'block';
+                document.getElementById('inputClaveValidador').value = '';
+                document.getElementById('gateAlert').innerHTML = '';
+            } else {
+                document.getElementById('gateAlert').innerHTML = '<div class="alert alert-error mostrar">Contraseña incorrecta.</div>';
+            }
+        }
+
         function validarCodigoPrestador() {
             const codigo = document.getElementById('inputCodigoValidador').value.trim().toUpperCase();
             
@@ -2243,6 +2280,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         function volverDelValidador() {
             limpiarValidador();
+            // Limpiar el hash para que no reabra el validador al recargar
+            if (location.hash) history.replaceState(null, '', location.pathname);
             showVista('vistaLogin');
         }
 
@@ -2924,6 +2963,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Cargar desplegables de cumpleaños (Día / Mes / Año)
             popularCumple();
+
+            // Acceso de prestadores por URL oculta (ej: /beneficios#validar)
+            if (location.hash === '#validar' || location.hash === '#prestador') {
+                abrirValidador();
+            }
 
             // Llenar dropdown de agentes en registro (si existe el selector)
             const select = document.getElementById('regAgente');
