@@ -1167,7 +1167,8 @@
                                 <input type="text" id="loginCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){verificarCodigo();}">
                             </div>
                             <button class="btn btn-primary" onclick="verificarCodigo()">Ingresar</button>
-                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:10px;">Cambiar email</button>
+                            <p style="text-align:center; font-size:12px; color:var(--gray-dark); margin-top:14px;">¿No te llegó? <button id="btnReenviar" onclick="reenviarCodigo()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; text-decoration:underline; padding:0; font-size:12px;">Reenviar código</button></p>
+                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:6px;">Cambiar email</button>
                         </div>
                         <div class="toggle-form">
                             ¿No tenés cuenta? <button onclick="toggleForm()">Registrate</button>
@@ -1574,6 +1575,26 @@
             document.getElementById('otpPaso2').style.display = 'block';
             const ci = document.getElementById('loginCodigo'); if (ci) ci.focus();
             showAlert('vistaLogin', 'Te enviamos el código por email.', 'success');
+        }
+
+        async function reenviarCodigo() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) { volverAEmail(); return; }
+            const btn = document.getElementById('btnReenviar');
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (error) { showAlert('vistaLogin', 'Esperá unos segundos antes de pedir otro código.', 'error'); return; }
+            showAlert('vistaLogin', 'Te reenviamos el código.', 'success');
+            // Cooldown de 30 segundos para no saturar
+            if (btn) {
+                btn.disabled = true;
+                let s = 30;
+                btn.textContent = `Reenviar (${s})`;
+                const t = setInterval(() => {
+                    s--;
+                    if (s <= 0) { clearInterval(t); btn.disabled = false; btn.textContent = 'Reenviar código'; }
+                    else { btn.textContent = `Reenviar (${s})`; }
+                }, 1000);
+            }
         }
 
         async function verificarCodigo() {
