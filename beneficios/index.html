@@ -1566,7 +1566,23 @@
             const email = document.getElementById('loginEmail').value.trim();
             if (!email) { showAlert('vistaLogin', 'Ingresá tu email.', 'error'); return; }
             const btn = document.getElementById('btnEnviarCodigo');
-            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
+
+            // Chequear que el email esté registrado ANTES de mandar el código
+            const { data: existe, error: errChk } = await supabaseClient.rpc('cliente_existe', { p_email: email });
+            if (errChk) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
+                showAlert('vistaLogin', 'No se pudo verificar el email. Probá de nuevo.', 'error');
+                console.error(errChk);
+                return;
+            }
+            if (!existe) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
+                showAlert('vistaLogin', 'Ese email no está registrado en el programa de beneficios. Registrate primero.', 'error');
+                return;
+            }
+
+            if (btn) { btn.textContent = 'Enviando...'; }
             const { error } = await supabaseClient.auth.signInWithOtp({ email });
             if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
             if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
