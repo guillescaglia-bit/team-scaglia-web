@@ -1500,7 +1500,14 @@
         </div>
     </div>
 
+    <!-- Librería de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // ── Conexión a Supabase ──
+        const SUPABASE_URL = 'https://fgipdqcxsbmrjvozalqn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // ==================== MOCK DATA ====================
         let appState = {
             usuarioActual: null, // { id, nombre, email, rol, agenteId }
@@ -1618,7 +1625,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.body.insertAdjacentHTML('beforeend', html);
         }
 
-        function handleRegistro() {
+        async function handleRegistro() {
             const nombre = document.getElementById('regNombre').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const telefono = document.getElementById('regTelefono').value.trim();
@@ -1642,20 +1649,30 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 return;
             }
 
-            // Mock: Crear cliente
-            const nuevoCliente = {
-                id: Date.now().toString(),
+            // Guardar en Supabase (base de datos real)
+            const { error } = await supabaseClient.from('clientes').insert({
                 nombre,
                 email,
                 telefono,
                 cumple,
-                agenteId,
+                agente_id: agenteId,
                 operacion,
-                direccion,
-                registradoEn: new Date(),
-                validado: false // Pendiente de validación por admin
-            };
+                direccion
+            });
 
+            if (error) {
+                showAlert('vistaLogin', 'No se pudo completar el registro. Probá de nuevo en un momento.', 'error');
+                console.error('Error al registrar en Supabase:', error);
+                return;
+            }
+
+            // Estado local para que el flujo de la app siga funcionando
+            const nuevoCliente = {
+                id: Date.now().toString(),
+                nombre, email, telefono, cumple, agenteId, operacion, direccion,
+                registradoEn: new Date(),
+                validado: false
+            };
             appState.clientes.push(nuevoCliente);
             appState.usuarioActual = { id: nuevoCliente.id, nombre, email, rol: 'cliente', clienteId: nuevoCliente.id };
 
