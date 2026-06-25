@@ -1148,18 +1148,27 @@
 
                     <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
 
-                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">O logueate manualmente:</p>
+                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">O ingresá con tu email:</p>
 
                     <div id="formLoginContainer">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="loginEmail" placeholder="tu@email.com">
+                        <!-- Paso 1: pedir el email -->
+                        <div id="otpPaso1">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="loginEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter'){enviarCodigo();}">
+                            </div>
+                            <button class="btn btn-primary" id="btnEnviarCodigo" onclick="enviarCodigo()">Enviarme el código</button>
                         </div>
-                        <div class="form-group">
-                            <label>Contraseña</label>
-                            <input type="password" id="loginPassword" placeholder="••••••••">
+                        <!-- Paso 2: ingresar el código -->
+                        <div id="otpPaso2" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Te enviamos un código a <strong id="otpEmailDisplay"></strong>. Revisá tu correo (y la carpeta de spam).</p>
+                            <div class="form-group">
+                                <label>Código de 6 dígitos</label>
+                                <input type="text" id="loginCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){verificarCodigo();}">
+                            </div>
+                            <button class="btn btn-primary" onclick="verificarCodigo()">Ingresar</button>
+                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:10px;">Cambiar email</button>
                         </div>
-                        <button class="btn btn-primary" onclick="handleLogin()">Ingresar</button>
                         <div class="toggle-form">
                             ¿No tenés cuenta? <button onclick="toggleForm()">Registrate</button>
                         </div>
@@ -1555,31 +1564,46 @@
             document.getElementById('formRegistroContainer').style.display = document.getElementById('formRegistroContainer').style.display === 'none' ? 'block' : 'none';
         }
 
-        function handleLogin() {
+        // ── Login por código (OTP) por email ──
+        async function enviarCodigo() {
             const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
+            if (!email) { showAlert('vistaLogin', 'Ingresá tu email.', 'error'); return; }
+            const btn = document.getElementById('btnEnviarCodigo');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
+            if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
+            document.getElementById('otpEmailDisplay').textContent = email;
+            document.getElementById('otpPaso1').style.display = 'none';
+            document.getElementById('otpPaso2').style.display = 'block';
+            const ci = document.getElementById('loginCodigo'); if (ci) ci.focus();
+            showAlert('vistaLogin', 'Te enviamos el código por email.', 'success');
+        }
 
-            if (!email || !password) {
-                showAlert('vistaLogin', 'Completa todos los campos', 'error');
-                return;
-            }
-
-            // Mock: Simular login (después será con Supabase)
-            if (email === 'admin@teamscaglia.com' && password === 'admin123') {
-                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAdmin();
-            } else if (email === 'agente@teamscaglia.com' && password === 'agente123') {
-                appState.usuarioActual = { id: 'agente1', nombre: 'Guillermo Scaglia', email, rol: 'agente', agenteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAgente();
-            } else if (email === 'cliente@teamscaglia.com' && password === 'cliente123') {
-                appState.usuarioActual = { id: 'cliente1', nombre: 'Juan García', email, rol: 'cliente', clienteId: '1' };
+        async function verificarCodigo() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const token = document.getElementById('loginCodigo').value.trim();
+            if (token.length < 6) { showAlert('vistaLogin', 'Ingresá el código de 6 dígitos.', 'error'); return; }
+            const { error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
+            if (error) { showAlert('vistaLogin', 'Código incorrecto o vencido. Probá de nuevo.', 'error'); return; }
+            // Buscar la ficha del cliente por su email
+            const { data: filas } = await supabaseClient.from('clientes').select('*').eq('email', email).order('created_at', { ascending: false }).limit(1);
+            if (filas && filas.length) {
+                const c = filas[0];
+                appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
                 document.getElementById('vistaLogin').classList.remove('activa');
                 showDashboardCliente();
             } else {
-                showAlert('vistaLogin', 'Email o contraseña incorrectos. Prueba: cliente@teamscaglia.com / cliente123', 'error');
+                showAlert('vistaLogin', 'Ese email todavía no está registrado. Registrate primero.', 'error');
+                toggleForm();
             }
+        }
+
+        function volverAEmail() {
+            document.getElementById('otpPaso2').style.display = 'none';
+            document.getElementById('otpPaso1').style.display = 'block';
+            const ci = document.getElementById('loginCodigo'); if (ci) ci.value = '';
         }
 
         function quickLogin(rol) {
@@ -1689,7 +1713,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs primero
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
@@ -1759,7 +1783,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
@@ -1798,7 +1822,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
@@ -2872,7 +2896,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar formularios
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('formLoginContainer').style.display = 'block';
             document.getElementById('formRegistroContainer').style.display = 'none';
         }
@@ -3016,14 +3040,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         });
 
-        // Enter en inputs
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                if (document.getElementById('loginEmail') === document.activeElement) {
-                    handleLogin();
-                }
-            }
-        });
 
         init();
     </script>
