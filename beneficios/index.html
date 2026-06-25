@@ -1163,8 +1163,8 @@
                         <div id="otpPaso2" style="display:none;">
                             <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Te enviamos un código a <strong id="otpEmailDisplay"></strong>. Revisá tu correo (y la carpeta de spam).</p>
                             <div class="form-group">
-                                <label>Código de 6 dígitos</label>
-                                <input type="text" id="loginCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){verificarCodigo();}">
+                                <label>Código de acceso</label>
+                                <input type="text" id="loginCodigo" inputmode="numeric" maxlength="8" placeholder="--------" style="text-align:center; letter-spacing:6px; font-size:22px;" onkeydown="if(event.key==='Enter'){verificarCodigo();}">
                             </div>
                             <button class="btn btn-primary" onclick="verificarCodigo()">Ingresar</button>
                             <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:10px;">Cambiar email</button>
