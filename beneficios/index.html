@@ -2387,7 +2387,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             });
 
             if (error) {
-                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón. Probá de nuevo en un momento.', 'error');
+                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón: ' + (error.message || 'error desconocido'), 'error');
                 console.error('Error al crear cupón en Supabase:', error);
                 return;
             }
