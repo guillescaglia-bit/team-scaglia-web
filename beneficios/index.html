@@ -2760,8 +2760,26 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             cliente.validado = true;
             renderClientes();
-            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado correctamente`, 'success');
-            // Nota: el aviso por mail al cliente se enviará cuando esté el endpoint del servidor.
+            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado. Enviando aviso por mail...`, 'success');
+
+            // Avisar al cliente por mail (vía la función segura de Vercel)
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const resp = await fetch('/api/notificar-validacion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre })
+                });
+                if (resp.ok) {
+                    showAlert('vistaAdmin', `📧 Mail de aviso enviado a ${cliente.email}`, 'success');
+                } else {
+                    const det = await resp.json().catch(() => ({}));
+                    showAlert('vistaAdmin', `✓ Validado, pero el mail no se pudo enviar (${det.error || resp.status}). El cliente igual ya puede entrar.`, 'error');
+                }
+            } catch (e) {
+                showAlert('vistaAdmin', '✓ Validado, pero el mail no se pudo enviar. El cliente igual ya puede entrar.', 'error');
+                console.error('Error al enviar mail de validación:', e);
+            }
         }
 
         async function rechazarCliente(clienteId) {
