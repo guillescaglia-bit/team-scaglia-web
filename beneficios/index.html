@@ -1155,10 +1155,21 @@
                         <div id="otpPaso1">
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" id="loginEmail" placeholder="tu@email.com" oninput="limpiarErrorEmail()" onkeydown="if(event.key==='Enter'){enviarCodigo();}">
+                                <input type="email" id="loginEmail" placeholder="tu@email.com" oninput="limpiarErrorEmail()" onkeydown="if(event.key==='Enter'){continuarLogin();}">
                                 <p id="loginEmailError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
                             </div>
-                            <button class="btn btn-primary" id="btnEnviarCodigo" onclick="enviarCodigo()">Enviarme el código</button>
+                            <button class="btn btn-primary" id="btnEnviarCodigo" onclick="continuarLogin()">Continuar</button>
+                        </div>
+                        <!-- Paso equipo: contraseña (admin / agentes) -->
+                        <div id="otpPasoPass" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Hola 👋 Ingresá tu contraseña para <strong id="passEmailDisplay"></strong>.</p>
+                            <div class="form-group">
+                                <label>Contraseña</label>
+                                <input type="password" id="loginPasswordEquipo" placeholder="••••••••" onkeydown="if(event.key==='Enter'){loginConPassword();}">
+                                <p id="loginPasswordError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
+                            </div>
+                            <button class="btn btn-primary" id="btnIngresarPass" onclick="loginConPassword()">Ingresar</button>
+                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:6px;">Cambiar email</button>
                         </div>
                         <!-- Paso 2: ingresar el código -->
                         <div id="otpPaso2" style="display:none;">
@@ -1515,6 +1526,14 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Emails con acceso de admin (validan clientes). Para sumar otro, agregalo a la lista.
+        const ADMIN_EMAILS = ['info@teamscaglia.com'];
+        const esAdminEmail = (email) => ADMIN_EMAILS.includes((email || '').trim().toLowerCase());
+        // Busca un agente por su email (los emails están en appState.agentes)
+        const getAgentePorEmail = (email) => (appState.agentes || []).find(a => (a.email || '').toLowerCase() === (email || '').trim().toLowerCase());
+        // "Staff" = admin o agente → entran con contraseña; el resto (clientes) con código
+        const esStaffEmail = (email) => esAdminEmail(email) || !!getAgentePorEmail(email);
+
         // ==================== MOCK DATA ====================
         let appState = {
             usuarioActual: null, // { id, nombre, email, rol, agenteId }
@@ -1530,15 +1549,15 @@
                 { id: '9', nombre: 'Irene Ruiz Díaz', email: 'iruizdiaz@redsuma.com.ar', activo: true },
             ],
             prestadores: [
-                { id: '1', nombre: 'Helixperience Miami', email: 'info@helixperience.com', descuento: 20, descripcion: 'Vuelos +20% + 5 min extra de vuelo', alcance: 'Miami, EE.UU.', url: 'https://helixperience.com', icono: '✈️', color: '#1e90ff', banner: '/beneficios/image/banner-helix.png', tyc: 'El cupón es válido por 30 días desde su creación. No es acumulable con otras promociones. Requiere reserva directa en nuestro sitio. Consultar disponibilidad según destino.', activo: true },
-                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', alcance: 'Vicente López · envíos a todo el país', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
-                { id: '3', nombre: 'Wilson Tobal', email: 'info@wilsontobal.com', descuento: 15, descripcion: 'Interiorismo 15% precio de lista', alcance: 'Todo el país', url: 'https://wilsontobal.com', icono: '🏠', color: '#8b7355', banner: '/beneficios/image/banner-wilson-tobal.png', tyc: 'Aplica a proyectos de interiorismo. Requiere presupuesto previo. Válido 30 días. No acumulable con otras promociones. Consultar disponibilidad de tiempos.', activo: false },
-                { id: '4', nombre: 'Anna Rossatti', email: 'ordonezcamila06@gmail.com', descuento: 20, descripcion: 'Ropa de diseño · 20% OFF', url: 'https://www.annarossatti.com/', icono: '👗', color: '#ff69b4', banner: '/beneficios/image/banner-anna-rossatti.png', tipoLimite: 'unico', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF para clientas validadas.\n\n🛍️ APLICACIÓN\nBeneficio aplicable exclusivamente sobre la línea ready-to-wear de Anna Rossatti, disponible en canal online y/o local físico.\n\n💵 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REÚSOS\nUn uso por clienta.\n\n🚫 EXCEPCIONES\nNo aplica para vestidos de fiesta.\n\n📞 CONTACTO\nCamila Ordoñez\nTeléfono: 11 2264-6301\nEmail: ordonezcamila06@gmail.com', activo: true },
-                { id: '5', nombre: 'Almacén 1249', email: 'info@almacen1249.com', descuento: 10, descripcion: 'Picadas premium 10%', alcance: 'CABA', url: 'https://almacen1249.com.ar', icono: '🍽️', color: '#d4af37', banner: '/beneficios/image/banner-almacen.png', tyc: 'Descuento aplicable a picadas premium. Pedido mínimo requerido. Válido 30 días. Consultar disponibilidad y formas de entrega.', activo: false },
-                { id: '6', nombre: 'Mul nordelta', email: 'info@mulnordelta.com', descuento: 15, descripcion: 'Spa capilar Asiático', alcance: 'Nordelta', url: 'https://www.instagram.com/mul.nordelta/', icono: '💇', color: '#ff6b9d', banner: '/beneficios/image/banner-mul.png', tyc: '💰 DESCUENTO\n15% de descuento sobre el valor vigente de los tratamientos en la sede Nordelta de MUL Spa Capilar & Facial o la compra de Gift Card. Beneficio no acumulable con otras promociones o descuentos vigentes.\n\n🎫 VALIDEZ DEL CUPÓN\nVálido por 30 días corridos desde su emisión. Un único uso por persona por mes. El límite se renueva el 1 de cada mes.\n\n📅 VIGENCIA\nBeneficio permanente, vigente hasta nuevo aviso.\n\n🚫 EXCEPCIONES\nSin excepciones. Aplica sobre todos los tratamientos ofrecidos en Nordelta, incluyendo Gift Card.\n\n💵 TOPE DE REINTEGRO\nSin límite máximo de reintegro mensual ni anual.\n\n🔄 CÓMO CANJEAR\n1. Presenta el cupón al reservar (presencial, WhatsApp, teléfono o medios que la empresa acepte)\n2. Confirma disponibilidad\n3. Asiste a tu cita\n\n⚠️ TÉRMINOS IMPORTANTES\n- Válido únicamente con presentación del cupón\n- Sujeto a disponibilidad y políticas de cancelación de la sede\n- No canjeable por dinero\n- Aceptar estas condiciones implica conocer y estar de acuerdo con las políticas vigentes de MUL\n\n📞 CONTACTO\nWhatsApp/Teléfono: +54 9 11 5114-7581\nInstagram: https://www.instagram.com/mul.nordelta/\nHorarios: A confirmar con MUL', activo: true },
-                { id: '7', nombre: 'Cerantola', email: 'info@cerantola.com', descuento: null, descripcion: 'Aberturas (descuento a confirmar)', alcance: 'Todo el país', url: 'https://www.cerantola.com.ar/', icono: '🪟', color: '#6b5b4f', banner: '/beneficios/image/banner-cerantola.png', tyc: 'Descuento a confirmar. Aplica en línea de aberturas seleccionadas. Requiere presupuesto. Válido 30 días.', activo: false },
-                { id: '8', nombre: 'Inox Style', email: 'info@inoxstyle.com.ar', descuento: 20, descripcion: 'Estética y personalización vehicular · 20% OFF', alcance: 'Martínez, Bs. As.', url: 'https://inoxstyle.com.ar/', icono: '🚗', color: '#4a5568', banner: '/beneficios/image/banner-inox.png', tyc: '💰 DESCUENTO\n20% de descuento.\n\n📅 VIGENCIA\nAño 2026.\n\n💵 TOPE DE REINTEGRO\n$200.000.\n\n🎫 VALIDEZ DEL CUPÓN\nÚnicamente para el Pack Detailing:\n• Lavado Premium\n• Limpieza Interior Full\n• Limpieza Motor\n• Pulido y abrillantado de carrocería\n\n🚫 EXCEPCIONES\nEl descuento no aplica para productos, vehículos o servicios que no sean el Pack Detailing.\n\n🔄 CÓMO CANJEAR\nComunicate con nosotros por WhatsApp y brindá el código de descuento.\n\n📞 CONTACTO\nWhatsApp / Teléfono: +54 9 11 5801-2856', activo: true },
-                { id: '9', nombre: 'WN Interiores', email: '', descuento: 15, descripcion: 'Interiorismo · 15% OFF', alcance: 'CABA', url: 'https://www.instagram.com/wn.interiores/', icono: '🛋️', color: '#7d7367', banner: '/beneficios/image/banner-wn-interiores.png', tyc: '💰 BENEFICIO\n15% OFF sobre los honorarios de diseño de WN Interiores.\n\n🎫 VALIDEZ DEL CUPÓN\nEl beneficio podrá utilizarse dentro de los 10 (diez) días corridos posteriores al envío del presupuesto.\n\n🚫 EXCEPCIONES\n• No acumulable con otras promociones o descuentos.\n• No aplica sobre gastos de obra, materiales, mobiliario, traslados ni compras realizadas a terceros.\n• Válido únicamente para nuevos proyectos.\n\n💵 TOPE DEL DESCUENTO\nSin tope de reintegro. El descuento se aplica exclusivamente sobre los honorarios profesionales de diseño.\n\n🔄 ¿CÓMO CANJEARLO?\n1. Solicitar el presupuesto de WN Interiores.\n2. Presentar este cupón antes de la confirmación del proyecto.\n3. Una vez validado, el descuento se aplicará al presupuesto correspondiente.\n\n⚠️ TÉRMINOS IMPORTANTES\n• El descuento aplica únicamente sobre los honorarios de diseño.\n• Una vez aprobada la propuesta y definidos los conceptos de diseño, cualquier modificación sustancial o cambio de alcance solicitado con posterioridad será cotizado por separado.\n• La contratación implica la aceptación de estas condiciones.\n\n📞 CONTACTO\nWN Interiores\nWhatsApp / Teléfono: +54 9 11 5899-7627', activo: true },
+                { id: '1', nombre: 'Helixperience Miami', email: 'info@helixperience.com', descuento: 20, descripcion: 'Vuelos +20% + 5 min extra de vuelo', alcance: 'Miami, EE.UU.', url: 'https://helixperience.com', icono: '✈️', color: '#1e90ff', banner: '/beneficios/image/banner-helix.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'El cupón es válido por 30 días desde su creación. No es acumulable con otras promociones. Requiere reserva directa en nuestro sitio. Consultar disponibilidad según destino.', activo: true },
+                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', alcance: 'Vicente López · envíos a todo el país', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
+                { id: '3', nombre: 'Wilson Tobal', email: 'info@wilsontobal.com', descuento: 15, descripcion: 'Interiorismo 15% precio de lista', alcance: 'Todo el país', url: 'https://wilsontobal.com', icono: '🏠', color: '#8b7355', banner: '/beneficios/image/banner-wilson-tobal.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Aplica a proyectos de interiorismo. Requiere presupuesto previo. Válido 30 días. No acumulable con otras promociones. Consultar disponibilidad de tiempos.', activo: false },
+                { id: '4', nombre: 'Anna Rossatti', email: 'ordonezcamila06@gmail.com', descuento: 20, descripcion: 'Ropa de diseño · 20% OFF', url: 'https://www.annarossatti.com/', icono: '👗', color: '#ff69b4', banner: '/beneficios/image/banner-anna-rossatti.png', vigenciaDias: 30, limite: 'unico', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF para clientas validadas.\n\n🛍️ APLICACIÓN\nBeneficio aplicable exclusivamente sobre la línea ready-to-wear de Anna Rossatti, disponible en canal online y/o local físico.\n\n💵 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REÚSOS\nUn uso por clienta.\n\n🚫 EXCEPCIONES\nNo aplica para vestidos de fiesta.\n\n📞 CONTACTO\nCamila Ordoñez\nTeléfono: 11 2264-6301\nEmail: ordonezcamila06@gmail.com', activo: true },
+                { id: '5', nombre: 'Almacén 1249', email: 'info@almacen1249.com', descuento: 10, descripcion: 'Picadas premium 10%', alcance: 'CABA', url: 'https://almacen1249.com.ar', icono: '🍽️', color: '#d4af37', banner: '/beneficios/image/banner-almacen.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Descuento aplicable a picadas premium. Pedido mínimo requerido. Válido 30 días. Consultar disponibilidad y formas de entrega.', activo: false },
+                { id: '6', nombre: 'Mul nordelta', email: 'info@mulnordelta.com', descuento: 15, descripcion: 'Spa capilar Asiático', alcance: 'Nordelta', url: 'https://www.instagram.com/mul.nordelta/', icono: '💇', color: '#ff6b9d', banner: '/beneficios/image/banner-mul.png', vigenciaDias: 30, limite: 'mensual', tyc: '💰 DESCUENTO\n15% de descuento sobre el valor vigente de los tratamientos en la sede Nordelta de MUL Spa Capilar & Facial o la compra de Gift Card. Beneficio no acumulable con otras promociones o descuentos vigentes.\n\n🎫 VALIDEZ DEL CUPÓN\nVálido por 30 días corridos desde su emisión. Un único uso por persona por mes. El límite se renueva el 1 de cada mes.\n\n📅 VIGENCIA\nBeneficio permanente, vigente hasta nuevo aviso.\n\n🚫 EXCEPCIONES\nSin excepciones. Aplica sobre todos los tratamientos ofrecidos en Nordelta, incluyendo Gift Card.\n\n💵 TOPE DE REINTEGRO\nSin límite máximo de reintegro mensual ni anual.\n\n🔄 CÓMO CANJEAR\n1. Presenta el cupón al reservar (presencial, WhatsApp, teléfono o medios que la empresa acepte)\n2. Confirma disponibilidad\n3. Asiste a tu cita\n\n⚠️ TÉRMINOS IMPORTANTES\n- Válido únicamente con presentación del cupón\n- Sujeto a disponibilidad y políticas de cancelación de la sede\n- No canjeable por dinero\n- Aceptar estas condiciones implica conocer y estar de acuerdo con las políticas vigentes de MUL\n\n📞 CONTACTO\nWhatsApp/Teléfono: +54 9 11 5114-7581\nInstagram: https://www.instagram.com/mul.nordelta/\nHorarios: A confirmar con MUL', activo: true },
+                { id: '7', nombre: 'Cerantola', email: 'info@cerantola.com', descuento: null, descripcion: 'Aberturas (descuento a confirmar)', alcance: 'Todo el país', url: 'https://www.cerantola.com.ar/', icono: '🪟', color: '#6b5b4f', banner: '/beneficios/image/banner-cerantola.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Descuento a confirmar. Aplica en línea de aberturas seleccionadas. Requiere presupuesto. Válido 30 días.', activo: false },
+                { id: '8', nombre: 'Inox Style', email: 'info@inoxstyle.com.ar', descuento: 20, descripcion: 'Estética y personalización vehicular · 20% OFF', alcance: 'Martínez, Bs. As.', url: 'https://inoxstyle.com.ar/', icono: '🚗', color: '#4a5568', banner: '/beneficios/image/banner-inox.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\n20% de descuento.\n\n📅 VIGENCIA\nAño 2026.\n\n💵 TOPE DE REINTEGRO\n$200.000.\n\n🎫 VALIDEZ DEL CUPÓN\nÚnicamente para el Pack Detailing:\n• Lavado Premium\n• Limpieza Interior Full\n• Limpieza Motor\n• Pulido y abrillantado de carrocería\n\n🚫 EXCEPCIONES\nEl descuento no aplica para productos, vehículos o servicios que no sean el Pack Detailing.\n\n🔄 CÓMO CANJEAR\nComunicate con nosotros por WhatsApp y brindá el código de descuento.\n\n📞 CONTACTO\nWhatsApp / Teléfono: +54 9 11 5801-2856', activo: true },
+                { id: '9', nombre: 'WN Interiores', email: '', descuento: 15, descripcion: 'Interiorismo · 15% OFF', alcance: 'CABA', url: 'https://www.instagram.com/wn.interiores/', icono: '🛋️', color: '#7d7367', banner: '/beneficios/image/banner-wn-interiores.png', vigenciaDias: 10, limite: 'ilimitado', tyc: '💰 BENEFICIO\n15% OFF sobre los honorarios de diseño de WN Interiores.\n\n🎫 VALIDEZ DEL CUPÓN\nEl beneficio podrá utilizarse dentro de los 10 (diez) días corridos posteriores al envío del presupuesto.\n\n🚫 EXCEPCIONES\n• No acumulable con otras promociones o descuentos.\n• No aplica sobre gastos de obra, materiales, mobiliario, traslados ni compras realizadas a terceros.\n• Válido únicamente para nuevos proyectos.\n\n💵 TOPE DEL DESCUENTO\nSin tope de reintegro. El descuento se aplica exclusivamente sobre los honorarios profesionales de diseño.\n\n🔄 ¿CÓMO CANJEARLO?\n1. Solicitar el presupuesto de WN Interiores.\n2. Presentar este cupón antes de la confirmación del proyecto.\n3. Una vez validado, el descuento se aplicará al presupuesto correspondiente.\n\n⚠️ TÉRMINOS IMPORTANTES\n• El descuento aplica únicamente sobre los honorarios de diseño.\n• Una vez aprobada la propuesta y definidos los conceptos de diseño, cualquier modificación sustancial o cambio de alcance solicitado con posterioridad será cotizado por separado.\n• La contratación implica la aceptación de estas condiciones.\n\n📞 CONTACTO\nWN Interiores\nWhatsApp / Teléfono: +54 9 11 5899-7627', activo: true },
             ],
             clientes: [
                 { id: '1', nombre: 'Juan García', email: 'juan@email.com', telefono: '+54 9 11 1234567', cumple: '1990-05-12', agenteId: '1', validado: true },
@@ -1578,6 +1597,50 @@
         }
 
         // ── Login por código (OTP) por email ──
+        // Decide el camino según el email: equipo → contraseña, cliente → código
+        function continuarLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            limpiarErrorEmail();
+            const esEmailValido = /^\S+@\S+\.\S+$/.test(email);
+            if (!email || !esEmailValido) { mostrarErrorEmail('Ingresá un email válido.'); return; }
+            if (esStaffEmail(email)) {
+                document.getElementById('passEmailDisplay').textContent = email;
+                document.getElementById('otpPaso1').style.display = 'none';
+                document.getElementById('otpPasoPass').style.display = 'block';
+                const pi = document.getElementById('loginPasswordEquipo'); if (pi) { pi.value = ''; pi.focus(); }
+                return;
+            }
+            enviarCodigo();
+        }
+
+        // Login con contraseña (admin / agentes)
+        async function loginConPassword() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPasswordEquipo').value;
+            const errEl = document.getElementById('loginPasswordError');
+            if (errEl) errEl.style.display = 'none';
+            if (!password) { if (errEl) { errEl.textContent = 'Ingresá tu contraseña.'; errEl.style.display = 'block'; } return; }
+            const btn = document.getElementById('btnIngresarPass');
+            if (btn) { btn.disabled = true; btn.textContent = 'Ingresando...'; }
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
+            if (error) {
+                if (errEl) { errEl.textContent = 'Contraseña incorrecta. Probá de nuevo.'; errEl.style.display = 'block'; }
+                console.error(error);
+                return;
+            }
+            document.getElementById('vistaLogin').classList.remove('activa');
+            if (esAdminEmail(email)) {
+                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                await cargarClientesAdmin();
+                showDashboardAdmin();
+            } else {
+                const ag = getAgentePorEmail(email);
+                appState.usuarioActual = { id: 'agente_' + ag.id, nombre: ag.nombre, email, rol: 'agente', agenteId: ag.id };
+                showDashboardAgente();
+            }
+        }
+
         async function enviarCodigo() {
             const email = document.getElementById('loginEmail').value.trim();
             limpiarErrorEmail();
@@ -1586,49 +1649,76 @@
             const btn = document.getElementById('btnEnviarCodigo');
             if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
 
-            // Chequear que el email esté registrado ANTES de mandar el código
-            const { data: existe, error: errChk } = await supabaseClient.rpc('cliente_existe', { p_email: email });
-            if (errChk) {
-                if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
-                mostrarErrorEmail('No se pudo verificar el email. Probá de nuevo.');
-                console.error(errChk);
-                return;
-            }
-            if (!existe) {
-                if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
-                mostrarErrorEmail('Este email no está registrado. Revisá que esté bien escrito o registrate.');
-                return;
+            // El admin entra con su email sin pasar por el chequeo de "cliente registrado"
+            if (!esAdminEmail(email)) {
+                // Chequear que el email esté registrado ANTES de mandar el código
+                const { data: existe, error: errChk } = await supabaseClient.rpc('cliente_existe', { p_email: email });
+                if (errChk) {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+                    mostrarErrorEmail('No se pudo verificar el email. Probá de nuevo.');
+                    console.error(errChk);
+                    return;
+                }
+                if (!existe) {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+                    mostrarErrorEmail('Este email no está registrado. Revisá que esté bien escrito o registrate.');
+                    return;
+                }
             }
 
             if (btn) { btn.textContent = 'Enviando...'; }
             const { error } = await supabaseClient.auth.signInWithOtp({ email });
-            if (btn) { btn.disabled = false; btn.textContent = 'Enviarme el código'; }
-            if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
+            if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+            if (error) {
+                const esRate = /second|rate|only request|request this/i.test(error.message || '');
+                mostrarErrorEmail(esRate
+                    ? 'Pediste un código hace muy poco. Esperá un minuto y volvé a intentar. Si ya te llegó un código, usá ese.'
+                    : 'No se pudo enviar el código. Probá de nuevo en un momento.');
+                console.error(error);
+                return;
+            }
             document.getElementById('otpEmailDisplay').textContent = email;
             document.getElementById('otpPaso1').style.display = 'none';
             document.getElementById('otpPaso2').style.display = 'block';
             const ci = document.getElementById('loginCodigo'); if (ci) ci.focus();
             showAlert('vistaLogin', 'Te enviamos el código por email.', 'success');
+            iniciarCooldownReenvio(60);
+        }
+
+        // Cuenta regresiva del botón "Reenviar" (Supabase limita a ~1 código por minuto)
+        let _cooldownTimer = null;
+        function iniciarCooldownReenvio(segundos) {
+            const btn = document.getElementById('btnReenviar');
+            if (!btn) return;
+            if (_cooldownTimer) clearInterval(_cooldownTimer);
+            let s = segundos;
+            btn.disabled = true;
+            btn.style.cursor = 'default';
+            btn.style.opacity = '0.55';
+            btn.style.textDecoration = 'none';
+            btn.textContent = `Reenviar en ${s}s`;
+            _cooldownTimer = setInterval(() => {
+                s--;
+                if (s <= 0) {
+                    clearInterval(_cooldownTimer); _cooldownTimer = null;
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                    btn.style.textDecoration = 'underline';
+                    btn.textContent = 'Reenviar código';
+                } else {
+                    btn.textContent = `Reenviar en ${s}s`;
+                }
+            }, 1000);
         }
 
         async function reenviarCodigo() {
             const email = document.getElementById('loginEmail').value.trim();
             if (!email) { volverAEmail(); return; }
-            const btn = document.getElementById('btnReenviar');
             const { error } = await supabaseClient.auth.signInWithOtp({ email });
-            if (error) { showAlert('vistaLogin', 'Esperá unos segundos antes de pedir otro código.', 'error'); return; }
+            if (error) { showAlert('vistaLogin', 'Pediste un código hace muy poco. Esperá a que termine la cuenta regresiva. Si ya te llegó uno, usá ese.', 'error'); console.error(error); return; }
             showAlert('vistaLogin', 'Te reenviamos el código.', 'success');
-            // Cooldown de 30 segundos para no saturar
-            if (btn) {
-                btn.disabled = true;
-                let s = 30;
-                btn.textContent = `Reenviar (${s})`;
-                const t = setInterval(() => {
-                    s--;
-                    if (s <= 0) { clearInterval(t); btn.disabled = false; btn.textContent = 'Reenviar código'; }
-                    else { btn.textContent = `Reenviar (${s})`; }
-                }, 1000);
-            }
+            iniciarCooldownReenvio(60);
         }
 
         async function verificarCodigo() {
@@ -1637,12 +1727,21 @@
             if (token.length < 6) { showAlert('vistaLogin', 'Ingresá el código de 6 dígitos.', 'error'); return; }
             const { error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
             if (error) { showAlert('vistaLogin', 'Código incorrecto o vencido. Probá de nuevo.', 'error'); return; }
+            // Si es admin, entra directo al panel de validación
+            if (esAdminEmail(email)) {
+                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                await cargarClientesAdmin();
+                document.getElementById('vistaLogin').classList.remove('activa');
+                showDashboardAdmin();
+                return;
+            }
             // Buscar la ficha del cliente por su email
             const { data: filas } = await supabaseClient.from('clientes').select('*').eq('email', email).order('created_at', { ascending: false }).limit(1);
             if (filas && filas.length) {
                 const c = filas[0];
                 appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
                 appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                await cargarCuponesCliente();
                 document.getElementById('vistaLogin').classList.remove('activa');
                 showDashboardCliente();
             } else {
@@ -1653,8 +1752,11 @@
 
         function volverAEmail() {
             document.getElementById('otpPaso2').style.display = 'none';
+            const pp = document.getElementById('otpPasoPass'); if (pp) pp.style.display = 'none';
             document.getElementById('otpPaso1').style.display = 'block';
             const ci = document.getElementById('loginCodigo'); if (ci) ci.value = '';
+            const pi = document.getElementById('loginPasswordEquipo'); if (pi) pi.value = '';
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
         function quickLogin(rol) {
@@ -2056,6 +2158,32 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             grid.innerHTML = html;
         }
 
+        // Trae de Supabase los cupones del cliente logueado y los carga en appState
+        async function cargarCuponesCliente() {
+            const clienteId = appState.usuarioActual.clienteId;
+            const { data, error } = await supabaseClient
+                .from('cupones').select('*')
+                .eq('cliente_id', clienteId)
+                .order('creado_en', { ascending: false });
+            if (error) { console.error('Error al cargar cupones:', error); return; }
+            // Reemplazar en memoria solo los cupones de este cliente
+            appState.cupones = appState.cupones.filter(c => c.clienteId !== clienteId);
+            const ahora = new Date();
+            (data || []).forEach(row => {
+                appState.cupones.push({
+                    id: row.id,
+                    clienteId: row.cliente_id,
+                    prestadorId: row.prestador_id,
+                    agenteId: row.agente_id,
+                    codigo: row.codigo,
+                    estado: row.usado_en ? 'usado' : (new Date(row.vence_en) > ahora ? 'activo' : 'vencido'),
+                    creadoEn: new Date(row.creado_en),
+                    expirado: new Date(row.vence_en),
+                    usadoEn: row.usado_en ? new Date(row.usado_en) : null
+                });
+            });
+        }
+
         function renderCuponesCliente() {
             const clienteId = appState.usuarioActual.clienteId;
             const cuponesDelCliente = appState.cupones.filter(c => c.clienteId === clienteId);
@@ -2064,10 +2192,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             appState.prestadores.forEach(prestador => {
                 const cuponesPrestador = cuponesDelCliente.filter(c => c.prestadorId === prestador.id);
-                const cupone = cuponesPrestador.length > 0 ? cuponesPrestador[0] : null;
+                const limite = prestador.limite || 'ilimitado';
+                // Cupón activo = todavía no se usó y no venció
+                const activo = cuponesPrestador.find(c => c.estado === 'activo') || null;
+                const cupone = activo || (cuponesPrestador[0] || null);
 
-                const tieneActivo = cupone && cupone.estado === 'activo';
-                const tieneUsado = cupone && cupone.estado === 'usado';
+                const tieneActivo = !!activo;
+                // Único ya consumido: existe algún cupón y ninguno activo
+                const unicoAgotado = limite === 'unico' && cuponesPrestador.length > 0 && !activo;
 
                 const inactivo = prestador.activo === false;
 
@@ -2098,23 +2230,24 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                     <p style="font-weight:600; color:var(--accent); margin-bottom:6px;">🕓 Próximamente</p>
                                     <p style="font-size:13px; color:#999;">Este beneficio va a estar disponible muy pronto.</p>
                                 </div>
-                            ` : (cupone ? `
+                            ` : (tieneActivo ? `
                                 <div class="cupone-codigo">${cupone.codigo}</div>
-                                <div class="cupone-fecha">
-                                    ${tieneActivo ? `Válido hasta ${cupone.expirado.toLocaleDateString('es-AR')}` : ''}
-                                    ${tieneUsado ? `Canjeado el ${cupone.usadoEn.toLocaleDateString('es-AR')}` : ''}
-                                </div>
+                                <div class="cupone-fecha">Válido hasta ${cupone.expirado.toLocaleDateString('es-AR')}</div>
                                 <div class="cupone-estado">
-                                    <span class="${tieneActivo ? 'estado-activo' : 'estado-usado'}">
-                                        ${tieneActivo ? '✓ Disponible' : '✓ Canjeado'}
-                                    </span>
+                                    <span class="estado-activo">✓ Disponible</span>
                                 </div>
-                                ${tieneActivo ? `<p style="font-size: 12px; color: #999; margin-top: 15px;">⏳ Cupón activo · mostrá este código al prestador para canjearlo.</p>` : ''}
+                                <p style="font-size: 12px; color: #999; margin-top: 15px;">⏳ Cupón activo · mostrá este código al prestador para canjearlo.</p>
                                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    ${(tieneUsado && prestador.tipoLimite !== 'unico') ? `<button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear nuevo cupón</button>` : ''}
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                 </div>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
+                            ` : (unicoAgotado ? `
+                                <div style="text-align: center; padding: 16px 0;">
+                                    <p style="font-weight:600; color:var(--accent); margin-bottom:6px;">✓ Beneficio utilizado</p>
+                                    <p style="font-size:13px; color:#999; margin-bottom:12px;">Este beneficio es de un solo uso y ya lo aprovechaste.</p>
+                                    <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Visitar sitio →</a>
+                                    <p style="font-size: 12px; color: #999; margin-top: 12px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
+                                </div>
                             ` : `
                                 <div style="text-align: center; padding: 20px 0; color: #999;">
                                     <p style="margin-bottom: 10px;">No tenés cupón de este prestador</p>
@@ -2124,7 +2257,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                     </div>
                                     <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
                                 </div>
-                            `)}
+                            `))}
                         </div>
                     </div>
                 `;
@@ -2199,66 +2332,70 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (m) m.remove();
         }
 
-        function crearCupon(prestadorId, prestadorNombre) {
+        async function crearCupon(prestadorId, prestadorNombre) {
             const clienteId = appState.usuarioActual.clienteId;
             const prestador = appState.prestadores.find(p => p.id === prestadorId);
 
-            // Si es cupón único (como Anna Rosatti), verificar si ya existe CUALQUIER cupón
-            if (prestador.tipoLimite === 'unico') {
-                const cuponUnico = appState.cupones.find(c => 
+            const hoy = new Date();
+            const limite = prestador.limite || 'ilimitado';
+
+            // Cupón activo = todavía no se usó y no venció
+            const tieneActivo = appState.cupones.some(c =>
+                c.clienteId === clienteId && c.prestadorId === prestadorId &&
+                c.usadoEn === null && new Date(c.expirado) > hoy
+            );
+            if (tieneActivo) {
+                showAlert('vistaDashboardCliente', `❌ Ya tenés un cupón activo de ${prestadorNombre}. Usalo o esperá a que venza para generar otro.`, 'error');
+                return;
+            }
+
+            if (limite === 'unico') {
+                // Un solo uso de por vida: si ya existe CUALQUIER cupón, bloquear
+                const yaExiste = appState.cupones.some(c =>
                     c.clienteId === clienteId && c.prestadorId === prestadorId
                 );
-                
-                if (cuponUnico) {
-                    showAlert('vistaDashboardCliente', `❌ Ya canjeaste tu cupón único de ${prestadorNombre}. Solo puedes usar este beneficio una sola vez.`, 'error');
+                if (yaExiste) {
+                    showAlert('vistaDashboardCliente', `❌ Ya usaste tu cupón único de ${prestadorNombre}. Este beneficio es de un solo uso.`, 'error');
                     return;
                 }
-            } else {
-                // Para cupones mensuales normales
-                const hoy = new Date();
+            } else if (limite === 'mensual') {
+                // Uno por mes calendario: bloquear si ya hay uno de este mes
                 const primerDiaDelMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-                
-                // Buscar si ya existe un cupón activo de este cliente con este prestador en el mes actual
-                const cuponExistenteDelMes = appState.cupones.find(c => {
-                    const esDelCliente = c.clienteId === clienteId;
-                    const esDelPrestador = c.prestadorId === prestadorId;
-                    const esDelMesActual = new Date(c.creadoEn) >= primerDiaDelMes;
-                    const estaActivo = c.estado === 'activo' || (c.usadoEn === null && new Date(c.expirado) > hoy);
-                    
-                    return esDelCliente && esDelPrestador && esDelMesActual && estaActivo;
-                });
-                
-                // Si ya existe un cupón activo este mes, bloquear
-                if (cuponExistenteDelMes) {
-                    showAlert('vistaDashboardCliente', `❌ Ya tenés un cupón activo de ${prestadorNombre} este mes. Vuelve el próximo 1 de mes para solicitar uno nuevo.`, 'error');
+                const yaEsteMes = appState.cupones.some(c =>
+                    c.clienteId === clienteId && c.prestadorId === prestadorId &&
+                    new Date(c.creadoEn) >= primerDiaDelMes
+                );
+                if (yaEsteMes) {
+                    showAlert('vistaDashboardCliente', `❌ Ya generaste tu cupón de ${prestadorNombre} este mes. El límite se renueva el 1° del mes que viene.`, 'error');
                     return;
                 }
             }
+            // 'ilimitado': sin tope; solo aplica el chequeo de "cupón activo" de arriba.
 
             // Generar código único
             const codigo = `SCGL-${prestadorNombre.substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            const agenteId = appState.clientes.find(c => c.id === clienteId)?.agenteId || null;
+            const venceEn = new Date(Date.now() + (prestador.vigenciaDias || 30) * 24 * 60 * 60 * 1000);
 
-            const nuevoCupon = {
-                id: Date.now().toString(),
-                clienteId: appState.usuarioActual.clienteId,
-                prestadorId,
-                agenteId: appState.clientes.find(c => c.id === appState.usuarioActual.clienteId).agenteId,
+            // Guardar el cupón en Supabase (base de datos real)
+            const { error } = await supabaseClient.from('cupones').insert({
+                cliente_id: clienteId,
+                prestador_id: prestadorId,
+                agente_id: agenteId,
                 codigo,
-                estado: 'activo',
-                creadoEn: new Date(),
-                expirado: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                usadoEn: null
-            };
+                vence_en: venceEn.toISOString()
+            });
 
-            appState.cupones.push(nuevoCupon);
+            if (error) {
+                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón. Probá de nuevo en un momento.', 'error');
+                console.error('Error al crear cupón en Supabase:', error);
+                return;
+            }
 
-            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}`, 'success');
+            // Refrescar los cupones desde la base y volver a dibujar
+            await cargarCuponesCliente();
             renderCuponesCliente();
-
-            // Simular envío de email
-            setTimeout(() => {
-                showAlert('vistaDashboardCliente', `📧 Mails enviados a ti y a ${prestadorNombre}`, 'info');
-            }, 500);
+            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}`, 'success');
         }
 
         // Contraseña de prestadores (demo; con Supabase será real y por prestador)
@@ -2512,26 +2649,50 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.getElementById('clientesTableBody').innerHTML = html;
         }
 
-        function validarCliente(clienteId) {
-            const cliente = appState.clientes.find(c => c.id === clienteId);
-            cliente.validado = true;
-            cliente.validado_at = new Date();
-
-            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado correctamente`, 'success');
-            renderClientes();
-
-            // Simular email
-            setTimeout(() => {
-                showAlert('vistaAdmin', `📧 Email enviado a ${cliente.email}`, 'info');
-            }, 500);
+        // Trae TODOS los clientes desde Supabase (solo funciona con sesión de admin por RLS)
+        async function cargarClientesAdmin() {
+            const { data, error } = await supabaseClient
+                .from('clientes').select('*')
+                .order('created_at', { ascending: false });
+            if (error) { console.error('Error al cargar clientes (admin):', error); return; }
+            appState.clientes = (data || []).map(c => ({
+                id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
+                agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+            }));
         }
 
-        function rechazarCliente(clienteId) {
-            if (confirm('¿Estás seguro de que querés rechazar este cliente?')) {
-                appState.clientes = appState.clientes.filter(c => c.id !== clienteId);
-                showAlert('vistaAdmin', 'Cliente rechazado', 'success');
-                renderClientes();
+        async function validarCliente(clienteId) {
+            const cliente = appState.clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+
+            // Guardar la validación en Supabase (base de datos real)
+            const { error } = await supabaseClient.from('clientes')
+                .update({ validado: true })
+                .eq('id', clienteId);
+            if (error) {
+                showAlert('vistaAdmin', 'No se pudo validar. Probá de nuevo en un momento.', 'error');
+                console.error('Error al validar cliente:', error);
+                return;
             }
+
+            cliente.validado = true;
+            renderClientes();
+            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado correctamente`, 'success');
+            // Nota: el aviso por mail al cliente se enviará cuando esté el endpoint del servidor.
+        }
+
+        async function rechazarCliente(clienteId) {
+            if (!confirm('¿Seguro que querés rechazar y eliminar este registro? No se puede deshacer.')) return;
+            const { error } = await supabaseClient.from('clientes').delete().eq('id', clienteId);
+            if (error) {
+                showAlert('vistaAdmin', 'No se pudo rechazar. Probá de nuevo en un momento.', 'error');
+                console.error('Error al rechazar cliente:', error);
+                return;
+            }
+            appState.clientes = appState.clientes.filter(c => c.id !== clienteId);
+            renderClientes();
+            showAlert('vistaAdmin', 'Registro rechazado y eliminado.', 'success');
         }
 
         function renderAgentes() {
