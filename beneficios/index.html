@@ -1656,6 +1656,7 @@
             } else {
                 const ag = getAgentePorEmail(email);
                 appState.usuarioActual = { id: 'agente_' + ag.id, nombre: ag.nombre, email, rol: 'agente', agenteId: ag.id };
+                await cargarDatosAgente(ag.id);
                 showDashboardAgente();
             }
         }
@@ -2008,6 +2009,37 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 </div>
             `;
             showVista('vistaDashboardCliente');
+        }
+
+        // Trae de Supabase los clientes del agente y los cupones de esos clientes (RLS los filtra)
+        async function cargarDatosAgente(agenteId) {
+            const { data: cls, error: e1 } = await supabaseClient
+                .from('clientes').select('*')
+                .eq('agente_id', agenteId)
+                .order('created_at', { ascending: false });
+            if (e1) { console.error('Error al cargar clientes del agente:', e1); }
+            else {
+                appState.clientes = (cls || []).map(c => ({
+                    id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
+                    agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                    validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+                }));
+            }
+            const { data: cps, error: e2 } = await supabaseClient
+                .from('cupones').select('*')
+                .eq('agente_id', agenteId)
+                .order('creado_en', { ascending: false });
+            if (e2) { console.error('Error al cargar cupones del agente:', e2); }
+            else {
+                const ahora = new Date();
+                appState.cupones = (cps || []).map(row => ({
+                    id: row.id, clienteId: row.cliente_id, prestadorId: row.prestador_id, agenteId: row.agente_id,
+                    codigo: row.codigo,
+                    estado: row.usado_en ? 'usado' : (new Date(row.vence_en) > ahora ? 'activo' : 'vencido'),
+                    creadoEn: new Date(row.creado_en), expirado: new Date(row.vence_en),
+                    usadoEn: row.usado_en ? new Date(row.usado_en) : null
+                }));
+            }
         }
 
         function showDashboardAgente() {
