@@ -1192,6 +1192,7 @@
                     </div>
 
                     <div id="formRegistroContainer" style="display: none;">
+                        <div id="regPasoDatos">
                         <div class="form-group">
                             <label>Nombre completo</label>
                             <input type="text" id="regNombre" placeholder="Juan García">
@@ -1236,7 +1237,20 @@
                             <input type="checkbox" id="regTyC" style="width:auto; margin-top:3px; flex-shrink:0;">
                             <label for="regTyC" style="font-weight:400; font-size:12px; color:var(--text-secondary); cursor:pointer;">Leí y acepto los <a href="#" onclick="openModalTyCPrograma(); return false;" style="color:var(--primary); text-decoration:underline;">términos y condiciones</a> del programa de beneficios.</label>
                         </div>
-                        <button class="btn btn-primary" onclick="handleRegistro()">Crear cuenta</button>
+                        <button class="btn btn-primary" id="btnCrearCuenta" onclick="iniciarRegistro()">Crear cuenta</button>
+                        </div>
+                        <!-- Paso 2 del registro: confirmar el email con un código -->
+                        <div id="regPasoCodigo" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Para confirmar que tu email es correcto, te enviamos un código a <strong id="regEmailDisplay"></strong>. Revisá tu correo (y la carpeta de spam).</p>
+                            <div class="form-group">
+                                <label>Código de 6 dígitos</label>
+                                <input type="text" id="regCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){confirmarRegistro();}">
+                                <p id="regCodigoError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
+                            </div>
+                            <button class="btn btn-primary" id="btnConfirmarReg" onclick="confirmarRegistro()">Confirmar y registrarme</button>
+                            <p style="text-align:center; font-size:12px; color:var(--gray-dark); margin-top:14px;">¿No te llegó? <button id="btnReenviarReg" onclick="reenviarCodigoReg()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; text-decoration:underline; padding:0; font-size:12px;">Reenviar código</button></p>
+                            <button class="btn btn-secondary" onclick="volverADatosRegistro()" style="width:100%; margin-top:6px;">Corregir mis datos</button>
+                        </div>
                         <div class="toggle-form">
                             ¿Ya tenés cuenta? <button onclick="toggleForm()">Ingresá</button>
                         </div>
@@ -1580,6 +1594,11 @@
         function toggleForm() {
             document.getElementById('formLoginContainer').style.display = document.getElementById('formLoginContainer').style.display === 'none' ? 'block' : 'none';
             document.getElementById('formRegistroContainer').style.display = document.getElementById('formRegistroContainer').style.display === 'none' ? 'block' : 'none';
+            // Resetear el registro al paso de datos (por si quedó en el paso del código)
+            const rd = document.getElementById('regPasoDatos'); if (rd) rd.style.display = 'block';
+            const rc = document.getElementById('regPasoCodigo'); if (rc) rc.style.display = 'none';
+            _registroPendiente = null;
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
         // Muestra/oculta el error del campo email (borde rojo + leyenda)
@@ -1687,8 +1706,8 @@
 
         // Cuenta regresiva del botón "Reenviar" (Supabase limita a ~1 código por minuto)
         let _cooldownTimer = null;
-        function iniciarCooldownReenvio(segundos) {
-            const btn = document.getElementById('btnReenviar');
+        function iniciarCooldownReenvio(segundos, btnId = 'btnReenviar') {
+            const btn = document.getElementById(btnId);
             if (!btn) return;
             if (_cooldownTimer) clearInterval(_cooldownTimer);
             let s = segundos;
@@ -1802,7 +1821,9 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.body.insertAdjacentHTML('beforeend', html);
         }
 
-        async function handleRegistro() {
+        // Paso 1 del registro: validar datos y enviar un código para confirmar el email
+        let _registroPendiente = null;
+        async function iniciarRegistro() {
             const nombre = document.getElementById('regNombre').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const telefono = document.getElementById('regTelefono').value.trim();
@@ -1819,41 +1840,102 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 showAlert('vistaLogin', 'Completá todos los campos', 'error');
                 return;
             }
-
+            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                showAlert('vistaLogin', 'Revisá el email: no parece válido.', 'error');
+                return;
+            }
             if (!aceptaTyC) {
                 showAlert('vistaLogin', 'Debés aceptar los términos y condiciones para registrarte.', 'error');
                 return;
             }
+            if (esStaffEmail(email)) {
+                showAlert('vistaLogin', 'Ese email es de un agente/admin del equipo. Usá otro email para registrarte como cliente.', 'error');
+                return;
+            }
 
-            // Guardar en Supabase (base de datos real)
+            const btn = document.getElementById('btnCrearCuenta');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando código...'; }
+
+            // Evitar duplicados: ¿ya existe este email?
+            const { data: existe } = await supabaseClient.rpc('cliente_existe', { p_email: email });
+            if (existe) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+                showAlert('vistaLogin', 'Ese email ya está registrado. Ingresá con tu código desde "Ya tenés cuenta".', 'error');
+                return;
+            }
+
+            // Enviar el código para confirmar que el email es real y es suyo
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+            if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
+
+            _registroPendiente = { nombre, email, telefono, cumple, agenteId, operacion, direccion };
+            document.getElementById('regEmailDisplay').textContent = email;
+            document.getElementById('regPasoDatos').style.display = 'none';
+            document.getElementById('regPasoCodigo').style.display = 'block';
+            const ci = document.getElementById('regCodigo'); if (ci) { ci.value = ''; ci.focus(); }
+            iniciarCooldownReenvio(60, 'btnReenviarReg');
+        }
+
+        // Paso 2 del registro: confirmar el código y recién ahí guardar el registro
+        async function confirmarRegistro() {
+            if (!_registroPendiente) { volverADatosRegistro(); return; }
+            const token = document.getElementById('regCodigo').value.trim();
+            const errEl = document.getElementById('regCodigoError');
+            if (errEl) errEl.style.display = 'none';
+            if (token.length < 6) { if (errEl) { errEl.textContent = 'Ingresá el código de 6 dígitos.'; errEl.style.display = 'block'; } return; }
+
+            const btn = document.getElementById('btnConfirmarReg');
+            if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
+            const { error: errVerify } = await supabaseClient.auth.verifyOtp({ email: _registroPendiente.email, token, type: 'email' });
+            if (errVerify) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
+                if (errEl) { errEl.textContent = 'Código incorrecto o vencido. Revisá e intentá de nuevo.'; errEl.style.display = 'block'; }
+                return;
+            }
+
+            // Email confirmado → guardar el registro en Supabase
+            const r = _registroPendiente;
             const { error } = await supabaseClient.from('clientes').insert({
-                nombre,
-                email,
-                telefono,
-                cumple,
-                agente_id: agenteId,
-                operacion,
-                direccion
+                nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
+                agente_id: r.agenteId, operacion: r.operacion, direccion: r.direccion
             });
-
+            if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
             if (error) {
-                showAlert('vistaLogin', 'No se pudo completar el registro. Probá de nuevo en un momento.', 'error');
+                showAlert('vistaLogin', 'No se pudo completar el registro: ' + (error.message || 'error desconocido'), 'error');
                 console.error('Error al registrar en Supabase:', error);
                 return;
             }
 
-            // Estado local para que el flujo de la app siga funcionando
             const nuevoCliente = {
                 id: Date.now().toString(),
-                nombre, email, telefono, cumple, agenteId, operacion, direccion,
-                registradoEn: new Date(),
-                validado: false
+                nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
+                agenteId: r.agenteId, operacion: r.operacion, direccion: r.direccion,
+                registradoEn: new Date(), validado: false
             };
             appState.clientes.push(nuevoCliente);
-            appState.usuarioActual = { id: nuevoCliente.id, nombre, email, rol: 'cliente', clienteId: nuevoCliente.id };
+            appState.usuarioActual = { id: nuevoCliente.id, nombre: r.nombre, email: r.email, rol: 'cliente', clienteId: nuevoCliente.id };
+            _registroPendiente = null;
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
 
-            showAlert('vistaLogin', '¡Cuenta creada! Esperando validación...', 'success');
-            setTimeout(() => showDashboardCliente(), 1000);
+            document.getElementById('vistaLogin').classList.remove('activa');
+            showAlert('vistaLogin', '¡Email confirmado y cuenta creada!', 'success');
+            showDashboardCliente();
+        }
+
+        async function reenviarCodigoReg() {
+            if (!_registroPendiente) return;
+            const { error } = await supabaseClient.auth.signInWithOtp({ email: _registroPendiente.email });
+            if (error) { showAlert('vistaLogin', 'Pediste un código hace muy poco. Esperá a que termine la cuenta regresiva.', 'error'); console.error(error); return; }
+            showAlert('vistaLogin', 'Te reenviamos el código.', 'success');
+            iniciarCooldownReenvio(60, 'btnReenviarReg');
+        }
+
+        function volverADatosRegistro() {
+            document.getElementById('regPasoCodigo').style.display = 'none';
+            document.getElementById('regPasoDatos').style.display = 'block';
+            const ci = document.getElementById('regCodigo'); if (ci) ci.value = '';
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
         function showDashboardCliente() {
