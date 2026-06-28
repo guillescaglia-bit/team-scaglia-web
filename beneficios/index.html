@@ -2671,7 +2671,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 .update({ validado: true })
                 .eq('id', clienteId);
             if (error) {
-                showAlert('vistaAdmin', 'No se pudo validar. Probá de nuevo en un momento.', 'error');
+                showAlert('vistaAdmin', 'No se pudo validar: ' + (error.message || 'error desconocido'), 'error');
                 console.error('Error al validar cliente:', error);
                 return;
             }
