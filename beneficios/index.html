@@ -921,6 +921,8 @@
                 padding: 25px;
             }
 
+            .seguinos-txt { display: none; }
+
             .cupones-grid {
                 grid-template-columns: 1fr;
             }
@@ -1080,23 +1082,18 @@
     <header id="header" style="display: none;">
         <div class="container">
             <div class="logo">
-                <a href="https://www.instagram.com/teamscaglia" target="_blank" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;" title="Seguinos en Instagram">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <circle cx="17.5" cy="6.5" r="1.5"></circle>
-                    </svg>
-                    <div>
-                        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: 0.05em;">Team Scaglia</div>
-                        <div style="font-size: 11px; opacity: 0.7; letter-spacing: 0.1em; margin-top: 2px;">@teamscaglia</div>
-                    </div>
-                </a>
+                <img src="/logos/logo-team-blanco-trim.png" alt="Team Scaglia" style="height: 36px; width: auto; display: block;">
             </div>
             <div class="user-info">
                 <div style="text-align: right;">
                     <div class="user-name" id="userNameDisplay"></div>
                     <small style="opacity: 0.7; display: block; font-size: 12px;" id="userRoleDisplay"></small>
                 </div>
+                <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
+                <a href="https://www.instagram.com/teamscaglia" target="_blank" rel="noopener" title="Seguinos en Instagram" style="display:flex; align-items:center; gap:6px; color:#fff; text-decoration:none; opacity:0.65; font-size:11px; font-weight:500; letter-spacing:0.05em; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.65">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><circle cx="17.5" cy="6.5" r="1"></circle></svg>
+                    <span class="seguinos-txt">Seguinos</span>
+                </a>
                 <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
                 <button id="themeToggleBtn" onclick="toggleThemeManual()" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer; padding:4px; line-height:1; transition:transform 0.3s;" onmouseover="this.style.transform='rotate(20deg)'" onmouseout="this.style.transform='rotate(0deg)'" title="Cambiar tema">
                     <span id="themeIcon">🌙</span>
@@ -2581,7 +2578,24 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             await cargarCuponesCliente();
             renderCuponesCliente();
             renderHistorialCliente();
-            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}`, 'success');
+            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}. Te lo enviamos por mail.`, 'success');
+
+            // Mandarle el cupón por mail al cliente (para que lo tenga a mano)
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                await fetch('/api/notificar-cupon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({
+                        email: appState.usuarioActual.email,
+                        nombre: appState.usuarioActual.nombre,
+                        codigo,
+                        prestadorNombre: prestador.nombre,
+                        descuento: prestador.descuento,
+                        venceEn: venceEn.toISOString()
+                    })
+                });
+            } catch (e) { console.error('No se pudo enviar el cupón por mail:', e); }
         }
 
         // Contraseña de prestadores (demo; con Supabase será real y por prestador)
