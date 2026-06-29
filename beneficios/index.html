@@ -1988,11 +1988,17 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div class="cupones-grid" id="cuponesGrid">
                                 <!-- Se llena dinámicamente -->
                             </div>
+                            <div style="margin-top:48px; background:white; border-radius:12px; padding:25px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                <h3 style="color:#324a70; margin-bottom:6px;">Historial de cupones</h3>
+                                <p style="color:#999; font-size:13px; margin-bottom:18px;">Todos los cupones que generaste, con su estado.</p>
+                                <div id="historialCupones" style="overflow-x:auto;"></div>
+                            </div>
                         </div>
                     </div>
                 `;
-                
+
                 renderCuponesCliente();
+                renderHistorialCliente();
                 showVista('vistaDashboardCliente');
             }
         }
@@ -2314,6 +2320,54 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             });
         }
 
+        // Historial de todos los cupones del cliente (activos, canjeados y vencidos)
+        function renderHistorialCliente() {
+            const cont = document.getElementById('historialCupones');
+            if (!cont) return;
+            const clienteId = appState.usuarioActual.clienteId;
+            const ahora = new Date();
+            const cupones = appState.cupones
+                .filter(c => c.clienteId === clienteId)
+                .sort((a, b) => new Date(b.creadoEn) - new Date(a.creadoEn));
+
+            if (!cupones.length) {
+                cont.innerHTML = '<p style="color:#999; font-size:14px;">Todavía no generaste ningún cupón.</p>';
+                return;
+            }
+
+            const filas = cupones.map(c => {
+                const prestador = appState.prestadores.find(p => p.id === c.prestadorId);
+                let estado, color;
+                if (c.usadoEn) { estado = 'Canjeado'; color = '#2d7a4f'; }
+                else if (new Date(c.expirado) < ahora) { estado = 'Vencido'; color = '#b91c1c'; }
+                else { estado = 'Activo'; color = '#1e6fd6'; }
+                const fechaRef = c.usadoEn
+                    ? 'Canjeado: ' + new Date(c.usadoEn).toLocaleDateString('es-AR')
+                    : 'Vence: ' + new Date(c.expirado).toLocaleDateString('es-AR');
+                return `<tr style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:10px 8px; font-weight:600; color:#324a70;">${prestador ? prestador.nombre : '—'}</td>
+                    <td style="padding:10px 8px; font-family:monospace; letter-spacing:0.5px;">${c.codigo}</td>
+                    <td style="padding:10px 8px;"><span style="color:${color}; font-weight:600;">${estado}</span></td>
+                    <td style="padding:10px 8px; color:#666;">${new Date(c.creadoEn).toLocaleDateString('es-AR')}</td>
+                    <td style="padding:10px 8px; color:#666;">${fechaRef}</td>
+                </tr>`;
+            }).join('');
+
+            cont.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:560px;">
+                    <thead>
+                        <tr style="text-align:left; color:#666; border-bottom:2px solid #eee;">
+                            <th style="padding:10px 8px;">Prestador</th>
+                            <th style="padding:10px 8px;">Código</th>
+                            <th style="padding:10px 8px;">Estado</th>
+                            <th style="padding:10px 8px;">Creado</th>
+                            <th style="padding:10px 8px;">Canje / Vence</th>
+                        </tr>
+                    </thead>
+                    <tbody>${filas}</tbody>
+                </table>`;
+        }
+
         function renderCuponesCliente() {
             const clienteId = appState.usuarioActual.clienteId;
             const cuponesDelCliente = appState.cupones.filter(c => c.clienteId === clienteId);
@@ -2525,6 +2579,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             // Refrescar los cupones desde la base y volver a dibujar
             await cargarCuponesCliente();
             renderCuponesCliente();
+            renderHistorialCliente();
             showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}`, 'success');
         }
 
