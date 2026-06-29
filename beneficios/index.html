@@ -2649,6 +2649,12 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
         }
 
+        // Oculta los últimos 4 caracteres del código (para que agente/admin no vean el código canjeable)
+        function enmascararCodigo(codigo) {
+            if (!codigo || codigo.length <= 4) return 'XXXX';
+            return codigo.slice(0, -4) + 'XXXX';
+        }
+
         // Llena los desplegables de cumpleaños: Día / Mes / Año
         function popularCumple() {
             const dia = document.getElementById('regCumpleDia');
@@ -2724,7 +2730,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div style="font-weight: 600; color: #324a70;">${cliente.nombre}</div>
                             <div style="color: #666; font-size: 14px; margin: 5px 0;">${accion}</div>
                             <div style="color: #999; font-size: 12px;">
-                                ${fecha.toLocaleString('es-AR')} | Código: <strong>${cupone.codigo}</strong>
+                                ${fecha.toLocaleString('es-AR')} | Código: <strong>${enmascararCodigo(cupone.codigo)}</strong>
                             </div>
                         </div>
                     `;
@@ -3176,7 +3182,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td>${cliente ? cliente.nombre : 'N/A'}</td>
                         <td>${agente ? agente.nombre : 'N/A'}</td>
                         <td>${prestador ? prestador.nombre : 'N/A'}</td>
-                        <td><strong>${cupone.codigo}</strong></td>
+                        <td><strong>${enmascararCodigo(cupone.codigo)}</strong></td>
                         <td><span class="badge ${estado === 'Canjeado' ? 'badge-success' : estado === 'Expirado' ? 'badge-danger' : 'badge-info'}">${estado}</span></td>
                         <td>${new Date(cupone.creadoEn).toLocaleDateString('es-AR')}</td>
                         <td>${cupone.usadoEn ? new Date(cupone.usadoEn).toLocaleDateString('es-AR') : '-'}</td>
