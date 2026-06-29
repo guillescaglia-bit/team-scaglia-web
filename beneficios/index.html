@@ -1096,7 +1096,6 @@
                     <small style="opacity: 0.7; display: block; font-size: 12px;" id="userRoleDisplay"></small>
                 </div>
                 <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
-                <a href="/" style="background:none; border:none; color:#fff; text-decoration:none; font-size:12px; font-weight:500; letter-spacing:0.08em; cursor:pointer; opacity:0.85; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85" title="Volver al sitio Team Scaglia">Volver a inicio</a>
                 <button id="themeToggleBtn" onclick="toggleThemeManual()" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer; padding:4px; line-height:1; transition:transform 0.3s;" onmouseover="this.style.transform='rotate(20deg)'" onmouseout="this.style.transform='rotate(0deg)'" title="Cambiar tema">
                     <span id="themeIcon">🌙</span>
                 </button>
@@ -3303,20 +3302,63 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         }
 
-        function logout() {
+        async function logout() {
+            if (!confirm('¿Seguro que querés salir de tu cuenta?')) return;
+            try { await supabaseClient.auth.signOut(); } catch (e) { /* igual cerramos */ }
             appState.usuarioActual = null;
             document.getElementById('header').style.display = 'none';
             showVista('vistaLogin');
 
-            // Limpiar formularios
+            // Limpiar formularios y volver al paso inicial del login
             document.getElementById('loginEmail').value = '';
             if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('formLoginContainer').style.display = 'block';
             document.getElementById('formRegistroContainer').style.display = 'none';
+            const p1 = document.getElementById('otpPaso1'); if (p1) p1.style.display = 'block';
+            const p2 = document.getElementById('otpPaso2'); if (p2) p2.style.display = 'none';
+            const pp = document.getElementById('otpPasoPass'); if (pp) pp.style.display = 'none';
+        }
+
+        // Al recargar la página: si hay una sesión activa, restaurar el panel sin pedir login de nuevo
+        async function restaurarSesion() {
+            let session = null;
+            try { const r = await supabaseClient.auth.getSession(); session = r.data.session; } catch (e) { return false; }
+            if (!session || !session.user) return false;
+            const email = session.user.email || '';
+
+            // Admin
+            if (esAdminEmail(email)) {
+                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarClientesAdmin();
+                showDashboardAdmin();
+                return true;
+            }
+            // Agente
+            const ag = getAgentePorEmail(email);
+            if (ag) {
+                appState.usuarioActual = { id: 'agente_' + ag.id, nombre: ag.nombre, email, rol: 'agente', agenteId: ag.id };
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarDatosAgente(ag.id);
+                showDashboardAgente();
+                return true;
+            }
+            // Cliente
+            const { data: filas } = await supabaseClient.from('clientes').select('*').eq('email', email).order('created_at', { ascending: false }).limit(1);
+            if (filas && filas.length) {
+                const c = filas[0];
+                appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarCuponesCliente();
+                showDashboardCliente();
+                return true;
+            }
+            return false;
         }
 
         function showAlert(vistaId, mensaje, tipo) {
-            const containerId = vistaId === 'vistaAdmin' ? 'adminAlertContainer' : 
+            const containerId = vistaId === 'vistaAdmin' ? 'adminAlertContainer' :
                                vistaId === 'vistaDashboardAgente' ? 'agenteAlertContainer' : 'alertContainer';
 
             const alertHTML = `<div class="alert alert-${tipo} mostrar">${mensaje}</div>`;
@@ -3427,6 +3469,9 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             // Acceso de prestadores por URL oculta (ej: /beneficios#validar)
             if (location.hash === '#validar' || location.hash === '#prestador') {
                 abrirValidador();
+            } else {
+                // Si hay sesión activa, restaurar el panel sin pedir login otra vez
+                restaurarSesion();
             }
 
             // Llenar dropdown de agentes en registro (si existe el selector)
