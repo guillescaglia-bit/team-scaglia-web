@@ -1916,6 +1916,22 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             };
             appState.clientes.push(nuevoCliente);
             appState.usuarioActual = { id: nuevoCliente.id, nombre: r.nombre, email: r.email, rol: 'cliente', clienteId: nuevoCliente.id };
+
+            // Avisar a info@ y al agente asignado (no bloquea el registro si falla)
+            try {
+                const agente = appState.agentes.find(a => a.id === r.agenteId);
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                await fetch('/api/notificar-registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({
+                        nombre: r.nombre, email: r.email, telefono: r.telefono,
+                        operacion: r.operacion, direccion: r.direccion,
+                        agenteNombre: agente?.nombre || '', agenteEmail: agente?.email || ''
+                    })
+                });
+            } catch (e) { console.error('No se pudo enviar el aviso de registro:', e); }
+
             _registroPendiente = null;
             if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
 
@@ -2800,13 +2816,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             renderClientes();
             showAlert('vistaAdmin', `✓ ${cliente.nombre} validado. Enviando aviso por mail...`, 'success');
 
-            // Avisar al cliente por mail (vía la función segura de Vercel)
+            // Avisar al cliente y al agente por mail (vía la función segura de Vercel)
             try {
+                const agente = appState.agentes.find(a => a.id === cliente.agenteId);
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const resp = await fetch('/api/notificar-validacion', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-                    body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre })
+                    body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agenteEmail: agente?.email || '', agenteNombre: agente?.nombre || '' })
                 });
                 if (resp.ok) {
                     showAlert('vistaAdmin', `📧 Mail de aviso enviado a ${cliente.email}`, 'success');

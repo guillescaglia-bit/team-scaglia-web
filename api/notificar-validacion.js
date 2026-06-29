@@ -1,4 +1,6 @@
-// Mini-función (Vercel) que envía el mail "ya podés acceder" cuando el admin aprueba un cliente.
+// Mini-función (Vercel) que avisa por mail cuando el admin aprueba un cliente:
+//  - al CLIENTE: "ya podés acceder a tus beneficios"
+//  - al AGENTE: "tu cliente fue validado"
 // Seguridad: solo se ejecuta si quien la llama está logueado como admin (verificado contra Supabase).
 // La llave de Resend vive en una variable de entorno secreta (RESEND_API_KEY), nunca en el navegador.
 
@@ -7,6 +9,30 @@ const SUPABASE_URL = 'https://fgipdqcxsbmrjvozalqn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
 const ADMIN_EMAIL = 'info@teamscaglia.com';
 const BENEFICIOS_URL = 'https://www.teamscaglia.com/beneficios';
+
+async function enviarMail(key, to, subject, html) {
+  return fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: 'Team Scaglia <info@teamscaglia.com>', to: [to], subject, html })
+  });
+}
+
+function envoltorio(titulo, cuerpoHtml) {
+  return `
+  <div style="background:#f4f4f5; padding:32px 0; font-family:Helvetica,Arial,sans-serif;">
+    <div style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      <div style="background:#253C64; padding:28px 32px; text-align:center;">
+        <p style="margin:0; color:rgba(255,255,255,0.7); font-size:11px; letter-spacing:3px; text-transform:uppercase;">Team Scaglia</p>
+        <h1 style="margin:8px 0 0; color:#ffffff; font-size:22px; font-weight:500;">${titulo}</h1>
+      </div>
+      <div style="padding:32px;">${cuerpoHtml}</div>
+      <div style="padding:18px 32px; border-top:1px solid #eee; text-align:center;">
+        <p style="margin:0; font-size:11px; color:#aaa;">Team Scaglia · Red Suma · teamscaglia.com</p>
+      </div>
+    </div>
+  </div>`;
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
@@ -32,58 +58,49 @@ module.exports = async (req, res) => {
     return res.status(403).json({ error: 'No autorizado' });
   }
 
-  // 2) Leer datos del cliente a notificar
+  // 2) Datos
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const email = (body.email || '').trim();
   const nombre = (body.nombre || '').trim();
+  const agenteEmail = (body.agenteEmail || '').trim();
+  const agenteNombre = (body.agenteNombre || '').trim();
   if (!email) return res.status(400).json({ error: 'Falta el email del cliente' });
 
   const primerNombre = nombre.split(' ')[0] || 'Hola';
 
-  // 3) Armar y enviar el mail con Resend (desde info@teamscaglia.com)
-  const html = `
-  <div style="background:#f4f4f5; padding:32px 0; font-family:Helvetica,Arial,sans-serif;">
-    <div style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-      <div style="background:#253C64; padding:28px 32px; text-align:center;">
-        <p style="margin:0; color:rgba(255,255,255,0.7); font-size:11px; letter-spacing:3px; text-transform:uppercase;">Team Scaglia</p>
-        <h1 style="margin:8px 0 0; color:#ffffff; font-size:22px; font-weight:500;">Programa de Beneficios</h1>
-      </div>
-      <div style="padding:32px;">
-        <p style="font-size:16px; color:#253C64; margin:0 0 16px;">¡Hola, ${primerNombre}! 👋</p>
-        <p style="font-size:14px; line-height:1.7; color:#444; margin:0 0 16px;">
-          Tu cuenta del <strong>Programa de Beneficios Team Scaglia</strong> fue <strong>aprobada</strong>.
-          Ya podés ingresar y empezar a generar tus cupones de descuento en las marcas seleccionadas.
-        </p>
-        <div style="text-align:center; margin:28px 0;">
-          <a href="${BENEFICIOS_URL}" style="display:inline-block; background:#253C64; color:#ffffff; text-decoration:none; padding:14px 34px; border-radius:8px; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Entrar a mis beneficios</a>
-        </div>
-        <p style="font-size:13px; line-height:1.7; color:#777; margin:0;">
-          Para ingresar, usá este mismo email y te enviaremos un código de acceso.
-        </p>
-      </div>
-      <div style="padding:18px 32px; border-top:1px solid #eee; text-align:center;">
-        <p style="margin:0; font-size:11px; color:#aaa;">Team Scaglia · Red Suma · teamscaglia.com</p>
-      </div>
+  // 3a) Mail al CLIENTE
+  const htmlCliente = envoltorio('Programa de Beneficios', `
+    <p style="font-size:16px; color:#253C64; margin:0 0 16px;">¡Hola, ${primerNombre}! 👋</p>
+    <p style="font-size:14px; line-height:1.7; color:#444; margin:0 0 16px;">
+      Tu cuenta del <strong>Programa de Beneficios Team Scaglia</strong> fue <strong>aprobada</strong>.
+      Ya podés ingresar y empezar a generar tus cupones de descuento en las marcas seleccionadas.
+    </p>
+    <div style="text-align:center; margin:28px 0;">
+      <a href="${BENEFICIOS_URL}" style="display:inline-block; background:#253C64; color:#ffffff; text-decoration:none; padding:14px 34px; border-radius:8px; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Entrar a mis beneficios</a>
     </div>
-  </div>`;
+    <p style="font-size:13px; line-height:1.7; color:#777; margin:0;">Para ingresar, usá este mismo email y te enviaremos un código de acceso.</p>
+  `);
 
   try {
-    const sendResp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: 'Team Scaglia <info@teamscaglia.com>',
-        to: [email],
-        subject: '¡Ya podés acceder a tus beneficios! · Team Scaglia',
-        html
-      })
-    });
-    if (!sendResp.ok) {
-      const detail = await sendResp.text();
-      return res.status(502).json({ error: 'Resend rechazó el envío', detail });
+    const r = await enviarMail(RESEND_API_KEY, email, '¡Ya podés acceder a tus beneficios! · Team Scaglia', htmlCliente);
+    if (!r.ok) {
+      const detail = await r.text();
+      return res.status(502).json({ error: 'Resend rechazó el envío al cliente', detail });
     }
   } catch (e) {
-    return res.status(502).json({ error: 'No se pudo enviar el mail' });
+    return res.status(502).json({ error: 'No se pudo enviar el mail al cliente' });
+  }
+
+  // 3b) Mail al AGENTE (si tenemos su email). No bloquea el resultado si falla.
+  if (agenteEmail) {
+    const htmlAgente = envoltorio('Cliente validado', `
+      <p style="font-size:15px; color:#253C64; margin:0 0 14px;">Hola${agenteNombre ? ', ' + agenteNombre.split(' ')[0] : ''} 👋</p>
+      <p style="font-size:14px; line-height:1.7; color:#444; margin:0;">
+        Tu cliente <strong>${nombre || email}</strong> fue <strong>validado</strong> en el Programa de Beneficios y ya puede generar sus cupones.
+      </p>
+    `);
+    try { await enviarMail(RESEND_API_KEY, agenteEmail, `Tu cliente ${nombre || ''} fue validado · Beneficios`, htmlAgente); }
+    catch (e) { /* no frenamos por el mail al agente */ }
   }
 
   return res.status(200).json({ ok: true });
