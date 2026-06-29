@@ -2575,8 +2575,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             } catch (e) { console.error('No se pudo enviar el cupón por mail:', e); }
         }
 
-        // Contraseña de prestadores (demo; con Supabase será real y por prestador)
-        const CLAVE_PRESTADOR = 'teamscaglia';
+        // La clave del validador NO vive acá (sería visible). La verifica el servidor (Supabase).
         let _claveValidador = '';
 
         // Abre el validador en estado bloqueado (pide contraseña)
@@ -2591,9 +2590,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             showVista('vistaValidarCupon');
         }
 
-        function desbloquearValidador() {
+        async function desbloquearValidador() {
             const clave = document.getElementById('inputClaveValidador').value;
-            if (clave === CLAVE_PRESTADOR) {
+            // El servidor (Supabase) verifica la clave; nunca está escrita en esta página
+            const { data: ok, error } = await supabaseClient.rpc('validador_clave_ok', { p_clave: clave });
+            if (!error && ok === true) {
                 _claveValidador = clave;
                 document.getElementById('validadorGate').style.display = 'none';
                 document.getElementById('validadorContenido').style.display = 'block';
