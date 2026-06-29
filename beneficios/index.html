@@ -2503,7 +2503,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             // 'ilimitado': sin tope; solo aplica el chequeo de "cupón activo" de arriba.
 
             // Generar código único
-            const codigo = `SCGL-${prestadorNombre.substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            const codigo = `SCGL-${prestadorNombre.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
             const agenteId = appState.clientes.find(c => c.id === clienteId)?.agenteId || null;
             const venceEn = new Date(Date.now() + (prestador.vigenciaDias || 30) * 24 * 60 * 60 * 1000);
 
@@ -2530,6 +2530,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         // Contraseña de prestadores (demo; con Supabase será real y por prestador)
         const CLAVE_PRESTADOR = 'teamscaglia';
+        let _claveValidador = '';
 
         // Abre el validador en estado bloqueado (pide contraseña)
         function abrirValidador() {
@@ -2546,6 +2547,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function desbloquearValidador() {
             const clave = document.getElementById('inputClaveValidador').value;
             if (clave === CLAVE_PRESTADOR) {
+                _claveValidador = clave;
                 document.getElementById('validadorGate').style.display = 'none';
                 document.getElementById('validadorContenido').style.display = 'block';
                 document.getElementById('inputClaveValidador').value = '';
@@ -2555,79 +2557,68 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         }
 
-        function validarCodigoPrestador() {
+        async function validarCodigoPrestador() {
             const codigo = document.getElementById('inputCodigoValidador').value.trim().toUpperCase();
-            
             if (!codigo) {
                 showAlertValidador('Por favor ingresá un código', 'error');
                 return;
             }
 
-            // Buscar cupón
-            const cupone = appState.cupones.find(c => c.codigo === codigo);
+            // Buscar el cupón en la base (función segura, sin marcarlo usado todavía)
+            const { data, error } = await supabaseClient.rpc('buscar_cupon', { p_codigo: codigo, p_clave: _claveValidador });
+            if (error) { showAlertValidador('Error al verificar el código. Probá de nuevo.', 'error'); console.error(error); return; }
 
-            if (!cupone) {
-                showAlertValidador('❌ Código no encontrado', 'error');
-                return;
-            }
+            const estado = data && data.estado;
+            if (estado === 'clave_invalida') { showAlertValidador('Sesión vencida. Volvé a ingresar la clave.', 'error'); return; }
+            if (estado === 'no_existe') { showAlertValidador('❌ Código no encontrado', 'error'); return; }
+            if (estado === 'ya_usado') { showAlertValidador('❌ Este cupón ya fue canjeado', 'error'); return; }
+            if (estado === 'vencido') { showAlertValidador('❌ Este cupón está vencido', 'error'); return; }
+            if (estado !== 'ok') { showAlertValidador('❌ No se pudo validar el cupón', 'error'); return; }
 
-            if (cupone.estado === 'usado') {
-                showAlertValidador('❌ Este cupón ya fue canjeado', 'error');
-                return;
-            }
-
-            if (cupone.estado === 'expirado') {
-                showAlertValidador('❌ Este cupón expiró', 'error');
-                return;
-            }
-
-            // Verificar que no esté expirado
-            if (new Date() > cupone.expirado) {
-                cupone.estado = 'expirado';
-                showAlertValidador('❌ Este cupón expiró', 'error');
-                return;
-            }
-
-            // Si llegó aquí, el cupón es válido
-            const cliente = appState.clientes.find(c => c.id === cupone.clienteId);
-            const prestador = appState.prestadores.find(p => p.id === cupone.prestadorId);
-            const agente = appState.agentes.find(a => a.id === cupone.agenteId);
+            const prestador = appState.prestadores.find(p => p.id === data.prestador_id);
+            const venceTxt = data.vence_en ? new Date(data.vence_en).toLocaleDateString('es-AR') : '—';
 
             document.getElementById('resultadoValidacion').innerHTML = `
                 <div style="background: #dcfce7; border: 2px solid var(--success); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                     <h3 style="color: var(--success); margin-bottom: 15px;">✓ CUPÓN VÁLIDO</h3>
                     <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                         <div style="margin-bottom: 10px;">
-                            <strong style="color: var(--primary);">Cliente:</strong> ${cliente.nombre}
+                            <strong style="color: var(--primary);">Cliente:</strong> ${data.cliente}
                         </div>
                         <div style="margin-bottom: 10px;">
-                            <strong style="color: var(--primary);">Descuento:</strong> ${prestador.descuento}% en ${prestador.nombre}
+                            <strong style="color: var(--primary);">Descuento:</strong> ${prestador ? prestador.descuento + '% en ' + prestador.nombre : 'según el prestador'}
                         </div>
                         <div>
-                            <strong style="color: var(--primary);">Válido hasta:</strong> ${cupone.expirado.toLocaleDateString('es-AR')}
+                            <strong style="color: var(--primary);">Válido hasta:</strong> ${venceTxt}
                         </div>
                     </div>
-                    <button class="btn btn-success" onclick="confirmarCanjeDesdeValidador('${cupone.id}', '${cliente.nombre}', '${prestador.nombre}', '${agente.nombre}')" style="width: 100%;">Confirmar canje</button>
+                    <button class="btn btn-success" id="btnConfirmarCanje" onclick="confirmarCanjeDesdeValidador('${codigo}')" style="width: 100%;">Confirmar canje</button>
                 </div>
             `;
         }
 
-        function confirmarCanjeDesdeValidador(cuponeId, clienteNombre, prestadorNombre, agenteNombre) {
-            const cupone = appState.cupones.find(c => c.id === cuponeId);
-            cupone.estado = 'usado';
-            cupone.usadoEn = new Date();
+        async function confirmarCanjeDesdeValidador(codigo) {
+            const btn = document.getElementById('btnConfirmarCanje');
+            if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
+
+            // Marcar el cupón como usado en la base (función segura)
+            const { data, error } = await supabaseClient.rpc('canjear_cupon', { p_codigo: codigo, p_clave: _claveValidador });
+            if (error || !data || data.estado !== 'ok') {
+                if (data && data.estado === 'ya_usado') showAlertValidador('❌ Este cupón ya fue canjeado', 'error');
+                else showAlertValidador('No se pudo canjear el cupón. Probá de nuevo.', 'error');
+                if (btn) { btn.disabled = false; btn.textContent = 'Confirmar canje'; }
+                console.error(error || data);
+                return;
+            }
 
             document.getElementById('resultadoValidacion').innerHTML = `
                 <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 20px; text-align: center;">
                     <h3 style="color: #1e40af; margin-bottom: 15px;">✓ Cupón canjeado correctamente</h3>
-                    <p style="color: #1e40af; margin-bottom: 20px;">Se enviaron confirmaciones por email a:<br><strong>${clienteNombre}</strong><br><strong>${agenteNombre}</strong></p>
+                    <p style="color: #1e40af;">El descuento fue aplicado y el cupón quedó marcado como usado.</p>
                 </div>
             `;
 
             document.getElementById('inputCodigoValidador').value = '';
-            document.getElementById('inputCodigoValidador').disabled = true;
-            document.querySelector('button[onclick="validarCodigoPrestador()"]').disabled = true;
-
             showAlertValidador('✓ Canje procesado exitosamente', 'success');
 
             setTimeout(() => {
