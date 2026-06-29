@@ -3149,8 +3149,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const color = document.getElementById('modalColor').value;
             const tyc = document.getElementById('modalTyC').value.trim();
 
-            if (!nombre || !email || !url || !icono || !tyc) {
-                showAlert('vistaAdmin', '❌ Completa todos los campos obligatorios (incluye T&C)', 'error');
+            if (!nombre || !url || !icono || !tyc) {
+                showAlert('vistaAdmin', '❌ Completá los campos obligatorios: nombre, URL, ícono y T&C', 'error');
                 return;
             }
 
