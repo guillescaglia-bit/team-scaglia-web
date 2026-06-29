@@ -1137,16 +1137,7 @@
                     <h1>Team Scaglia</h1>
                     <p>Portal de beneficios exclusivos<br><span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})">↓ Mirá todos los descuentos disponibles</span></p>
 
-                    <!-- ACCESO DE PRUEBA (DEMO) -->
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; display:flex; flex-direction:column; gap:10px;">
-                        <button class="btn btn-primary btn-sm" onclick="quickLogin('cliente')" style="width: 100%;">Ingresar como cliente (demo)</button>
-                        <button class="btn btn-secondary btn-sm" onclick="quickLogin('agente')" style="width: 100%;">Ingresar como agente (demo)</button>
-                        <button class="btn btn-secondary btn-sm" onclick="quickLogin('admin')" style="width: 100%;">Ingresar como admin (demo)</button>
-                    </div>
-
-                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
-
-                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">O ingresá con tu email:</p>
+                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">Ingresá con tu email:</p>
 
                     <div id="formLoginContainer">
                         <!-- Paso 1: pedir el email -->
@@ -1777,22 +1768,6 @@
             if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
-        function quickLogin(rol) {
-            if (rol === 'admin') {
-                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email: 'admin@teamscaglia.com', rol: 'admin' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAdmin();
-            } else if (rol === 'agente') {
-                appState.usuarioActual = { id: 'agente1', nombre: 'Guillermo Scaglia', email: 'agente@teamscaglia.com', rol: 'agente', agenteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAgente();
-            } else if (rol === 'cliente') {
-                appState.usuarioActual = { id: 'cliente1', nombre: 'Juan García', email: 'cliente@teamscaglia.com', rol: 'cliente', clienteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardCliente();
-            }
-        }
-
         function openModalTyCPrograma() {
             const prev = document.getElementById('modalTyCPrograma');
             if (prev) prev.remove();
@@ -1901,7 +1876,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             });
             if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
             if (error) {
-                showAlert('vistaLogin', 'No se pudo completar el registro: ' + (error.message || 'error desconocido'), 'error');
+                showAlert('vistaLogin', 'No se pudo completar el registro. Probá de nuevo en un momento.', 'error');
                 console.error('Error al registrar en Supabase:', error);
                 return;
             }
@@ -2569,7 +2544,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             });
 
             if (error) {
-                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón: ' + (error.message || 'error desconocido'), 'error');
+                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón. Probá de nuevo en un momento.', 'error');
                 console.error('Error al crear cupón en Supabase:', error);
                 return;
             }
@@ -2868,7 +2843,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 .update({ validado: true })
                 .eq('id', clienteId);
             if (error) {
-                showAlert('vistaAdmin', 'No se pudo validar: ' + (error.message || 'error desconocido'), 'error');
+                showAlert('vistaAdmin', 'No se pudo validar. Probá de nuevo en un momento.', 'error');
                 console.error('Error al validar cliente:', error);
                 return;
             }
@@ -3500,12 +3475,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                     select.appendChild(option);
                 });
             }
-
-            // Mensajes de login de prueba
-            console.log('🔐 Credenciales de prueba:');
-            console.log('Admin: admin@teamscaglia.com / admin123');
-            console.log('Agente: agente@teamscaglia.com / agente123');
-            console.log('Cliente: cliente@teamscaglia.com / cliente123');
         }
 
         // Cerrar modal haciendo clic afuera
