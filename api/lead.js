@@ -41,6 +41,13 @@ module.exports = async function handler(req, res) {
     }
     body = body || {};
 
+    // ── Anti-spam (honeypot): si el campo trampa viene completo, es un bot.
+    // Respondemos OK pero NO enviamos ningún mail (para no avisarle al bot que lo detectamos).
+    const honeypot = (body.website || '').toString().trim();
+    if (honeypot) {
+        return res.status(200).json({ ok: true });
+    }
+
     const nombre    = (body.nombre || '').toString().slice(0, 120);
     const email     = (body.email || '').toString().slice(0, 160);
     const telefono  = (body.telefono || '').toString().slice(0, 60);

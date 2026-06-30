@@ -1465,6 +1465,8 @@
             </div>
             <div class="reveal">
                 <form class="contact-form" id="contactForm">
+                    <!-- Campo trampa anti-bots: invisible para personas, los bots lo completan. No tocar. -->
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; opacity:0;">
                     <div class="form-field">
                         <input type="text" id="nombre" placeholder="Nombre completo" aria-label="Nombre completo" required>
                     </div>
@@ -1686,6 +1688,7 @@
             const email   = document.getElementById('email').value;
             const tel     = document.getElementById('telefono').value;
             const consulta = document.getElementById('consulta').value;
+            const website = document.getElementById('website').value; // honeypot (debe quedar vacío)
 
             const btnTxt = btn.textContent;
             btn.disabled = true; btn.textContent = 'Enviando…';
@@ -1694,7 +1697,7 @@
                 const resp = await fetch('/api/lead', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, email, telefono: tel, consulta, origen: 'Formulario de contacto' })
+                    body: JSON.stringify({ nombre, email, telefono: tel, consulta, website, origen: 'Formulario de contacto' })
                 });
                 if (!resp.ok) throw new Error('fail');
                 document.getElementById('formSuccess').classList.add('show');
