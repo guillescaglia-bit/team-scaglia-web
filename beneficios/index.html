@@ -2154,6 +2154,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                             <th>Estado</th>
                                             <th>Cupones Creados</th>
                                             <th>Cupones Canjeados</th>
+                                            <th>Aviso</th>
                                         </tr>
                                     </thead>
                                     <tbody id="basedataTableBody">
@@ -2923,26 +2924,45 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             cliente.validado = true;
             renderClientes();
+            renderBasedataTable();
             showAlert('vistaAdmin', `✓ ${cliente.nombre} validado. Enviando aviso por mail...`, 'success');
 
-            // Avisar al cliente y al agente por mail (vía la función segura de Vercel)
             try {
-                const agente = appState.agentes.find(a => a.id === cliente.agenteId);
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                const resp = await fetch('/api/notificar-validacion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-                    body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agenteEmail: agente?.email || '', agenteNombre: agente?.nombre || '' })
-                });
-                if (resp.ok) {
-                    showAlert('vistaAdmin', `📧 Mail de aviso enviado a ${cliente.email}`, 'success');
-                } else {
-                    const det = await resp.json().catch(() => ({}));
-                    showAlert('vistaAdmin', `✓ Validado, pero el mail no se pudo enviar (${det.error || resp.status}). El cliente igual ya puede entrar.`, 'error');
-                }
+                const r = await enviarMailValidacion(cliente);
+                if (r.ok) showAlert('vistaAdmin', `📧 Mail de aviso enviado a ${cliente.email}`, 'success');
+                else showAlert('vistaAdmin', `✓ Validado, pero el mail no salió (${r.error}). Reenviálo desde "Base de Datos".`, 'error');
             } catch (e) {
-                showAlert('vistaAdmin', '✓ Validado, pero el mail no se pudo enviar. El cliente igual ya puede entrar.', 'error');
+                showAlert('vistaAdmin', '✓ Validado, pero el mail no salió. Reenviálo desde "Base de Datos".', 'error');
                 console.error('Error al enviar mail de validación:', e);
+            }
+        }
+
+        // Envía el mail de validación al cliente + agente (vía la función segura de Vercel)
+        async function enviarMailValidacion(cliente) {
+            const agente = appState.agentes.find(a => a.id === cliente.agenteId);
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const resp = await fetch('/api/notificar-validacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agenteEmail: agente?.email || '', agenteNombre: agente?.nombre || '' })
+            });
+            if (resp.ok) return { ok: true };
+            const det = await resp.json().catch(() => ({}));
+            return { ok: false, error: det.error || resp.status };
+        }
+
+        // Reenvía el mail de "ya podés acceder" a un cliente ya validado
+        async function reenviarValidacion(clienteId) {
+            const cliente = appState.clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+            showAlert('vistaAdmin', `Reenviando mail a ${cliente.email}...`, 'info');
+            try {
+                const r = await enviarMailValidacion(cliente);
+                if (r.ok) showAlert('vistaAdmin', `📧 Mail reenviado a ${cliente.email}`, 'success');
+                else showAlert('vistaAdmin', `No se pudo reenviar (${r.error}). Esperá unos segundos y probá de nuevo.`, 'error');
+            } catch (e) {
+                showAlert('vistaAdmin', 'No se pudo reenviar el mail. Probá de nuevo.', 'error');
+                console.error('Error al reenviar validación:', e);
             }
         }
 
@@ -3284,7 +3304,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
                         <td>${cuponesCanjeados}</td>
-                        <td>${cliente.fechaRegistro ? new Date(cliente.fechaRegistro).toLocaleDateString('es-AR') : 'N/A'}</td>
+                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}')">📧 Reenviar</button>` : '—'}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
