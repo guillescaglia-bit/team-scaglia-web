@@ -2728,7 +2728,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         // Registra (sin bloquear la navegación) un clic en "Visitar sitio" de un prestador
         function registrarClic(prestadorId) {
-            try { supabaseClient.rpc('registrar_clic', { p_prestador_id: prestadorId, p_tipo: 'visitar_sitio' }); } catch (e) {}
+            // El .then() es necesario para que Supabase DISPARE el pedido (si no, queda sin enviarse)
+            try { supabaseClient.rpc('registrar_clic', { p_prestador_id: prestadorId, p_tipo: 'visitar_sitio' }).then(() => {}, () => {}); } catch (e) {}
         }
 
         // Carga el resumen de clics por prestador (solo admin) y lo dibuja
