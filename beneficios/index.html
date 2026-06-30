@@ -3347,7 +3347,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
                         <td>${cuponesCanjeados}</td>
-                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">📧 Reenviar</button>` : '—'}</td>
+                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">Reenviar</button>` : '—'}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
