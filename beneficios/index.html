@@ -299,17 +299,6 @@
         .login-scroll-hint { font-size: 11px; font-weight: 600; color: var(--primary); margin-top: 8px; cursor: pointer; display: inline-block; transition: opacity 0.2s; }
         .login-scroll-hint:hover { opacity: 0.7; }
 
-        /* Cartel PRÓXIMAMENTE (tarjeta frosted sobre el navy) */
-        .login-box.login-box--proxi { background: rgba(255,255,255,0.10); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.22); box-shadow: 0 24px 70px rgba(0,0,0,0.28); text-align: center; }
-        .login-box--proxi .lb-label { font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
-        .login-box--proxi h1 { color: #fff; }
-        .login-box--proxi .lb-sub { color: rgba(255,255,255,0.82); margin-bottom: 0; }
-        .login-box--proxi .login-scroll-hint { color: #fff; }
-        .proxi-badge { display: inline-block; margin: 28px 0 18px; padding: 9px 24px; border: 1px solid rgba(255,255,255,0.45); border-radius: 50px; font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: #fff; }
-        .proxi-text { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.85); margin-bottom: 26px; }
-        .proxi-back { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.2s; }
-        .proxi-back:hover { color: #fff; }
-
         /* Navbar del sitio (idéntico a la home) en la pantalla de beneficios */
         #homeNav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 0 56px; height: 72px; display: flex; align-items: center; justify-content: space-between; transition: background 0.4s, box-shadow 0.4s; }
         #homeNav.scrolled { background: rgba(255,255,255,0.97); box-shadow: 0 1px 0 var(--border-color); backdrop-filter: blur(12px); }
@@ -834,6 +823,8 @@
             padding: 30px;
             max-width: 500px;
             width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.3s;
             color: var(--text-primary);
@@ -879,7 +870,7 @@
         }
 
         .btn-close:hover {
-            color: #333;
+            color: var(--text-primary);
         }
 
         /* Alerts */
@@ -929,6 +920,8 @@
             .login-box {
                 padding: 25px;
             }
+
+            .seguinos-txt { display: none; }
 
             .cupones-grid {
                 grid-template-columns: 1fr;
@@ -1089,17 +1082,7 @@
     <header id="header" style="display: none;">
         <div class="container">
             <div class="logo">
-                <a href="https://www.instagram.com/teamscaglia" target="_blank" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;" title="Seguinos en Instagram">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <circle cx="17.5" cy="6.5" r="1.5"></circle>
-                    </svg>
-                    <div>
-                        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; line-height: 1; letter-spacing: 0.05em;">Team Scaglia</div>
-                        <div style="font-size: 11px; opacity: 0.7; letter-spacing: 0.1em; margin-top: 2px;">@teamscaglia</div>
-                    </div>
-                </a>
+                <img src="/logos/logo-team-blanco-trim.png" alt="Team Scaglia" style="height: 36px; width: auto; display: block;">
             </div>
             <div class="user-info">
                 <div style="text-align: right;">
@@ -1107,7 +1090,11 @@
                     <small style="opacity: 0.7; display: block; font-size: 12px;" id="userRoleDisplay"></small>
                 </div>
                 <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
-                <a href="/" style="background:none; border:none; color:#fff; text-decoration:none; font-size:12px; font-weight:500; letter-spacing:0.08em; cursor:pointer; opacity:0.85; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85" title="Volver al sitio Team Scaglia">Volver a inicio</a>
+                <a href="https://www.instagram.com/teamscaglia" target="_blank" rel="noopener" title="Seguinos en Instagram" style="display:flex; align-items:center; gap:6px; color:#fff; text-decoration:none; opacity:0.65; font-size:11px; font-weight:500; letter-spacing:0.05em; transition:opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.65">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><circle cx="17.5" cy="6.5" r="1"></circle></svg>
+                    <span class="seguinos-txt">Seguinos</span>
+                </a>
+                <div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2);"></div>
                 <button id="themeToggleBtn" onclick="toggleThemeManual()" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer; padding:4px; line-height:1; transition:transform 0.3s;" onmouseover="this.style.transform='rotate(20deg)'" onmouseout="this.style.transform='rotate(0deg)'" title="Cambiar tema">
                     <span id="themeIcon">🌙</span>
                 </button>
@@ -1145,15 +1132,119 @@
                 </div>
             </nav>
             <div class="login-container">
-                <div class="login-box login-box--proxi">
-                    <p class="lb-label">Beneficios a clientes</p>
+                <div class="login-box">
+                    <p style="font-size: 10px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px;">Beneficios a clientes</p>
                     <h1>Team Scaglia</h1>
-                    <p class="lb-sub">Portal de beneficios exclusivos</p>
-                    <div class="proxi-badge">Próximamente</div>
-                    <p class="proxi-text">Estamos terminando de preparar tu portal. Muy pronto vas a poder registrarte, generar cupones y canjear tus descuentos exclusivos.</p>
-                    <span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})">↓ Mientras tanto, mirá todos los descuentos disponibles</span>
-                    <div style="margin-top: 24px;">
-                        <a href="/" class="proxi-back">← Volver al sitio</a>
+                    <p>Portal de beneficios exclusivos</p>
+
+                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 15px;">Ingresá con tu email:</p>
+
+                    <div id="formLoginContainer">
+                        <!-- Paso 1: pedir el email -->
+                        <div id="otpPaso1">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="loginEmail" placeholder="tu@email.com" oninput="limpiarErrorEmail()" onkeydown="if(event.key==='Enter'){continuarLogin();}">
+                                <p id="loginEmailError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
+                            </div>
+                            <button class="btn btn-primary" id="btnEnviarCodigo" onclick="continuarLogin()">Continuar</button>
+                        </div>
+                        <!-- Paso equipo: contraseña (admin / agentes) -->
+                        <div id="otpPasoPass" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Hola 👋 Ingresá tu contraseña para <strong id="passEmailDisplay"></strong>.</p>
+                            <div class="form-group">
+                                <label>Contraseña</label>
+                                <input type="password" id="loginPasswordEquipo" placeholder="••••••••" onkeydown="if(event.key==='Enter'){loginConPassword();}">
+                                <p id="loginPasswordError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
+                            </div>
+                            <button class="btn btn-primary" id="btnIngresarPass" onclick="loginConPassword()">Ingresar</button>
+                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:6px;">Cambiar email</button>
+                        </div>
+                        <!-- Paso 2: ingresar el código -->
+                        <div id="otpPaso2" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Te enviamos un código a <strong id="otpEmailDisplay"></strong>. Revisá tu correo (y la carpeta de spam).</p>
+                            <div class="form-group">
+                                <label>Código de 6 dígitos</label>
+                                <input type="text" id="loginCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){verificarCodigo();}">
+                            </div>
+                            <button class="btn btn-primary" onclick="verificarCodigo()">Ingresar</button>
+                            <p style="text-align:center; font-size:12px; color:var(--gray-dark); margin-top:14px;">¿No te llegó? <button id="btnReenviar" onclick="reenviarCodigo()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; text-decoration:underline; padding:0; font-size:12px;">Reenviar código</button></p>
+                            <button class="btn btn-secondary" onclick="volverAEmail()" style="width:100%; margin-top:6px;">Cambiar email</button>
+                        </div>
+                        <div class="toggle-form">
+                            ¿No tenés cuenta? <button onclick="toggleForm()">Registrate</button>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 24px;">
+                            <a href="/" style="font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray-dark); text-decoration: none;">← Volver al sitio</a>
+                            <br>
+                            <span class="login-scroll-hint" onclick="document.getElementById('vidriera').scrollIntoView({behavior:'smooth'})" style="margin-top: 14px;">↓ Mirá todos los descuentos disponibles</span>
+                        </div>
+                    </div>
+
+                    <div id="formRegistroContainer" style="display: none;">
+                        <div id="regPasoDatos">
+                        <div class="form-group">
+                            <label>Nombre completo</label>
+                            <input type="text" id="regNombre" placeholder="Juan García">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="regTelefono" placeholder="+54 9 11 1234-5678">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de cumpleaños</label>
+                            <div style="display:flex; gap:8px;">
+                                <select id="regCumpleDia" style="flex:1;"><option value="">Día</option></select>
+                                <select id="regCumpleMes" style="flex:1.5;"><option value="">Mes</option></select>
+                                <select id="regCumpleAnio" style="flex:1.2;"><option value="">Año</option></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Seleccioná tu agente</label>
+                            <select id="regAgente">
+                                <option value="">-- Elige un agente --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de operación</label>
+                            <select id="regOperacion">
+                                <option value="">-- Elegí una opción --</option>
+                                <option value="Vendí">Vendí</option>
+                                <option value="Compré">Compré</option>
+                                <option value="Alquilé (propietario)">Alquilé (propietario)</option>
+                                <option value="Alquilé (inquilino)">Alquilé (inquilino)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección de la propiedad</label>
+                            <input type="text" id="regDireccion" placeholder="Calle, número, barrio">
+                        </div>
+                        <div class="form-group" style="display:flex; align-items:flex-start; gap:8px;">
+                            <input type="checkbox" id="regTyC" style="width:auto; margin-top:3px; flex-shrink:0;">
+                            <label for="regTyC" style="font-weight:400; font-size:12px; color:var(--text-secondary); cursor:pointer;">Leí y acepto los <a href="#" onclick="openModalTyCPrograma(); return false;" style="color:var(--primary); text-decoration:underline;">términos y condiciones</a> del programa de beneficios.</label>
+                        </div>
+                        <button class="btn btn-primary" id="btnCrearCuenta" onclick="iniciarRegistro()">Crear cuenta</button>
+                        </div>
+                        <!-- Paso 2 del registro: confirmar el email con un código -->
+                        <div id="regPasoCodigo" style="display:none;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:14px;">Para confirmar que tu email es correcto, te enviamos un código a <strong id="regEmailDisplay"></strong>. Revisá tu correo (y la carpeta de spam).</p>
+                            <div class="form-group">
+                                <label>Código de 6 dígitos</label>
+                                <input type="text" id="regCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center; letter-spacing:8px; font-size:22px;" onkeydown="if(event.key==='Enter'){confirmarRegistro();}">
+                                <p id="regCodigoError" style="display:none; color:var(--danger); font-size:12px; margin-top:6px;"></p>
+                            </div>
+                            <button class="btn btn-primary" id="btnConfirmarReg" onclick="confirmarRegistro()">Confirmar y registrarme</button>
+                            <p style="text-align:center; font-size:12px; color:var(--gray-dark); margin-top:14px;">¿No te llegó? <button id="btnReenviarReg" onclick="reenviarCodigoReg()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; text-decoration:underline; padding:0; font-size:12px;">Reenviar código</button></p>
+                            <button class="btn btn-secondary" onclick="volverADatosRegistro()" style="width:100%; margin-top:6px;">Corregir mis datos</button>
+                        </div>
+                        <div class="toggle-form">
+                            ¿Ya tenés cuenta? <button onclick="toggleForm()">Ingresá</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1218,25 +1309,41 @@
         <div id="vistaValidarCupon" class="vista">
             <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
                 <div style="background: var(--white); border-radius: 12px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; margin: 20px;">
-                    <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Validar Cupón</h2>
-                    <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá el código para validar el descuento</p>
-
-                    <div id="validadorAlertContainer"></div>
-
-                    <div class="form-group">
-                        <label>Código del cupón</label>
-                        <input type="text" id="inputCodigoValidador" placeholder="Ej: SCGL-NIKE-ABC123" style="text-transform: uppercase; font-size: 18px; text-align: center; letter-spacing: 2px;">
+                    <!-- Acceso con contraseña (solo prestadores) -->
+                    <div id="validadorGate">
+                        <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Acceso prestadores</h2>
+                        <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá la contraseña para validar cupones.</p>
+                        <div id="gateAlert"></div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="inputClaveValidador" placeholder="••••••••" onkeydown="if(event.key==='Enter'){desbloquearValidador();}">
+                        </div>
+                        <button class="btn btn-primary" onclick="desbloquearValidador()" style="margin-bottom: 15px;">Ingresar</button>
+                        <button class="btn btn-secondary" onclick="volverDelValidador()" style="width:100%;">Volver al sitio</button>
                     </div>
 
-                    <button class="btn btn-primary" onclick="validarCodigoPrestador()" style="margin-bottom: 15px;">Validar Código</button>
+                    <!-- Validar cupón (oculto hasta ingresar la contraseña) -->
+                    <div id="validadorContenido" style="display:none;">
+                        <h2 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Validar Cupón</h2>
+                        <p style="color: var(--gray-dark); text-align: center; margin-bottom: 30px; font-size: 14px;">Ingresá el código para validar el descuento</p>
 
-                    <div id="resultadoValidacion"></div>
+                        <div id="validadorAlertContainer"></div>
 
-                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
+                        <div class="form-group">
+                            <label>Código del cupón</label>
+                            <input type="text" id="inputCodigoValidador" placeholder="Ej: SCGL-IBATH-AB12CD" style="text-transform: uppercase; font-size: 18px; text-align: center; letter-spacing: 2px;">
+                        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="limpiarValidador()" style="flex: 1;">Limpiar</button>
-                        <button class="btn btn-secondary" onclick="volverDelValidador()" style="flex: 1;">Volver</button>
+                        <button class="btn btn-primary" onclick="validarCodigoPrestador()" style="margin-bottom: 15px;">Validar Código</button>
+
+                        <div id="resultadoValidacion"></div>
+
+                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e5e5;">
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="limpiarValidador()" style="flex: 1;">Limpiar</button>
+                            <button class="btn btn-secondary" onclick="volverDelValidador()" style="flex: 1;">Salir</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1416,34 +1523,50 @@
         </div>
     </div>
 
+    <!-- Librería de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // ── Conexión a Supabase ──
+        const SUPABASE_URL = 'https://fgipdqcxsbmrjvozalqn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Emails con acceso de admin (validan clientes). Para sumar otro, agregalo a la lista.
+        const ADMIN_EMAILS = ['info@teamscaglia.com'];
+        const esAdminEmail = (email) => ADMIN_EMAILS.includes((email || '').trim().toLowerCase());
+        // Busca un agente por su email (los emails están en appState.agentes)
+        const getAgentePorEmail = (email) => (appState.agentes || []).find(a => (a.email || '').toLowerCase() === (email || '').trim().toLowerCase());
+        // "Staff" = admin o agente → entran con contraseña; el resto (clientes) con código
+        const esStaffEmail = (email) => esAdminEmail(email) || !!getAgentePorEmail(email);
+
         // ==================== MOCK DATA ====================
         let appState = {
             usuarioActual: null, // { id, nombre, email, rol, agenteId }
             agentes: [
-                { id: '1', nombre: 'Guillermo Scaglia', email: 'guillermo@teamscaglia.com', activo: true },
-                { id: '2', nombre: 'Giuliano Larroca', email: 'giuliano@teamscaglia.com', activo: true },
-                { id: '3', nombre: 'Luciano Pérez Mango', email: 'luciano@teamscaglia.com', activo: true },
-                { id: '4', nombre: 'Carolina Klachko', email: 'carolina@teamscaglia.com', activo: true },
-                { id: '5', nombre: 'Romina Garfunkel', email: 'romina@teamscaglia.com', activo: true },
-                { id: '6', nombre: 'Federico Susemihl', email: 'federico@teamscaglia.com', activo: true },
-                { id: '7', nombre: 'Talia Larroca', email: 'talia@teamscaglia.com', activo: true },
-                { id: '8', nombre: 'Daniela Queijada', email: 'daniela@teamscaglia.com', activo: true },
-                { id: '9', nombre: 'Irene Ruiz Díaz', email: 'irene@teamscaglia.com', activo: true },
+                { id: '1', nombre: 'Guillermo Scaglia', email: 'gscaglia@redsuma.com.ar', activo: true },
+                { id: '2', nombre: 'Giuliano Larroca', email: 'glarroca@redsuma.com.ar', activo: true },
+                { id: '3', nombre: 'Luciano Pérez Mango', email: 'lperezmango@redsuma.com.ar', activo: true },
+                { id: '4', nombre: 'Carolina Klachko', email: 'carolinak@redsuma.com.ar', activo: true },
+                { id: '5', nombre: 'Romina Garfunkel', email: 'rgarfunkel@redsuma.com.ar', activo: true },
+                { id: '6', nombre: 'Federico Susemihl', email: 'fsusemihl@redsuma.com.ar', activo: true },
+                { id: '7', nombre: 'Talia Larroca', email: 'tlarroca@redsuma.com.ar', activo: true },
+                { id: '8', nombre: 'Cecilia Paul', email: 'cpaul@redsuma.com.ar', activo: true },
+                { id: '9', nombre: 'Irene Ruiz Díaz', email: 'iruizdiaz@redsuma.com.ar', activo: true },
             ],
             prestadores: [
-                { id: '1', nombre: 'Helixperience Miami', email: 'info@helixperience.com', descuento: 20, descripcion: 'Vuelos +20% + 5 min extra de vuelo', url: 'https://helixperience.com', icono: '✈️', color: '#1e90ff', banner: '/beneficios/image/banner-helix.png', tyc: 'El cupón es válido por 30 días desde su creación. No es acumulable con otras promociones. Requiere reserva directa en nuestro sitio. Consultar disponibilidad según destino.', activo: true },
-                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
-                { id: '3', nombre: 'Wilson Tobal', email: 'info@wilsontobal.com', descuento: 15, descripcion: 'Interiorismo 15% precio de lista', url: 'https://wilsontobal.com', icono: '🏠', color: '#8b7355', banner: '/beneficios/image/banner-wilson-tobal.png', tyc: 'Aplica a proyectos de interiorismo. Requiere presupuesto previo. Válido 30 días. No acumulable con otras promociones. Consultar disponibilidad de tiempos.', activo: true },
-                { id: '4', nombre: 'Anna Rossatti', email: 'ordonezcamila06@gmail.com', descuento: 20, descripcion: 'Ropa de diseño · 20% OFF', url: 'https://www.annarossatti.com/', icono: '👗', color: '#ff69b4', banner: '/beneficios/image/banner-anna-rossatti.png', tipoLimite: 'unico', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF para clientas validadas.\n\n🛍️ APLICACIÓN\nBeneficio aplicable exclusivamente sobre la línea ready-to-wear de Anna Rossatti, disponible en canal online y/o local físico.\n\n💵 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REÚSOS\nUn uso por clienta.\n\n🚫 EXCEPCIONES\nNo aplica para vestidos de fiesta.\n\n📞 CONTACTO\nCamila Ordoñez\nTeléfono: 11 2264-6301\nEmail: ordonezcamila06@gmail.com', activo: true },
-                { id: '5', nombre: 'Almacén 1249', email: 'info@almacen1249.com', descuento: 10, descripcion: 'Picadas premium 10%', url: 'https://almacen1249.com.ar', icono: '🍽️', color: '#d4af37', banner: '/beneficios/image/banner-almacen.png', tyc: 'Descuento aplicable a picadas premium. Pedido mínimo requerido. Válido 30 días. Consultar disponibilidad y formas de entrega.', activo: true },
-                { id: '6', nombre: 'Mul nordelta', email: 'info@mulnordelta.com', descuento: 15, descripcion: 'Spa capilar Asiático', url: 'https://www.instagram.com/mul.nordelta/', icono: '💇', color: '#ff6b9d', banner: '/beneficios/image/banner-mul.png', tyc: '💰 DESCUENTO\n15% de descuento sobre el valor vigente de los tratamientos en la sede Nordelta de MUL Spa Capilar & Facial o la compra de Gift Card. Beneficio no acumulable con otras promociones o descuentos vigentes.\n\n🎫 VALIDEZ DEL CUPÓN\nVálido por 30 días corridos desde su emisión. Un único uso por persona por mes. El límite se renueva el 1 de cada mes.\n\n📅 VIGENCIA\nBeneficio permanente, vigente hasta nuevo aviso.\n\n🚫 EXCEPCIONES\nSin excepciones. Aplica sobre todos los tratamientos ofrecidos en Nordelta, incluyendo Gift Card.\n\n💵 TOPE DE REINTEGRO\nSin límite máximo de reintegro mensual ni anual.\n\n🔄 CÓMO CANJEAR\n1. Presenta el cupón al reservar (presencial, WhatsApp, teléfono o medios que la empresa acepte)\n2. Confirma disponibilidad\n3. Asiste a tu cita\n\n⚠️ TÉRMINOS IMPORTANTES\n- Válido únicamente con presentación del cupón\n- Sujeto a disponibilidad y políticas de cancelación de la sede\n- No canjeable por dinero\n- Aceptar estas condiciones implica conocer y estar de acuerdo con las políticas vigentes de MUL\n\n📞 CONTACTO\nWhatsApp/Teléfono: +54 9 11 5114-7581\nInstagram: https://www.instagram.com/mul.nordelta/\nHorarios: A confirmar con MUL', activo: true },
-                { id: '7', nombre: 'Cerantola', email: 'info@cerantola.com', descuento: null, descripcion: 'Aberturas (descuento a confirmar)', url: 'https://www.cerantola.com.ar/', icono: '🪟', color: '#6b5b4f', banner: '/beneficios/image/banner-cerantola.png', tyc: 'Descuento a confirmar. Aplica en línea de aberturas seleccionadas. Requiere presupuesto. Válido 30 días.', activo: true },
-                { id: '8', nombre: 'Inox Style', email: 'info@inoxstyle.com.ar', descuento: null, descripcion: 'Diseño automotriz', url: 'https://inoxstyle.com.ar/', icono: '🚗', color: '#4a5568', banner: '/beneficios/image/banner-inox.png', tyc: 'Descuento a confirmar. Aplica en línea de productos de diseño automotriz seleccionados. Requiere consulta previa. Válido 30 días.', activo: true },
+                { id: '1', nombre: 'Helixperience Miami', email: 'info@helixperience.com', descuento: 20, descripcion: 'Tours +20% + 5 min extra de vuelo', alcance: 'Miami, EE.UU.', url: 'https://helixperience.com', icono: '✈️', color: '#1e90ff', banner: '/beneficios/image/banner-helix.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF sobre precio de lista. + 5 minutos extra de vuelo.\n\n🛒 APLICACIÓN\nBeneficio aplicable SOLO EN TOURS\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\n+1 (786) 810-6712', activo: true },
+                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', alcance: 'Vicente López · envíos a todo el país', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
+                { id: '3', nombre: 'Wilson Tobal', email: 'info@wilsontobal.com', descuento: 15, descripcion: 'Interiorismo 15% precio de lista', alcance: 'Todo el país', url: 'https://wilsontobal.com', icono: '🏠', color: '#8b7355', banner: '/beneficios/image/banner-wilson-tobal.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Aplica a proyectos de interiorismo. Requiere presupuesto previo. Válido 30 días. No acumulable con otras promociones. Consultar disponibilidad de tiempos.', activo: false },
+                { id: '4', nombre: 'Anna Rossatti', email: 'ordonezcamila06@gmail.com', descuento: 20, descripcion: 'Ropa de diseño · 20% OFF', url: 'https://www.annarossatti.com/', icono: '👗', color: '#ff69b4', banner: '/beneficios/image/banner-anna-rossatti.png', vigenciaDias: 30, limite: 'unico', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF para clientas validadas.\n\n🛍️ APLICACIÓN\nBeneficio aplicable exclusivamente sobre la línea ready-to-wear de Anna Rossatti, disponible en canal online y/o local físico.\n\n💵 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REÚSOS\nUn uso por clienta.\n\n🚫 EXCEPCIONES\nNo aplica para vestidos de fiesta.\n\n📞 CONTACTO\nCamila Ordoñez\nTeléfono: 11 2264-6301\nEmail: ordonezcamila06@gmail.com', activo: true },
+                { id: '5', nombre: 'Almacén 1249', email: 'info@almacen1249.com', descuento: 10, descripcion: 'Picadas premium 10%', alcance: 'CABA', url: 'https://almacen1249.com.ar', icono: '🍽️', color: '#d4af37', banner: '/beneficios/image/banner-almacen.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Descuento aplicable a picadas premium. Pedido mínimo requerido. Válido 30 días. Consultar disponibilidad y formas de entrega.', activo: false },
+                { id: '6', nombre: 'Mul nordelta', email: 'info@mulnordelta.com', descuento: 15, descripcion: 'Spa capilar Asiático', alcance: 'Nordelta', url: 'https://www.instagram.com/mul.nordelta/', icono: '💇', color: '#ff6b9d', banner: '/beneficios/image/banner-mul.png', vigenciaDias: 30, limite: 'mensual', tyc: '💰 DESCUENTO\n15% de descuento sobre el valor vigente de los tratamientos en la sede Nordelta de MUL Spa Capilar & Facial o la compra de Gift Card. Beneficio no acumulable con otras promociones o descuentos vigentes.\n\n🎫 VALIDEZ DEL CUPÓN\nVálido por 30 días corridos desde su emisión. Un único uso por persona por mes. El límite se renueva el 1 de cada mes.\n\n📅 VIGENCIA\nBeneficio permanente, vigente hasta nuevo aviso.\n\n🚫 EXCEPCIONES\nSin excepciones. Aplica sobre todos los tratamientos ofrecidos en Nordelta, incluyendo Gift Card.\n\n💵 TOPE DE REINTEGRO\nSin límite máximo de reintegro mensual ni anual.\n\n🔄 CÓMO CANJEAR\n1. Presenta el cupón al reservar (presencial, WhatsApp, teléfono o medios que la empresa acepte)\n2. Confirma disponibilidad\n3. Asiste a tu cita\n\n⚠️ TÉRMINOS IMPORTANTES\n- Válido únicamente con presentación del cupón\n- Sujeto a disponibilidad y políticas de cancelación de la sede\n- No canjeable por dinero\n- Aceptar estas condiciones implica conocer y estar de acuerdo con las políticas vigentes de MUL\n\n📞 CONTACTO\nWhatsApp/Teléfono: +54 9 11 5114-7581\nInstagram: https://www.instagram.com/mul.nordelta/\nHorarios: A confirmar con MUL', activo: true },
+                { id: '7', nombre: 'Cerantola', email: 'info@cerantola.com', descuento: null, descripcion: 'Aberturas (descuento a confirmar)', alcance: 'Todo el país', url: 'https://www.cerantola.com.ar/', icono: '🪟', color: '#6b5b4f', banner: '/beneficios/image/banner-cerantola.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Descuento a confirmar. Aplica en línea de aberturas seleccionadas. Requiere presupuesto. Válido 30 días.', activo: false },
+                { id: '8', nombre: 'Inox Style', email: 'info@inoxstyle.com.ar', descuento: 20, descripcion: 'Estética y personalización vehicular · 20% OFF', alcance: 'Martínez, Bs. As.', url: 'https://inoxstyle.com.ar/', icono: '🚗', color: '#4a5568', banner: '/beneficios/image/banner-inox.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\n20% de descuento.\n\n📅 VIGENCIA\nAño 2026.\n\n💵 TOPE DE REINTEGRO\n$200.000.\n\n🎫 VALIDEZ DEL CUPÓN\nÚnicamente para el Pack Detailing:\n• Lavado Premium\n• Limpieza Interior Full\n• Limpieza Motor\n• Pulido y abrillantado de carrocería\n\n🚫 EXCEPCIONES\nEl descuento no aplica para productos, vehículos o servicios que no sean el Pack Detailing.\n\n🔄 CÓMO CANJEAR\nComunicate con nosotros por WhatsApp y brindá el código de descuento.\n\n📞 CONTACTO\nWhatsApp / Teléfono: +54 9 11 5801-2856', activo: true },
+                { id: '9', nombre: 'WN Interiores', email: '', descuento: 15, descripcion: 'Interiorismo · 15% OFF', alcance: 'CABA', url: 'https://www.instagram.com/wn.interiores/', icono: '🛋️', color: '#7d7367', banner: '/beneficios/image/banner-wn-interiores.png', vigenciaDias: 10, limite: 'ilimitado', tyc: '💰 BENEFICIO\n15% OFF sobre los honorarios de diseño de WN Interiores.\n\n🎫 VALIDEZ DEL CUPÓN\nEl beneficio podrá utilizarse dentro de los 10 (diez) días corridos posteriores al envío del presupuesto.\n\n🚫 EXCEPCIONES\n• No acumulable con otras promociones o descuentos.\n• No aplica sobre gastos de obra, materiales, mobiliario, traslados ni compras realizadas a terceros.\n• Válido únicamente para nuevos proyectos.\n\n💵 TOPE DEL DESCUENTO\nSin tope de reintegro. El descuento se aplica exclusivamente sobre los honorarios profesionales de diseño.\n\n🔄 ¿CÓMO CANJEARLO?\n1. Solicitar el presupuesto de WN Interiores.\n2. Presentar este cupón antes de la confirmación del proyecto.\n3. Una vez validado, el descuento se aplicará al presupuesto correspondiente.\n\n⚠️ TÉRMINOS IMPORTANTES\n• El descuento aplica únicamente sobre los honorarios de diseño.\n• Una vez aprobada la propuesta y definidos los conceptos de diseño, cualquier modificación sustancial o cambio de alcance solicitado con posterioridad será cotizado por separado.\n• La contratación implica la aceptación de estas condiciones.\n\n📞 CONTACTO\nWN Interiores\nWhatsApp / Teléfono: +54 9 11 5899-7627', activo: true },
             ],
             clientes: [
-                { id: '1', nombre: 'Juan García', email: 'juan@email.com', telefono: '+54 9 11 1234567', agenteId: '1', validado: true },
-                { id: '2', nombre: 'María López', email: 'maria@email.com', telefono: '+54 9 11 2345678', agenteId: '2', validado: true },
+                { id: '1', nombre: 'Juan García', email: 'juan@email.com', telefono: '+54 9 11 1234567', cumple: '1990-05-12', agenteId: '1', validado: true },
+                { id: '2', nombre: 'María López', email: 'maria@email.com', telefono: '+54 9 11 2345678', cumple: '1985-11-03', agenteId: '2', validado: true },
             ],
             cupones: [
                 { id: '1', clienteId: '1', prestadorId: '1', agenteId: '1', codigo: 'SCGL-HELIX-ABC123', estado: 'activo', creadoEn: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), expirado: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000), usadoEn: null },
@@ -1462,49 +1585,189 @@
         function toggleForm() {
             document.getElementById('formLoginContainer').style.display = document.getElementById('formLoginContainer').style.display === 'none' ? 'block' : 'none';
             document.getElementById('formRegistroContainer').style.display = document.getElementById('formRegistroContainer').style.display === 'none' ? 'block' : 'none';
+            // Resetear el registro al paso de datos (por si quedó en el paso del código)
+            const rd = document.getElementById('regPasoDatos'); if (rd) rd.style.display = 'block';
+            const rc = document.getElementById('regPasoCodigo'); if (rc) rc.style.display = 'none';
+            _registroPendiente = null;
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
+        // Muestra/oculta el error del campo email (borde rojo + leyenda)
+        function mostrarErrorEmail(msg) {
+            const inp = document.getElementById('loginEmail');
+            const err = document.getElementById('loginEmailError');
+            if (inp) inp.style.borderColor = 'var(--danger)';
+            if (err) { err.textContent = msg; err.style.display = 'block'; }
+        }
+        function limpiarErrorEmail() {
+            const inp = document.getElementById('loginEmail');
+            const err = document.getElementById('loginEmailError');
+            if (inp) inp.style.borderColor = '';
+            if (err) err.style.display = 'none';
+        }
 
-            if (!email || !password) {
-                showAlert('vistaLogin', 'Completa todos los campos', 'error');
+        // ── Login por código (OTP) por email ──
+        // Decide el camino según el email: equipo → contraseña, cliente → código
+        function continuarLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            limpiarErrorEmail();
+            const esEmailValido = /^\S+@\S+\.\S+$/.test(email);
+            if (!email || !esEmailValido) { mostrarErrorEmail('Ingresá un email válido.'); return; }
+            if (esStaffEmail(email)) {
+                document.getElementById('passEmailDisplay').textContent = email;
+                document.getElementById('otpPaso1').style.display = 'none';
+                document.getElementById('otpPasoPass').style.display = 'block';
+                const pi = document.getElementById('loginPasswordEquipo'); if (pi) { pi.value = ''; pi.focus(); }
                 return;
             }
+            enviarCodigo();
+        }
 
-            // Mock: Simular login (después será con Supabase)
-            if (email === 'admin@teamscaglia.com' && password === 'admin123') {
+        // Login con contraseña (admin / agentes)
+        async function loginConPassword() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPasswordEquipo').value;
+            const errEl = document.getElementById('loginPasswordError');
+            if (errEl) errEl.style.display = 'none';
+            if (!password) { if (errEl) { errEl.textContent = 'Ingresá tu contraseña.'; errEl.style.display = 'block'; } return; }
+            const btn = document.getElementById('btnIngresarPass');
+            if (btn) { btn.disabled = true; btn.textContent = 'Ingresando...'; }
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (btn) { btn.disabled = false; btn.textContent = 'Ingresar'; }
+            if (error) {
+                if (errEl) { errEl.textContent = 'Contraseña incorrecta. Probá de nuevo.'; errEl.style.display = 'block'; }
+                console.error(error);
+                return;
+            }
+            document.getElementById('vistaLogin').classList.remove('activa');
+            if (esAdminEmail(email)) {
                 appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                await cargarClientesAdmin();
+                showDashboardAdmin();
+            } else {
+                const ag = getAgentePorEmail(email);
+                appState.usuarioActual = { id: 'agente_' + ag.id, nombre: ag.nombre, email, rol: 'agente', agenteId: ag.id };
+                await cargarDatosAgente(ag.id);
+                showDashboardAgente();
+            }
+        }
+
+        async function enviarCodigo() {
+            const email = document.getElementById('loginEmail').value.trim();
+            limpiarErrorEmail();
+            const esEmailValido = /^\S+@\S+\.\S+$/.test(email);
+            if (!email || !esEmailValido) { mostrarErrorEmail('Ingresá un email válido.'); return; }
+            const btn = document.getElementById('btnEnviarCodigo');
+            if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
+
+            // El admin entra con su email sin pasar por el chequeo de "cliente registrado"
+            if (!esAdminEmail(email)) {
+                // Chequear que el email esté registrado ANTES de mandar el código
+                const { data: existe, error: errChk } = await supabaseClient.rpc('cliente_existe', { p_email: email });
+                if (errChk) {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+                    mostrarErrorEmail('No se pudo verificar el email. Probá de nuevo.');
+                    console.error(errChk);
+                    return;
+                }
+                if (!existe) {
+                    if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+                    mostrarErrorEmail('Este email no está registrado. Revisá que esté bien escrito o registrate.');
+                    return;
+                }
+            }
+
+            if (btn) { btn.textContent = 'Enviando...'; }
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (btn) { btn.disabled = false; btn.textContent = 'Continuar'; }
+            if (error) {
+                const esRate = /second|rate|only request|request this/i.test(error.message || '');
+                mostrarErrorEmail(esRate
+                    ? 'Pediste un código hace muy poco. Esperá un minuto y volvé a intentar. Si ya te llegó un código, usá ese.'
+                    : 'No se pudo enviar el código. Probá de nuevo en un momento.');
+                console.error(error);
+                return;
+            }
+            document.getElementById('otpEmailDisplay').textContent = email;
+            document.getElementById('otpPaso1').style.display = 'none';
+            document.getElementById('otpPaso2').style.display = 'block';
+            const ci = document.getElementById('loginCodigo'); if (ci) ci.focus();
+            showAlert('vistaLogin', 'Te enviamos el código por email.', 'success');
+            iniciarCooldownReenvio(60);
+        }
+
+        // Cuenta regresiva del botón "Reenviar" (Supabase limita a ~1 código por minuto)
+        let _cooldownTimer = null;
+        function iniciarCooldownReenvio(segundos, btnId = 'btnReenviar') {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (_cooldownTimer) clearInterval(_cooldownTimer);
+            let s = segundos;
+            btn.disabled = true;
+            btn.style.cursor = 'default';
+            btn.style.opacity = '0.55';
+            btn.style.textDecoration = 'none';
+            btn.textContent = `Reenviar en ${s}s`;
+            _cooldownTimer = setInterval(() => {
+                s--;
+                if (s <= 0) {
+                    clearInterval(_cooldownTimer); _cooldownTimer = null;
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                    btn.style.textDecoration = 'underline';
+                    btn.textContent = 'Reenviar código';
+                } else {
+                    btn.textContent = `Reenviar en ${s}s`;
+                }
+            }, 1000);
+        }
+
+        async function reenviarCodigo() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) { volverAEmail(); return; }
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (error) { showAlert('vistaLogin', 'Pediste un código hace muy poco. Esperá a que termine la cuenta regresiva. Si ya te llegó uno, usá ese.', 'error'); console.error(error); return; }
+            showAlert('vistaLogin', 'Te reenviamos el código.', 'success');
+            iniciarCooldownReenvio(60);
+        }
+
+        async function verificarCodigo() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const token = document.getElementById('loginCodigo').value.trim();
+            if (token.length < 6) { showAlert('vistaLogin', 'Ingresá el código de 6 dígitos.', 'error'); return; }
+            const { error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
+            if (error) { showAlert('vistaLogin', 'Código incorrecto o vencido. Probá de nuevo.', 'error'); return; }
+            // Si es admin, entra directo al panel de validación
+            if (esAdminEmail(email)) {
+                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                await cargarClientesAdmin();
                 document.getElementById('vistaLogin').classList.remove('activa');
                 showDashboardAdmin();
-            } else if (email === 'agente@teamscaglia.com' && password === 'agente123') {
-                appState.usuarioActual = { id: 'agente1', nombre: 'Guillermo Scaglia', email, rol: 'agente', agenteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAgente();
-            } else if (email === 'cliente@teamscaglia.com' && password === 'cliente123') {
-                appState.usuarioActual = { id: 'cliente1', nombre: 'Juan García', email, rol: 'cliente', clienteId: '1' };
+                return;
+            }
+            // Buscar la ficha del cliente por su email
+            const { data: filas } = await supabaseClient.from('clientes').select('*').eq('email', email).order('created_at', { ascending: false }).limit(1);
+            if (filas && filas.length) {
+                const c = filas[0];
+                appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                await cargarCuponesCliente();
                 document.getElementById('vistaLogin').classList.remove('activa');
                 showDashboardCliente();
             } else {
-                showAlert('vistaLogin', 'Email o contraseña incorrectos. Prueba: cliente@teamscaglia.com / cliente123', 'error');
+                showAlert('vistaLogin', 'Ese email todavía no está registrado. Registrate primero.', 'error');
+                toggleForm();
             }
         }
 
-        function quickLogin(rol) {
-            if (rol === 'admin') {
-                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email: 'admin@teamscaglia.com', rol: 'admin' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAdmin();
-            } else if (rol === 'agente') {
-                appState.usuarioActual = { id: 'agente1', nombre: 'Guillermo Scaglia', email: 'agente@teamscaglia.com', rol: 'agente', agenteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardAgente();
-            } else if (rol === 'cliente') {
-                appState.usuarioActual = { id: 'cliente1', nombre: 'Juan García', email: 'cliente@teamscaglia.com', rol: 'cliente', clienteId: '1' };
-                document.getElementById('vistaLogin').classList.remove('activa');
-                showDashboardCliente();
-            }
+        function volverAEmail() {
+            document.getElementById('otpPaso2').style.display = 'none';
+            const pp = document.getElementById('otpPasoPass'); if (pp) pp.style.display = 'none';
+            document.getElementById('otpPaso1').style.display = 'block';
+            const ci = document.getElementById('loginCodigo'); if (ci) ci.value = '';
+            const pi = document.getElementById('loginPasswordEquipo'); if (pi) pi.value = '';
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
         function openModalTyCPrograma() {
@@ -1534,43 +1797,137 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.body.insertAdjacentHTML('beforeend', html);
         }
 
-        function handleRegistro() {
+        // Paso 1 del registro: validar datos y enviar un código para confirmar el email
+        let _registroPendiente = null;
+        async function iniciarRegistro() {
             const nombre = document.getElementById('regNombre').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const telefono = document.getElementById('regTelefono').value.trim();
+            const cDia = document.getElementById('regCumpleDia').value;
+            const cMes = document.getElementById('regCumpleMes').value;
+            const cAnio = document.getElementById('regCumpleAnio').value;
+            const cumple = (cDia && cMes && cAnio) ? `${cAnio}-${cMes}-${cDia}` : '';
             const agenteId = document.getElementById('regAgente').value;
             const operacion = document.getElementById('regOperacion').value;
             const direccion = document.getElementById('regDireccion').value.trim();
-            const password = document.getElementById('regPassword').value;
             const aceptaTyC = document.getElementById('regTyC').checked;
 
-            if (!nombre || !email || !telefono || !agenteId || !operacion || !direccion || !password) {
-                showAlert('vistaLogin', 'Completa todos los campos', 'error');
+            if (!nombre || !email || !telefono || !cumple || !agenteId || !operacion || !direccion) {
+                showAlert('vistaLogin', 'Completá todos los campos', 'error');
                 return;
             }
-
+            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                showAlert('vistaLogin', 'Revisá el email: no parece válido.', 'error');
+                return;
+            }
             if (!aceptaTyC) {
                 showAlert('vistaLogin', 'Debés aceptar los términos y condiciones para registrarte.', 'error');
                 return;
             }
+            if (esStaffEmail(email)) {
+                showAlert('vistaLogin', 'Ese email es de un agente/admin del equipo. Usá otro email para registrarte como cliente.', 'error');
+                return;
+            }
 
-            // Mock: Crear cliente
+            const btn = document.getElementById('btnCrearCuenta');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando código...'; }
+
+            // Evitar duplicados: ¿ya existe este email?
+            const { data: existe } = await supabaseClient.rpc('cliente_existe', { p_email: email });
+            if (existe) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+                showAlert('vistaLogin', 'Ese email ya está registrado. Ingresá con tu código desde "Ya tenés cuenta".', 'error');
+                return;
+            }
+
+            // Enviar el código para confirmar que el email es real y es suyo
+            const { error } = await supabaseClient.auth.signInWithOtp({ email });
+            if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
+            if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
+
+            _registroPendiente = { nombre, email, telefono, cumple, agenteId, operacion, direccion };
+            document.getElementById('regEmailDisplay').textContent = email;
+            document.getElementById('regPasoDatos').style.display = 'none';
+            document.getElementById('regPasoCodigo').style.display = 'block';
+            const ci = document.getElementById('regCodigo'); if (ci) { ci.value = ''; ci.focus(); }
+            iniciarCooldownReenvio(60, 'btnReenviarReg');
+        }
+
+        // Paso 2 del registro: confirmar el código y recién ahí guardar el registro
+        async function confirmarRegistro() {
+            if (!_registroPendiente) { volverADatosRegistro(); return; }
+            const token = document.getElementById('regCodigo').value.trim();
+            const errEl = document.getElementById('regCodigoError');
+            if (errEl) errEl.style.display = 'none';
+            if (token.length < 6) { if (errEl) { errEl.textContent = 'Ingresá el código de 6 dígitos.'; errEl.style.display = 'block'; } return; }
+
+            const btn = document.getElementById('btnConfirmarReg');
+            if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
+            const { error: errVerify } = await supabaseClient.auth.verifyOtp({ email: _registroPendiente.email, token, type: 'email' });
+            if (errVerify) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
+                if (errEl) { errEl.textContent = 'Código incorrecto o vencido. Revisá e intentá de nuevo.'; errEl.style.display = 'block'; }
+                return;
+            }
+
+            // Email confirmado → guardar el registro en Supabase
+            const r = _registroPendiente;
+            const { error } = await supabaseClient.from('clientes').insert({
+                nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
+                agente_id: r.agenteId, operacion: r.operacion, direccion: r.direccion
+            });
+            if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
+            if (error) {
+                showAlert('vistaLogin', 'No se pudo completar el registro. Probá de nuevo en un momento.', 'error');
+                console.error('Error al registrar en Supabase:', error);
+                return;
+            }
+
             const nuevoCliente = {
                 id: Date.now().toString(),
-                nombre,
-                email,
-                telefono,
-                agenteId,
-                operacion,
-                direccion,
-                validado: false // Pendiente de validación por admin
+                nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
+                agenteId: r.agenteId, operacion: r.operacion, direccion: r.direccion,
+                registradoEn: new Date(), validado: false
             };
-
             appState.clientes.push(nuevoCliente);
-            appState.usuarioActual = { id: nuevoCliente.id, nombre, email, rol: 'cliente', clienteId: nuevoCliente.id };
+            appState.usuarioActual = { id: nuevoCliente.id, nombre: r.nombre, email: r.email, rol: 'cliente', clienteId: nuevoCliente.id };
 
-            showAlert('vistaLogin', '¡Cuenta creada! Esperando validación...', 'success');
-            setTimeout(() => showDashboardCliente(), 1000);
+            // Avisar a info@ y al agente asignado (no bloquea el registro si falla)
+            try {
+                const agente = appState.agentes.find(a => a.id === r.agenteId);
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                await fetch('/api/notificar-registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({
+                        nombre: r.nombre, email: r.email, telefono: r.telefono,
+                        operacion: r.operacion, direccion: r.direccion,
+                        agenteNombre: agente?.nombre || '', agenteEmail: agente?.email || ''
+                    })
+                });
+            } catch (e) { console.error('No se pudo enviar el aviso de registro:', e); }
+
+            _registroPendiente = null;
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
+
+            document.getElementById('vistaLogin').classList.remove('activa');
+            showAlert('vistaLogin', '¡Email confirmado y cuenta creada!', 'success');
+            showDashboardCliente();
+        }
+
+        async function reenviarCodigoReg() {
+            if (!_registroPendiente) return;
+            const { error } = await supabaseClient.auth.signInWithOtp({ email: _registroPendiente.email });
+            if (error) { showAlert('vistaLogin', 'Pediste un código hace muy poco. Esperá a que termine la cuenta regresiva.', 'error'); console.error(error); return; }
+            showAlert('vistaLogin', 'Te reenviamos el código.', 'success');
+            iniciarCooldownReenvio(60, 'btnReenviarReg');
+        }
+
+        function volverADatosRegistro() {
+            document.getElementById('regPasoCodigo').style.display = 'none';
+            document.getElementById('regPasoDatos').style.display = 'block';
+            const ci = document.getElementById('regCodigo'); if (ci) ci.value = '';
+            if (_cooldownTimer) { clearInterval(_cooldownTimer); _cooldownTimer = null; }
         }
 
         function showDashboardCliente() {
@@ -1582,11 +1939,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs primero
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
-            document.getElementById('regPassword').value = '';
+            if (document.getElementById('regCumple')) document.getElementById('regCumple').value = '';
             if (document.getElementById('regOperacion')) document.getElementById('regOperacion').value = '';
             if (document.getElementById('regDireccion')) document.getElementById('regDireccion').value = '';
             if (document.getElementById('regTyC')) document.getElementById('regTyC').checked = false;
@@ -1606,11 +1963,17 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div class="cupones-grid" id="cuponesGrid">
                                 <!-- Se llena dinámicamente -->
                             </div>
+                            <div style="margin-top:48px; background:white; border-radius:12px; padding:25px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                <h3 style="color:#324a70; margin-bottom:6px;">Historial de cupones</h3>
+                                <p style="color:#999; font-size:13px; margin-bottom:18px;">Todos los cupones que generaste, con su estado.</p>
+                                <div id="historialCupones" style="overflow-x:auto;"></div>
+                            </div>
                         </div>
                     </div>
                 `;
-                
+
                 renderCuponesCliente();
+                renderHistorialCliente();
                 showVista('vistaDashboardCliente');
             }
         }
@@ -1645,6 +2008,37 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             showVista('vistaDashboardCliente');
         }
 
+        // Trae de Supabase los clientes del agente y los cupones de esos clientes (RLS los filtra)
+        async function cargarDatosAgente(agenteId) {
+            const { data: cls, error: e1 } = await supabaseClient
+                .from('clientes').select('*')
+                .eq('agente_id', agenteId)
+                .order('created_at', { ascending: false });
+            if (e1) { console.error('Error al cargar clientes del agente:', e1); }
+            else {
+                appState.clientes = (cls || []).map(c => ({
+                    id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
+                    agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                    validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+                }));
+            }
+            const { data: cps, error: e2 } = await supabaseClient
+                .from('cupones').select('*')
+                .eq('agente_id', agenteId)
+                .order('creado_en', { ascending: false });
+            if (e2) { console.error('Error al cargar cupones del agente:', e2); }
+            else {
+                const ahora = new Date();
+                appState.cupones = (cps || []).map(row => ({
+                    id: row.id, clienteId: row.cliente_id, prestadorId: row.prestador_id, agenteId: row.agente_id,
+                    codigo: row.codigo,
+                    estado: row.usado_en ? 'usado' : (new Date(row.vence_en) > ahora ? 'activo' : 'vencido'),
+                    creadoEn: new Date(row.creado_en), expirado: new Date(row.vence_en),
+                    usadoEn: row.usado_en ? new Date(row.usado_en) : null
+                }));
+            }
+        }
+
         function showDashboardAgente() {
             document.getElementById('header').style.display = 'block';
             document.getElementById('userNameDisplay').textContent = appState.usuarioActual.nombre;
@@ -1652,11 +2046,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
-            document.getElementById('regPassword').value = '';
+            if (document.getElementById('regCumple')) document.getElementById('regCumple').value = '';
 
             // Resetear vista
             document.getElementById('vistaDashboardAgente').innerHTML = `
@@ -1665,7 +2059,12 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <div id="agenteAlertContainer"></div>
                         <div class="dashboard-header">
                             <h2>Dashboard Agente</h2>
-                            <p>Seguimiento de cupones de tus clientes</p>
+                            <p>Tus clientes y la actividad de sus cupones</p>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
+                            <h3 style="color: #324a70; margin-bottom: 6px;">Tus clientes</h3>
+                            <p style="color:#999; font-size:13px; margin-bottom:18px;" id="clientesAgenteCount"></p>
+                            <div id="clientesAgente" style="overflow-x:auto;"></div>
                         </div>
                         <div id="notificacionesAgente" style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                             <!-- Se llena dinámicamente -->
@@ -1674,6 +2073,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 </div>
             `;
 
+            renderClientesAgente();
             renderNotificacionesAgente();
             showVista('vistaDashboardAgente');
         }
@@ -1685,11 +2085,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             // Limpiar inputs
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('regNombre').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regTelefono').value = '';
-            document.getElementById('regPassword').value = '';
+            if (document.getElementById('regCumple')) document.getElementById('regCumple').value = '';
 
             // Resetear vista
             document.getElementById('vistaAdmin').innerHTML = `
@@ -1698,7 +2098,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <div id="adminAlertContainer"></div>
                         <div class="dashboard-header">
                             <h2>Panel Administrativo</h2>
-                            <p>Gestiona agentes y prestadores</p>
+                            <p>Gestioná clientes, cupones, agentes y prestadores</p>
                         </div>
                         
                         <div class="tabs">
@@ -1844,20 +2244,24 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (!grid) return;
             let html = '';
             appState.prestadores.forEach(p => {
+                const inactivo = p.activo === false;
                 html += `
-                    <div class="cupone-card" style="border-left-color: ${p.color}; position: relative; overflow: hidden; padding: 0;">
+                    <div class="cupone-card" style="border-left-color: ${p.color}; position: relative; overflow: hidden; padding: 0; ${inactivo ? 'filter: grayscale(0.9); opacity: 0.55;' : ''}">
                         <div style="background: ${p.banner ? `url('${p.banner}') left/cover` : p.color}; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; min-height: 120px; display: flex; align-items: center; justify-content: flex-end; padding-right: 24px;">
                             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
-                                <span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${p.descuento ? p.descuento + '%' : '★'}</span>
-                                <span style="color: rgba(255,255,255,0.95); font-size: 11px; font-weight: 500; margin-top: 2px;">${p.descuento ? 'descuento' : 'beneficio'}</span>
+                                ${inactivo
+                                    ? `<span style="color: white; font-weight: 600; font-size: 15px; letter-spacing: 0.04em;">Próximamente</span>`
+                                    : `<span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${p.descuento ? p.descuento + '%' : '★'}</span>
+                                       <span style="color: rgba(255,255,255,0.95); font-size: 11px; font-weight: 500; margin-top: 2px;">${p.descuento ? 'descuento' : 'beneficio'}</span>`}
                             </div>
                         </div>
                         <div style="padding: 20px;">
                             <div style="margin-bottom: 16px;">
                                 <div style="color: var(--primary); font-weight: 700; font-size: 18px; margin-bottom: 4px;">${p.nombre}</div>
                                 <div style="color: var(--gray-dark); font-size: 13px; line-height: 1.4;">${p.descripcion}</div>
+                                ${p.alcance ? `<div style="font-size:11px; color:var(--accent); margin-top:6px; font-weight:500;">📍 ${p.alcance}</div>` : ''}
                             </div>
-                            <div class="v-lock">🔒 Exclusivo para clientes</div>
+                            <div class="v-lock">${inactivo ? '🕓 Beneficio próximamente disponible' : '🔒 Exclusivo para clientes'}</div>
                         </div>
                     </div>
                 `;
@@ -1865,34 +2269,109 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             grid.innerHTML = html;
         }
 
+        // Trae de Supabase los cupones del cliente logueado y los carga en appState
+        async function cargarCuponesCliente() {
+            const clienteId = appState.usuarioActual.clienteId;
+            const { data, error } = await supabaseClient
+                .from('cupones').select('*')
+                .eq('cliente_id', clienteId)
+                .order('creado_en', { ascending: false });
+            if (error) { console.error('Error al cargar cupones:', error); return; }
+            // Reemplazar en memoria solo los cupones de este cliente
+            appState.cupones = appState.cupones.filter(c => c.clienteId !== clienteId);
+            const ahora = new Date();
+            (data || []).forEach(row => {
+                appState.cupones.push({
+                    id: row.id,
+                    clienteId: row.cliente_id,
+                    prestadorId: row.prestador_id,
+                    agenteId: row.agente_id,
+                    codigo: row.codigo,
+                    estado: row.usado_en ? 'usado' : (new Date(row.vence_en) > ahora ? 'activo' : 'vencido'),
+                    creadoEn: new Date(row.creado_en),
+                    expirado: new Date(row.vence_en),
+                    usadoEn: row.usado_en ? new Date(row.usado_en) : null
+                });
+            });
+        }
+
+        // Historial de todos los cupones del cliente (activos, canjeados y vencidos)
+        function renderHistorialCliente() {
+            const cont = document.getElementById('historialCupones');
+            if (!cont) return;
+            const clienteId = appState.usuarioActual.clienteId;
+            const ahora = new Date();
+            const cupones = appState.cupones
+                .filter(c => c.clienteId === clienteId)
+                .sort((a, b) => new Date(b.creadoEn) - new Date(a.creadoEn));
+
+            if (!cupones.length) {
+                cont.innerHTML = '<p style="color:#999; font-size:14px;">Todavía no generaste ningún cupón.</p>';
+                return;
+            }
+
+            const filas = cupones.map(c => {
+                const prestador = appState.prestadores.find(p => p.id === c.prestadorId);
+                let estado, color;
+                if (c.usadoEn) { estado = 'Canjeado'; color = '#2d7a4f'; }
+                else if (new Date(c.expirado) < ahora) { estado = 'Vencido'; color = '#b91c1c'; }
+                else { estado = 'Activo'; color = '#1e6fd6'; }
+                const fechaRef = c.usadoEn
+                    ? 'Canjeado: ' + new Date(c.usadoEn).toLocaleDateString('es-AR')
+                    : 'Vence: ' + new Date(c.expirado).toLocaleDateString('es-AR');
+                return `<tr style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:10px 8px; font-weight:600; color:#324a70;">${prestador ? prestador.nombre : '—'}</td>
+                    <td style="padding:10px 8px; font-family:monospace; letter-spacing:0.5px;">${c.codigo}</td>
+                    <td style="padding:10px 8px;"><span style="color:${color}; font-weight:600;">${estado}</span></td>
+                    <td style="padding:10px 8px; color:#666;">${new Date(c.creadoEn).toLocaleDateString('es-AR')}</td>
+                    <td style="padding:10px 8px; color:#666;">${fechaRef}</td>
+                </tr>`;
+            }).join('');
+
+            cont.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:560px;">
+                    <thead>
+                        <tr style="text-align:left; color:#666; border-bottom:2px solid #eee;">
+                            <th style="padding:10px 8px;">Prestador</th>
+                            <th style="padding:10px 8px;">Código</th>
+                            <th style="padding:10px 8px;">Estado</th>
+                            <th style="padding:10px 8px;">Creado</th>
+                            <th style="padding:10px 8px;">Canje / Vence</th>
+                        </tr>
+                    </thead>
+                    <tbody>${filas}</tbody>
+                </table>`;
+        }
+
         function renderCuponesCliente() {
             const clienteId = appState.usuarioActual.clienteId;
             const cuponesDelCliente = appState.cupones.filter(c => c.clienteId === clienteId);
-
-            console.log('Cliente ID:', clienteId);
-            console.log('Cupones del cliente:', cuponesDelCliente);
-            console.log('Prestadores:', appState.prestadores);
 
             let html = '';
 
             appState.prestadores.forEach(prestador => {
                 const cuponesPrestador = cuponesDelCliente.filter(c => c.prestadorId === prestador.id);
-                const cupone = cuponesPrestador.length > 0 ? cuponesPrestador[0] : null;
+                const limite = prestador.limite || 'ilimitado';
+                // Cupón activo = todavía no se usó y no venció
+                const activo = cuponesPrestador.find(c => c.estado === 'activo') || null;
+                const cupone = activo || (cuponesPrestador[0] || null);
 
-                const tieneActivo = cupone && cupone.estado === 'activo';
-                const tieneUsado = cupone && cupone.estado === 'usado';
+                const tieneActivo = !!activo;
+                // Único ya consumido: existe algún cupón y ninguno activo
+                const unicoAgotado = limite === 'unico' && cuponesPrestador.length > 0 && !activo;
 
-                const descuentoText = prestador.descuento ? `${prestador.descuento}%` : 'Por confirmar';
+                const inactivo = prestador.activo === false;
 
                 html += `
-                    <div class="cupone-card" style="border-left-color: ${prestador.color}; position: relative; overflow: hidden; padding: 0;">
-                        <!-- Banner superior: Solo imagen flexible, 15% a la derecha -->
+                    <div class="cupone-card" style="border-left-color: ${prestador.color}; position: relative; overflow: hidden; padding: 0; ${inactivo ? 'filter: grayscale(0.9); opacity: 0.6;' : ''}">
+                        <!-- Banner superior -->
                         <div style="background: ${prestador.banner ? `url('${prestador.banner}') left/cover` : prestador.color}; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; min-height: 120px; display: flex; align-items: center; justify-content: flex-end; padding-right: 24px;">
-                            
-                            <!-- Descuento SUPERPUESTO en la esquina derecha -->
+                            <!-- Badge: descuento o Próximamente -->
                             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
-                                <span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${prestador.descuento ? prestador.descuento + '%' : '?'}</span>
-                                <span style="color: rgba(255,255,255,0.95); font-size: 11px; font-weight: 500; margin-top: 2px;">descuento</span>
+                                ${inactivo
+                                    ? `<span style="color: white; font-weight: 600; font-size: 15px; letter-spacing: 0.04em;">Próximamente</span>`
+                                    : `<span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${prestador.descuento ? prestador.descuento + '%' : '?'}</span>
+                                       <span style="color: rgba(255,255,255,0.95); font-size: 11px; font-weight: 500; margin-top: 2px;">descuento</span>`}
                             </div>
                         </div>
 
@@ -1902,25 +2381,32 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div style="margin-bottom: 20px;">
                                 <div style="color: var(--primary); font-weight: 700; font-size: 18px; margin-bottom: 4px;">${prestador.nombre}</div>
                                 <div style="color: var(--gray-dark); font-size: 13px; line-height: 1.4;">${prestador.descripcion}</div>
+                                ${prestador.alcance ? `<div style="font-size:11px; color:var(--accent); margin-top:6px; font-weight:500;">📍 ${prestador.alcance}</div>` : ''}
                             </div>
 
-                            ${cupone ? `
+                            ${inactivo ? `
+                                <div style="text-align:center; padding:16px 0;">
+                                    <p style="font-weight:600; color:var(--accent); margin-bottom:6px;">🕓 Próximamente</p>
+                                    <p style="font-size:13px; color:#999;">Este beneficio va a estar disponible muy pronto.</p>
+                                </div>
+                            ` : (tieneActivo ? `
                                 <div class="cupone-codigo">${cupone.codigo}</div>
-                                <div class="cupone-fecha">
-                                    ${tieneActivo ? `Válido hasta ${cupone.expirado.toLocaleDateString('es-AR')}` : ''}
-                                    ${tieneUsado ? `Canjeado el ${cupone.usadoEn.toLocaleDateString('es-AR')}` : ''}
-                                </div>
+                                <div class="cupone-fecha">Válido hasta ${cupone.expirado.toLocaleDateString('es-AR')}</div>
                                 <div class="cupone-estado">
-                                    <span class="${tieneActivo ? 'estado-activo' : 'estado-usado'}">
-                                        ${tieneActivo ? '✓ Disponible' : '✓ Canjeado'}
-                                    </span>
+                                    <span class="estado-activo">✓ Disponible</span>
                                 </div>
-                                ${tieneActivo ? `<p style="font-size: 12px; color: #999; margin-top: 15px;">Mostrá este código al prestador para canjear</p>` : ''}
+                                <p style="font-size: 12px; color: #999; margin-top: 15px;">⏳ Cupón activo · mostrá este código al prestador para canjearlo.</p>
                                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    ${tieneActivo ? `<button class="btn btn-primary btn-sm" onclick="solicitarCupon('${prestador.id}', '${prestador.nombre}')" style="flex: 1;">Crear cupón</button>` : ''}
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                 </div>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
+                            ` : (unicoAgotado ? `
+                                <div style="text-align: center; padding: 16px 0;">
+                                    <p style="font-weight:600; color:var(--accent); margin-bottom:6px;">✓ Beneficio utilizado</p>
+                                    <p style="font-size:13px; color:#999; margin-bottom:12px;">Este beneficio es de un solo uso y ya lo aprovechaste.</p>
+                                    <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Visitar sitio →</a>
+                                    <p style="font-size: 12px; color: #999; margin-top: 12px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
+                                </div>
                             ` : `
                                 <div style="text-align: center; padding: 20px 0; color: #999;">
                                     <p style="margin-bottom: 10px;">No tenés cupón de este prestador</p>
@@ -1930,7 +2416,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                     </div>
                                     <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
                                 </div>
-                            `}
+                            `))}
                         </div>
                     </div>
                 `;
@@ -1962,9 +2448,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
                             <button onclick="toggleTyCInline()" id="btnVerTyC" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; padding:0; margin-bottom:16px;">Ver términos y condiciones ▾</button>
 
-                            <div id="tycInline" style="display:none; max-height:240px; overflow-y:auto; background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:16px; margin-bottom:20px;">
+                            <div id="tycInline" style="display:none; max-height:240px; overflow-y:auto; background:var(--bg-main); border:1px solid var(--border-color); border-radius:8px; padding:16px; margin-bottom:8px; box-shadow: inset 0 -20px 16px -16px rgba(0,0,0,0.22);">
                                 <p id="tycInlineTexto" style="color:var(--text-primary); line-height:1.6; font-size:13px; white-space:pre-wrap;"></p>
                             </div>
+                            <p id="tycHint" style="display:none; text-align:center; font-size:11px; font-weight:600; letter-spacing:0.03em; color:var(--primary); margin:0 0 18px;">↓ Deslizá para leer todos los términos</p>
 
                             <div style="display:flex; gap:12px;">
                                 <button class="btn btn-secondary" onclick="cerrarConfirmCupon()" style="flex:1;">Cancelar</button>
@@ -1981,12 +2468,21 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function toggleTyCInline() {
             const box = document.getElementById('tycInline');
             const btn = document.getElementById('btnVerTyC');
+            const hint = document.getElementById('tycHint');
             if (box.style.display === 'none') {
                 box.style.display = 'block';
                 btn.innerHTML = 'Ocultar términos y condiciones ▴';
+                // Mostrar el cartel solo si hay contenido para scrollear
+                const hayScroll = box.scrollHeight > box.clientHeight + 4;
+                if (hint) hint.style.display = hayScroll ? 'block' : 'none';
+                box.onscroll = () => {
+                    const alFinal = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+                    if (hint) hint.style.display = alFinal ? 'none' : 'block';
+                };
             } else {
                 box.style.display = 'none';
                 btn.innerHTML = 'Ver términos y condiciones ▾';
+                if (hint) hint.style.display = 'none';
             }
         }
 
@@ -1995,141 +2491,182 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (m) m.remove();
         }
 
-        function crearCupon(prestadorId, prestadorNombre) {
+        async function crearCupon(prestadorId, prestadorNombre) {
             const clienteId = appState.usuarioActual.clienteId;
             const prestador = appState.prestadores.find(p => p.id === prestadorId);
 
-            // Si es cupón único (como Anna Rosatti), verificar si ya existe CUALQUIER cupón
-            if (prestador.tipoLimite === 'unico') {
-                const cuponUnico = appState.cupones.find(c => 
+            const hoy = new Date();
+            const limite = prestador.limite || 'ilimitado';
+
+            // Cupón activo = todavía no se usó y no venció
+            const tieneActivo = appState.cupones.some(c =>
+                c.clienteId === clienteId && c.prestadorId === prestadorId &&
+                c.usadoEn === null && new Date(c.expirado) > hoy
+            );
+            if (tieneActivo) {
+                showAlert('vistaDashboardCliente', `❌ Ya tenés un cupón activo de ${prestadorNombre}. Usalo o esperá a que venza para generar otro.`, 'error');
+                return;
+            }
+
+            if (limite === 'unico') {
+                // Un solo uso de por vida: si ya existe CUALQUIER cupón, bloquear
+                const yaExiste = appState.cupones.some(c =>
                     c.clienteId === clienteId && c.prestadorId === prestadorId
                 );
-                
-                if (cuponUnico) {
-                    showAlert('vistaDashboardCliente', `❌ Ya canjeaste tu cupón único de ${prestadorNombre}. Solo puedes usar este beneficio una sola vez.`, 'error');
+                if (yaExiste) {
+                    showAlert('vistaDashboardCliente', `❌ Ya usaste tu cupón único de ${prestadorNombre}. Este beneficio es de un solo uso.`, 'error');
                     return;
                 }
-            } else {
-                // Para cupones mensuales normales
-                const hoy = new Date();
+            } else if (limite === 'mensual') {
+                // Uno por mes calendario: bloquear si ya hay uno de este mes
                 const primerDiaDelMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-                
-                // Buscar si ya existe un cupón activo de este cliente con este prestador en el mes actual
-                const cuponExistenteDelMes = appState.cupones.find(c => {
-                    const esDelCliente = c.clienteId === clienteId;
-                    const esDelPrestador = c.prestadorId === prestadorId;
-                    const esDelMesActual = new Date(c.creadoEn) >= primerDiaDelMes;
-                    const estaActivo = c.estado === 'activo' || (c.usadoEn === null && new Date(c.expirado) > hoy);
-                    
-                    return esDelCliente && esDelPrestador && esDelMesActual && estaActivo;
-                });
-                
-                // Si ya existe un cupón activo este mes, bloquear
-                if (cuponExistenteDelMes) {
-                    showAlert('vistaDashboardCliente', `❌ Ya tenés un cupón activo de ${prestadorNombre} este mes. Vuelve el próximo 1 de mes para solicitar uno nuevo.`, 'error');
+                const yaEsteMes = appState.cupones.some(c =>
+                    c.clienteId === clienteId && c.prestadorId === prestadorId &&
+                    new Date(c.creadoEn) >= primerDiaDelMes
+                );
+                if (yaEsteMes) {
+                    showAlert('vistaDashboardCliente', `❌ Ya generaste tu cupón de ${prestadorNombre} este mes. El límite se renueva el 1° del mes que viene.`, 'error');
                     return;
                 }
             }
+            // 'ilimitado': sin tope; solo aplica el chequeo de "cupón activo" de arriba.
 
             // Generar código único
-            const codigo = `SCGL-${prestadorNombre.substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            const codigo = `SCGL-${prestadorNombre.replace(/[^a-zA-Z0-9]/g, '').substring(0, 3).toUpperCase()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+            const agenteId = appState.clientes.find(c => c.id === clienteId)?.agenteId || null;
+            const venceEn = new Date(Date.now() + (prestador.vigenciaDias || 30) * 24 * 60 * 60 * 1000);
 
-            const nuevoCupon = {
-                id: Date.now().toString(),
-                clienteId: appState.usuarioActual.clienteId,
-                prestadorId,
-                agenteId: appState.clientes.find(c => c.id === appState.usuarioActual.clienteId).agenteId,
+            // Guardar el cupón en Supabase (base de datos real)
+            const { error } = await supabaseClient.from('cupones').insert({
+                cliente_id: clienteId,
+                prestador_id: prestadorId,
+                agente_id: agenteId,
                 codigo,
-                estado: 'activo',
-                creadoEn: new Date(),
-                expirado: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                usadoEn: null
-            };
+                vence_en: venceEn.toISOString()
+            });
 
-            appState.cupones.push(nuevoCupon);
+            if (error) {
+                showAlert('vistaDashboardCliente', 'No se pudo crear el cupón. Probá de nuevo en un momento.', 'error');
+                console.error('Error al crear cupón en Supabase:', error);
+                return;
+            }
 
-            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}`, 'success');
+            // Refrescar los cupones desde la base y volver a dibujar
+            await cargarCuponesCliente();
             renderCuponesCliente();
+            renderHistorialCliente();
+            showAlert('vistaDashboardCliente', `✓ Cupón creado: ${codigo}. Te lo enviamos por mail.`, 'success');
 
-            // Simular envío de email
-            setTimeout(() => {
-                showAlert('vistaDashboardCliente', `📧 Mails enviados a ti y a ${prestadorNombre}`, 'info');
-            }, 500);
+            // Mandarle el cupón por mail al cliente (para que lo tenga a mano)
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                await fetch('/api/notificar-cupon', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({
+                        email: appState.usuarioActual.email,
+                        nombre: appState.usuarioActual.nombre,
+                        codigo,
+                        prestadorNombre: prestador.nombre,
+                        descuento: prestador.descuento,
+                        venceEn: venceEn.toISOString()
+                    })
+                });
+            } catch (e) { console.error('No se pudo enviar el cupón por mail:', e); }
         }
 
-        function validarCodigoPrestador() {
+        // La clave del validador NO vive acá (sería visible). La verifica el servidor (Supabase).
+        let _claveValidador = '';
+
+        // Abre el validador en estado bloqueado (pide contraseña)
+        function abrirValidador() {
+            const gate = document.getElementById('validadorGate');
+            const cont = document.getElementById('validadorContenido');
+            if (gate) gate.style.display = 'block';
+            if (cont) cont.style.display = 'none';
+            const ga = document.getElementById('gateAlert'); if (ga) ga.innerHTML = '';
+            const ci = document.getElementById('inputClaveValidador'); if (ci) ci.value = '';
+            const header = document.getElementById('header'); if (header) header.style.display = 'none';
+            showVista('vistaValidarCupon');
+        }
+
+        async function desbloquearValidador() {
+            const clave = document.getElementById('inputClaveValidador').value;
+            // El servidor (Supabase) verifica la clave; nunca está escrita en esta página
+            const { data: ok, error } = await supabaseClient.rpc('validador_clave_ok', { p_clave: clave });
+            if (!error && ok === true) {
+                _claveValidador = clave;
+                document.getElementById('validadorGate').style.display = 'none';
+                document.getElementById('validadorContenido').style.display = 'block';
+                document.getElementById('inputClaveValidador').value = '';
+                document.getElementById('gateAlert').innerHTML = '';
+            } else {
+                document.getElementById('gateAlert').innerHTML = '<div class="alert alert-error mostrar">Contraseña incorrecta.</div>';
+            }
+        }
+
+        async function validarCodigoPrestador() {
             const codigo = document.getElementById('inputCodigoValidador').value.trim().toUpperCase();
-            
             if (!codigo) {
                 showAlertValidador('Por favor ingresá un código', 'error');
                 return;
             }
 
-            // Buscar cupón
-            const cupone = appState.cupones.find(c => c.codigo === codigo);
+            // Buscar el cupón en la base (función segura, sin marcarlo usado todavía)
+            const { data, error } = await supabaseClient.rpc('buscar_cupon', { p_codigo: codigo, p_clave: _claveValidador });
+            if (error) { showAlertValidador('Error al verificar el código. Probá de nuevo.', 'error'); console.error(error); return; }
 
-            if (!cupone) {
-                showAlertValidador('❌ Código no encontrado', 'error');
-                return;
-            }
+            const estado = data && data.estado;
+            if (estado === 'clave_invalida') { showAlertValidador('Sesión vencida. Volvé a ingresar la clave.', 'error'); return; }
+            if (estado === 'no_existe') { showAlertValidador('❌ Código no encontrado', 'error'); return; }
+            if (estado === 'ya_usado') { showAlertValidador('❌ Este cupón ya fue canjeado', 'error'); return; }
+            if (estado === 'vencido') { showAlertValidador('❌ Este cupón está vencido', 'error'); return; }
+            if (estado !== 'ok') { showAlertValidador('❌ No se pudo validar el cupón', 'error'); return; }
 
-            if (cupone.estado === 'usado') {
-                showAlertValidador('❌ Este cupón ya fue canjeado', 'error');
-                return;
-            }
-
-            if (cupone.estado === 'expirado') {
-                showAlertValidador('❌ Este cupón expiró', 'error');
-                return;
-            }
-
-            // Verificar que no esté expirado
-            if (new Date() > cupone.expirado) {
-                cupone.estado = 'expirado';
-                showAlertValidador('❌ Este cupón expiró', 'error');
-                return;
-            }
-
-            // Si llegó aquí, el cupón es válido
-            const cliente = appState.clientes.find(c => c.id === cupone.clienteId);
-            const prestador = appState.prestadores.find(p => p.id === cupone.prestadorId);
-            const agente = appState.agentes.find(a => a.id === cupone.agenteId);
+            const prestador = appState.prestadores.find(p => p.id === data.prestador_id);
+            const venceTxt = data.vence_en ? new Date(data.vence_en).toLocaleDateString('es-AR') : '—';
 
             document.getElementById('resultadoValidacion').innerHTML = `
                 <div style="background: #dcfce7; border: 2px solid var(--success); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                     <h3 style="color: var(--success); margin-bottom: 15px;">✓ CUPÓN VÁLIDO</h3>
                     <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                         <div style="margin-bottom: 10px;">
-                            <strong style="color: var(--primary);">Cliente:</strong> ${cliente.nombre}
+                            <strong style="color: var(--primary);">Cliente:</strong> ${data.cliente}
                         </div>
                         <div style="margin-bottom: 10px;">
-                            <strong style="color: var(--primary);">Descuento:</strong> ${prestador.descuento}% en ${prestador.nombre}
+                            <strong style="color: var(--primary);">Descuento:</strong> ${prestador ? prestador.descuento + '% en ' + prestador.nombre : 'según el prestador'}
                         </div>
                         <div>
-                            <strong style="color: var(--primary);">Válido hasta:</strong> ${cupone.expirado.toLocaleDateString('es-AR')}
+                            <strong style="color: var(--primary);">Válido hasta:</strong> ${venceTxt}
                         </div>
                     </div>
-                    <button class="btn btn-success" onclick="confirmarCanjeDesdeValidador('${cupone.id}', '${cliente.nombre}', '${prestador.nombre}', '${agente.nombre}')" style="width: 100%;">Confirmar canje</button>
+                    <button class="btn btn-success" id="btnConfirmarCanje" onclick="confirmarCanjeDesdeValidador('${codigo}')" style="width: 100%;">Confirmar canje</button>
                 </div>
             `;
         }
 
-        function confirmarCanjeDesdeValidador(cuponeId, clienteNombre, prestadorNombre, agenteNombre) {
-            const cupone = appState.cupones.find(c => c.id === cuponeId);
-            cupone.estado = 'usado';
-            cupone.usadoEn = new Date();
+        async function confirmarCanjeDesdeValidador(codigo) {
+            const btn = document.getElementById('btnConfirmarCanje');
+            if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
+
+            // Marcar el cupón como usado en la base (función segura)
+            const { data, error } = await supabaseClient.rpc('canjear_cupon', { p_codigo: codigo, p_clave: _claveValidador });
+            if (error || !data || data.estado !== 'ok') {
+                if (data && data.estado === 'ya_usado') showAlertValidador('❌ Este cupón ya fue canjeado', 'error');
+                else showAlertValidador('No se pudo canjear el cupón. Probá de nuevo.', 'error');
+                if (btn) { btn.disabled = false; btn.textContent = 'Confirmar canje'; }
+                console.error(error || data);
+                return;
+            }
 
             document.getElementById('resultadoValidacion').innerHTML = `
                 <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 20px; text-align: center;">
                     <h3 style="color: #1e40af; margin-bottom: 15px;">✓ Cupón canjeado correctamente</h3>
-                    <p style="color: #1e40af; margin-bottom: 20px;">Se enviaron confirmaciones por email a:<br><strong>${clienteNombre}</strong><br><strong>${agenteNombre}</strong></p>
+                    <p style="color: #1e40af;">El descuento fue aplicado y el cupón quedó marcado como usado.</p>
                 </div>
             `;
 
             document.getElementById('inputCodigoValidador').value = '';
-            document.getElementById('inputCodigoValidador').disabled = true;
-            document.querySelector('button[onclick="validarCodigoPrestador()"]').disabled = true;
-
             showAlertValidador('✓ Canje procesado exitosamente', 'success');
 
             setTimeout(() => {
@@ -2147,6 +2684,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         function volverDelValidador() {
             limpiarValidador();
+            // Limpiar el hash para que no reabra el validador al recargar
+            if (location.hash) history.replaceState(null, '', location.pathname);
             showVista('vistaLogin');
         }
 
@@ -2157,6 +2696,72 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             setTimeout(() => {
                 document.getElementById('validadorAlertContainer').innerHTML = '';
             }, 4000);
+        }
+
+        function fmtFecha(f) {
+            if (!f) return '—';
+            const p = f.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
+        }
+
+        // Oculta los últimos 4 caracteres del código (para que agente/admin no vean el código canjeable)
+        function enmascararCodigo(codigo) {
+            if (!codigo || codigo.length <= 4) return 'XXXX';
+            return codigo.slice(0, -4) + 'XXXX';
+        }
+
+        // Llena los desplegables de cumpleaños: Día / Mes / Año
+        function popularCumple() {
+            const dia = document.getElementById('regCumpleDia');
+            const mes = document.getElementById('regCumpleMes');
+            const anio = document.getElementById('regCumpleAnio');
+            if (!dia || !mes || !anio) return;
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            for (let d = 1; d <= 31; d++) dia.innerHTML += `<option value="${String(d).padStart(2,'0')}">${d}</option>`;
+            meses.forEach((m, i) => mes.innerHTML += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
+            const hoy = new Date().getFullYear();
+            for (let y = hoy - 16; y >= 1940; y--) anio.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+
+        // Clientes del agente logueado (solo los que se registraron con él)
+        function renderClientesAgente() {
+            const agenteId = appState.usuarioActual.agenteId;
+            const clientes = appState.clientes.filter(c => c.agenteId === agenteId);
+            const cont = document.getElementById('clientesAgente');
+            const count = document.getElementById('clientesAgenteCount');
+            if (count) count.textContent = `${clientes.length} cliente${clientes.length === 1 ? '' : 's'} registrado${clientes.length === 1 ? '' : 's'} con vos`;
+            if (!clientes.length) {
+                cont.innerHTML = '<p style="color:#999;">Todavía no tenés clientes registrados con vos.</p>';
+                return;
+            }
+            cont.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:13px; min-width:720px;">
+                    <thead>
+                        <tr style="text-align:left; color:#666; border-bottom:2px solid #eee;">
+                            <th style="padding:10px 8px;">Nombre</th>
+                            <th style="padding:10px 8px;">Email</th>
+                            <th style="padding:10px 8px;">Teléfono</th>
+                            <th style="padding:10px 8px;">Cumpleaños</th>
+                            <th style="padding:10px 8px;">Operación</th>
+                            <th style="padding:10px 8px;">Dirección</th>
+                            <th style="padding:10px 8px;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${clientes.map(c => `
+                            <tr style="border-bottom:1px solid #f0f0f0;">
+                                <td style="padding:10px 8px; font-weight:600; color:#324a70;">${c.nombre}</td>
+                                <td style="padding:10px 8px;"><a href="mailto:${c.email}" style="color:#324a70;">${c.email}</a></td>
+                                <td style="padding:10px 8px;">${c.telefono || '—'}</td>
+                                <td style="padding:10px 8px;">${fmtFecha(c.cumple)}</td>
+                                <td style="padding:10px 8px;">${c.operacion || '—'}</td>
+                                <td style="padding:10px 8px;">${c.direccion || '—'}</td>
+                                <td style="padding:10px 8px;">${c.validado
+                                    ? '<span style="color:#2d7a4f; font-weight:600;">Validado</span>'
+                                    : '<span style="color:#b8860b; font-weight:600;">Pendiente</span>'}</td>
+                            </tr>`).join('')}
+                    </tbody>
+                </table>`;
         }
 
         function renderNotificacionesAgente() {
@@ -2180,7 +2785,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div style="font-weight: 600; color: #324a70;">${cliente.nombre}</div>
                             <div style="color: #666; font-size: 14px; margin: 5px 0;">${accion}</div>
                             <div style="color: #999; font-size: 12px;">
-                                ${fecha.toLocaleString('es-AR')} | Código: <strong>${cupone.codigo}</strong>
+                                ${fecha.toLocaleString('es-AR')} | Código: <strong>${enmascararCodigo(cupone.codigo)}</strong>
                             </div>
                         </div>
                     `;
@@ -2204,7 +2809,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <td>${cliente.nombre}</td>
                             <td>${cliente.email}</td>
                             <td>${cliente.telefono}</td>
-                            <td>${agente.nombre}</td>
+                            <td>${agente ? agente.nombre : '—'}</td>
                             <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">Pendiente</span></td>
                             <td>
                                 <div class="actions">
@@ -2219,26 +2824,69 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.getElementById('clientesTableBody').innerHTML = html;
         }
 
-        function validarCliente(clienteId) {
-            const cliente = appState.clientes.find(c => c.id === clienteId);
-            cliente.validado = true;
-            cliente.validado_at = new Date();
-
-            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado correctamente`, 'success');
-            renderClientes();
-
-            // Simular email
-            setTimeout(() => {
-                showAlert('vistaAdmin', `📧 Email enviado a ${cliente.email}`, 'info');
-            }, 500);
+        // Trae TODOS los clientes desde Supabase (solo funciona con sesión de admin por RLS)
+        async function cargarClientesAdmin() {
+            const { data, error } = await supabaseClient
+                .from('clientes').select('*')
+                .order('created_at', { ascending: false });
+            if (error) { console.error('Error al cargar clientes (admin):', error); return; }
+            appState.clientes = (data || []).map(c => ({
+                id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
+                agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+            }));
         }
 
-        function rechazarCliente(clienteId) {
-            if (confirm('¿Estás seguro de que querés rechazar este cliente?')) {
-                appState.clientes = appState.clientes.filter(c => c.id !== clienteId);
-                showAlert('vistaAdmin', 'Cliente rechazado', 'success');
-                renderClientes();
+        async function validarCliente(clienteId) {
+            const cliente = appState.clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+
+            // Guardar la validación en Supabase (base de datos real)
+            const { error } = await supabaseClient.from('clientes')
+                .update({ validado: true })
+                .eq('id', clienteId);
+            if (error) {
+                showAlert('vistaAdmin', 'No se pudo validar. Probá de nuevo en un momento.', 'error');
+                console.error('Error al validar cliente:', error);
+                return;
             }
+
+            cliente.validado = true;
+            renderClientes();
+            showAlert('vistaAdmin', `✓ ${cliente.nombre} validado. Enviando aviso por mail...`, 'success');
+
+            // Avisar al cliente y al agente por mail (vía la función segura de Vercel)
+            try {
+                const agente = appState.agentes.find(a => a.id === cliente.agenteId);
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const resp = await fetch('/api/notificar-validacion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agenteEmail: agente?.email || '', agenteNombre: agente?.nombre || '' })
+                });
+                if (resp.ok) {
+                    showAlert('vistaAdmin', `📧 Mail de aviso enviado a ${cliente.email}`, 'success');
+                } else {
+                    const det = await resp.json().catch(() => ({}));
+                    showAlert('vistaAdmin', `✓ Validado, pero el mail no se pudo enviar (${det.error || resp.status}). El cliente igual ya puede entrar.`, 'error');
+                }
+            } catch (e) {
+                showAlert('vistaAdmin', '✓ Validado, pero el mail no se pudo enviar. El cliente igual ya puede entrar.', 'error');
+                console.error('Error al enviar mail de validación:', e);
+            }
+        }
+
+        async function rechazarCliente(clienteId) {
+            if (!confirm('¿Seguro que querés rechazar y eliminar este registro? No se puede deshacer.')) return;
+            const { error } = await supabaseClient.from('clientes').delete().eq('id', clienteId);
+            if (error) {
+                showAlert('vistaAdmin', 'No se pudo rechazar. Probá de nuevo en un momento.', 'error');
+                console.error('Error al rechazar cliente:', error);
+                return;
+            }
+            appState.clientes = appState.clientes.filter(c => c.id !== clienteId);
+            renderClientes();
+            showAlert('vistaAdmin', 'Registro rechazado y eliminado.', 'success');
         }
 
         function renderAgentes() {
@@ -2493,8 +3141,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const color = document.getElementById('modalColor').value;
             const tyc = document.getElementById('modalTyC').value.trim();
 
-            if (!nombre || !email || !url || !icono || !tyc) {
-                showAlert('vistaAdmin', '❌ Completa todos los campos obligatorios (incluye T&C)', 'error');
+            if (!nombre || !url || !icono || !tyc) {
+                showAlert('vistaAdmin', '❌ Completá los campos obligatorios: nombre, URL, ícono y T&C', 'error');
                 return;
             }
 
@@ -2590,7 +3238,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td>${cliente ? cliente.nombre : 'N/A'}</td>
                         <td>${agente ? agente.nombre : 'N/A'}</td>
                         <td>${prestador ? prestador.nombre : 'N/A'}</td>
-                        <td><strong>${cupone.codigo}</strong></td>
+                        <td><strong>${enmascararCodigo(cupone.codigo)}</strong></td>
                         <td><span class="badge ${estado === 'Canjeado' ? 'badge-success' : estado === 'Expirado' ? 'badge-danger' : 'badge-info'}">${estado}</span></td>
                         <td>${new Date(cupone.creadoEn).toLocaleDateString('es-AR')}</td>
                         <td>${cupone.usadoEn ? new Date(cupone.usadoEn).toLocaleDateString('es-AR') : '-'}</td>
@@ -2618,8 +3266,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         </div>
                         <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
                             <h4 style="color: var(--primary); margin-bottom: 10px;">${prestador.nombre}</h4>
-                            <p style="color: #333; line-height: 1.6; font-size: 14px; white-space: pre-wrap;">${prestador.tyc}</p>
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e5e5;">
+                            <p style="color: var(--text-primary); line-height: 1.6; font-size: 14px; white-space: pre-wrap;">${prestador.tyc}</p>
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
                                 <button class="btn btn-primary" onclick="closeTyCModal()" style="width: 100%;">Entendido</button>
                             </div>
                         </div>
@@ -2648,20 +3296,63 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         }
 
-        function logout() {
+        async function logout() {
+            if (!confirm('¿Seguro que querés salir de tu cuenta?')) return;
+            try { await supabaseClient.auth.signOut(); } catch (e) { /* igual cerramos */ }
             appState.usuarioActual = null;
             document.getElementById('header').style.display = 'none';
             showVista('vistaLogin');
 
-            // Limpiar formularios
+            // Limpiar formularios y volver al paso inicial del login
             document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            if (document.getElementById('loginPassword')) document.getElementById('loginPassword').value = '';
             document.getElementById('formLoginContainer').style.display = 'block';
             document.getElementById('formRegistroContainer').style.display = 'none';
+            const p1 = document.getElementById('otpPaso1'); if (p1) p1.style.display = 'block';
+            const p2 = document.getElementById('otpPaso2'); if (p2) p2.style.display = 'none';
+            const pp = document.getElementById('otpPasoPass'); if (pp) pp.style.display = 'none';
+        }
+
+        // Al recargar la página: si hay una sesión activa, restaurar el panel sin pedir login de nuevo
+        async function restaurarSesion() {
+            let session = null;
+            try { const r = await supabaseClient.auth.getSession(); session = r.data.session; } catch (e) { return false; }
+            if (!session || !session.user) return false;
+            const email = session.user.email || '';
+
+            // Admin
+            if (esAdminEmail(email)) {
+                appState.usuarioActual = { id: 'admin', nombre: 'Admin Team Scaglia', email, rol: 'admin' };
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarClientesAdmin();
+                showDashboardAdmin();
+                return true;
+            }
+            // Agente
+            const ag = getAgentePorEmail(email);
+            if (ag) {
+                appState.usuarioActual = { id: 'agente_' + ag.id, nombre: ag.nombre, email, rol: 'agente', agenteId: ag.id };
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarDatosAgente(ag.id);
+                showDashboardAgente();
+                return true;
+            }
+            // Cliente
+            const { data: filas } = await supabaseClient.from('clientes').select('*').eq('email', email).order('created_at', { ascending: false }).limit(1);
+            if (filas && filas.length) {
+                const c = filas[0];
+                appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                document.getElementById('vistaLogin').classList.remove('activa');
+                await cargarCuponesCliente();
+                showDashboardCliente();
+                return true;
+            }
+            return false;
         }
 
         function showAlert(vistaId, mensaje, tipo) {
-            const containerId = vistaId === 'vistaAdmin' ? 'adminAlertContainer' : 
+            const containerId = vistaId === 'vistaAdmin' ? 'adminAlertContainer' :
                                vistaId === 'vistaDashboardAgente' ? 'agenteAlertContainer' : 'alertContainer';
 
             const alertHTML = `<div class="alert alert-${tipo} mostrar">${mensaje}</div>`;
@@ -2766,7 +3457,18 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             setupHomeNav();
             syncNavTheme();
 
-            // Llenar dropdown de agentes en registro (si existe el formulario)
+            // Cargar desplegables de cumpleaños (Día / Mes / Año)
+            popularCumple();
+
+            // Acceso de prestadores por URL oculta (ej: /beneficios#validar)
+            if (location.hash === '#validar' || location.hash === '#prestador') {
+                abrirValidador();
+            } else {
+                // Si hay sesión activa, restaurar el panel sin pedir login otra vez
+                restaurarSesion();
+            }
+
+            // Llenar dropdown de agentes en registro (si existe el selector)
             const select = document.getElementById('regAgente');
             if (select) {
                 appState.agentes.forEach(agente => {
@@ -2776,12 +3478,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                     select.appendChild(option);
                 });
             }
-
-            // Mensajes de login de prueba
-            console.log('🔐 Credenciales de prueba:');
-            console.log('Admin: admin@teamscaglia.com / admin123');
-            console.log('Agente: agente@teamscaglia.com / agente123');
-            console.log('Cliente: cliente@teamscaglia.com / cliente123');
         }
 
         // Cerrar modal haciendo clic afuera
@@ -2791,14 +3487,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             }
         });
 
-        // Enter en inputs
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                if (document.getElementById('loginEmail') === document.activeElement) {
-                    handleLogin();
-                }
-            }
-        });
 
         init();
     </script>
