@@ -2357,8 +2357,16 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 const cupone = activo || (cuponesPrestador[0] || null);
 
                 const tieneActivo = !!activo;
-                // Único ya consumido: existe algún cupón y ninguno activo
-                const unicoAgotado = limite === 'unico' && cuponesPrestador.length > 0 && !activo;
+                // Bloqueado por límite (sin cupón activo): único ya usado, o mensual ya usado este mes
+                const primerDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+                const hayEsteMes = cuponesPrestador.some(c => new Date(c.creadoEn) >= primerDiaMes);
+                const bloqueadoPorLimite = !activo && (
+                    (limite === 'unico' && cuponesPrestador.length > 0) ||
+                    (limite === 'mensual' && hayEsteMes)
+                );
+                const msgBloqueo = limite === 'unico'
+                    ? 'Este beneficio es de un solo uso y ya lo aprovechaste.'
+                    : 'Ya usaste tu beneficio de este mes. Vas a poder generar uno nuevo el 1° del mes que viene.';
 
                 const inactivo = prestador.activo === false;
 
@@ -2400,10 +2408,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                 </div>
                                 <p style="font-size: 12px; color: #999; margin-top: 10px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
-                            ` : (unicoAgotado ? `
+                            ` : (bloqueadoPorLimite ? `
                                 <div style="text-align: center; padding: 16px 0;">
                                     <p style="font-weight:600; color:var(--accent); margin-bottom:6px;">✓ Beneficio utilizado</p>
-                                    <p style="font-size:13px; color:#999; margin-bottom:12px;">Este beneficio es de un solo uso y ya lo aprovechaste.</p>
+                                    <p style="font-size:13px; color:#999; margin-bottom:12px;">${msgBloqueo}</p>
                                     <a href="${prestador.url}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Visitar sitio →</a>
                                     <p style="font-size: 12px; color: #999; margin-top: 12px; cursor: pointer; text-decoration: underline;" onclick="openModalTyC('${prestador.id}', '${prestador.nombre}')">Términos y condiciones del descuento</p>
                                 </div>
@@ -2497,6 +2505,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             const hoy = new Date();
             const limite = prestador.limite || 'ilimitado';
+
+            // Releer los cupones desde la base para chequear el límite con datos frescos
+            // (por si el cupón se canjeó/creó en otra sesión)
+            await cargarCuponesCliente();
 
             // Cupón activo = todavía no se usó y no venció
             const tieneActivo = appState.cupones.some(c =>
