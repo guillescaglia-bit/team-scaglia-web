@@ -2952,15 +2952,21 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         }
 
         // Reenvía el mail de "ya podés acceder" a un cliente ya validado
-        async function reenviarValidacion(clienteId) {
+        async function reenviarValidacion(clienteId, btn) {
             const cliente = appState.clientes.find(c => c.id === clienteId);
             if (!cliente) return;
-            showAlert('vistaAdmin', `Reenviando mail a ${cliente.email}...`, 'info');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; btn.style.opacity = '0.7'; }
             try {
                 const r = await enviarMailValidacion(cliente);
-                if (r.ok) showAlert('vistaAdmin', `📧 Mail reenviado a ${cliente.email}`, 'success');
-                else showAlert('vistaAdmin', `No se pudo reenviar (${r.error}). Esperá unos segundos y probá de nuevo.`, 'error');
+                if (r.ok) {
+                    if (btn) { btn.textContent = '✓ Enviado'; btn.style.background = '#16a34a'; btn.style.borderColor = '#16a34a'; btn.style.color = '#fff'; btn.style.opacity = '1'; }
+                    showAlert('vistaAdmin', `📧 Mail reenviado a ${cliente.email}`, 'success');
+                } else {
+                    if (btn) { btn.disabled = false; btn.textContent = '✗ Reintentar'; btn.style.background = '#dc2626'; btn.style.borderColor = '#dc2626'; btn.style.color = '#fff'; btn.style.opacity = '1'; }
+                    showAlert('vistaAdmin', `No se pudo reenviar a ${cliente.email} (${r.error}). Esperá unos segundos y reintentá.`, 'error');
+                }
             } catch (e) {
+                if (btn) { btn.disabled = false; btn.textContent = '✗ Reintentar'; btn.style.background = '#dc2626'; btn.style.borderColor = '#dc2626'; btn.style.color = '#fff'; btn.style.opacity = '1'; }
                 showAlert('vistaAdmin', 'No se pudo reenviar el mail. Probá de nuevo.', 'error');
                 console.error('Error al reenviar validación:', e);
             }
@@ -3304,7 +3310,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
                         <td>${cuponesCanjeados}</td>
-                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}')">📧 Reenviar</button>` : '—'}</td>
+                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">📧 Reenviar</button>` : '—'}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
