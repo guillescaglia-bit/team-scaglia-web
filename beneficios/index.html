@@ -2055,6 +2055,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <p>Tus clientes y la actividad de sus cupones</p>
                         </div>
                         <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
+                            <h3 style="color: #324a70; margin-bottom: 6px;">🎂 Próximos cumpleaños</h3>
+                            <p style="color:#999; font-size:13px; margin-bottom:18px;">Tus clientes que cumplen pronto.</p>
+                            <div id="cumplesAgente"></div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
                             <h3 style="color: #324a70; margin-bottom: 6px;">Tus clientes</h3>
                             <p style="color:#999; font-size:13px; margin-bottom:18px;" id="clientesAgenteCount"></p>
                             <div id="clientesAgente" style="overflow-x:auto;"></div>
@@ -2068,6 +2073,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             renderClientesAgente();
             renderNotificacionesAgente();
+            const cumplesAg = document.getElementById('cumplesAgente');
+            if (cumplesAg) cumplesAg.innerHTML = renderProximosCumplesHTML(appState.clientes.filter(c => c.agenteId === appState.usuarioActual.agenteId));
             showVista('vistaDashboardAgente');
         }
 
@@ -2093,7 +2100,12 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <h2>Panel Administrativo</h2>
                             <p>Gestioná clientes, cupones, agentes y prestadores</p>
                         </div>
-                        
+
+                        <div style="background: white; border-radius: 12px; padding: 22px 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
+                            <h3 style="color: #324a70; margin-bottom: 14px;">🎂 Próximos cumpleaños</h3>
+                            <div id="cumplesAdminBody"></div>
+                        </div>
+
                         <div class="tabs">
                             <button class="tab-btn activo" onclick="switchAdminTab('clientes')">Validar Clientes</button>
                             <button class="tab-btn" onclick="switchAdminTab('basedata')">Base de Datos</button>
@@ -2137,6 +2149,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                             <th>Nombre</th>
                                             <th>Email</th>
                                             <th>Teléfono</th>
+                                            <th>Cumpleaños</th>
                                             <th>Agente</th>
                                             <th>Estado</th>
                                             <th>Cupones Creados</th>
@@ -2228,6 +2241,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             renderClientes();
             renderAgentes();
             renderPrestadores();
+            const cumplesAdm = document.getElementById('cumplesAdminBody');
+            if (cumplesAdm) cumplesAdm.innerHTML = renderProximosCumplesHTML(appState.clientes, 60);
             showVista('vistaAdmin');
         }
 
@@ -2707,6 +2722,42 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (!f) return '—';
             const p = f.split('-');
             return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
+        }
+
+        // Días hasta el próximo cumpleaños (0 = es hoy). Null si no hay fecha válida.
+        function diasHastaCumple(cumpleStr) {
+            if (!cumpleStr) return null;
+            const p = cumpleStr.split('-');
+            if (p.length !== 3) return null;
+            const mes = parseInt(p[1], 10) - 1, dia = parseInt(p[2], 10);
+            if (isNaN(mes) || isNaN(dia)) return null;
+            const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+            let prox = new Date(hoy.getFullYear(), mes, dia);
+            if (prox < hoy) prox = new Date(hoy.getFullYear() + 1, mes, dia);
+            return Math.round((prox - hoy) / 86400000);
+        }
+
+        // HTML de la lista de próximos cumpleaños (clientes que cumplen dentro de N días)
+        function renderProximosCumplesHTML(clientes, dias = 45) {
+            const lista = (clientes || [])
+                .map(c => ({ c, d: diasHastaCumple(c.cumple) }))
+                .filter(x => x.d !== null && x.d <= dias)
+                .sort((a, b) => a.d - b.d);
+            if (!lista.length) {
+                return `<p style="color:#999; font-size:14px;">No hay cumpleaños en los próximos ${dias} días.</p>`;
+            }
+            return lista.map(({ c, d }) => {
+                const cuando = d === 0 ? '🎉 ¡HOY!' : d === 1 ? 'Mañana' : `en ${d} días`;
+                const fecha = fmtFecha(c.cumple).slice(0, 5); // DD/MM
+                const destacar = d <= 3;
+                return `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border-radius:8px; margin-bottom:8px; background:${destacar ? '#fff7ed' : '#f9f9f9'}; border-left:4px solid ${destacar ? '#f59e0b' : '#324a70'};">
+                    <div>
+                        <div style="font-weight:600; color:#324a70;">${c.nombre}</div>
+                        <div style="font-size:12px; color:#888;">🎂 ${fecha}${c.telefono ? ' · ' + c.telefono : ''}</div>
+                    </div>
+                    <div style="font-size:13px; font-weight:600; white-space:nowrap; color:${destacar ? '#b45309' : '#666'};">${cuando}</div>
+                </div>`;
+            }).join('');
         }
 
         // Oculta los últimos 4 caracteres del código (para que agente/admin no vean el código canjeable)
@@ -3228,6 +3279,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td>${cliente.nombre}</td>
                         <td>${cliente.email}</td>
                         <td>${cliente.telefono}</td>
+                        <td>${fmtFecha(cliente.cumple)}</td>
                         <td>${agente ? agente.nombre : 'N/A'}</td>
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
