@@ -2106,18 +2106,13 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <div id="cumplesAdminBody"></div>
                         </div>
 
-                        <div style="background: white; border-radius: 12px; padding: 22px 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px;">
-                            <h3 style="color: #324a70; margin-bottom: 6px;">📊 Clics en "Visitar sitio" por prestador</h3>
-                            <p style="color:#999; font-size:13px; margin-bottom:14px;">Cuántas veces los clientes tocaron el botón que lleva a la web de cada comercio.</p>
-                            <div id="clicsAdminBody"></div>
-                        </div>
-
                         <div class="tabs">
                             <button class="tab-btn activo" onclick="switchAdminTab('clientes')">Validar Clientes</button>
                             <button class="tab-btn" onclick="switchAdminTab('basedata')">Base de Datos</button>
                             <button class="tab-btn" onclick="switchAdminTab('actividad')">Actividad Cupones</button>
                             <button class="tab-btn" onclick="switchAdminTab('agentes')">Agentes</button>
                             <button class="tab-btn" onclick="switchAdminTab('prestadores')">Prestadores</button>
+                            <button class="tab-btn" onclick="switchAdminTab('clics')">📊 Clics</button>
                         </div>
 
                         <!-- Tab: Validar Clientes -->
@@ -2241,6 +2236,13 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                 </table>
                             </div>
                         </div>
+
+                        <!-- Tab: Clics -->
+                        <div id="adminClicsTab" class="admin-section" style="display: none;">
+                            <h3>Clics en "Visitar sitio" por prestador</h3>
+                            <p style="color:#999; font-size:13px; margin: 6px 0 18px;">Cuántas veces los clientes tocaron el botón que lleva a la web de cada comercio.</p>
+                            <div id="clicsAdminBody"></div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2250,7 +2252,6 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             renderPrestadores();
             const cumplesAdm = document.getElementById('cumplesAdminBody');
             if (cumplesAdm) cumplesAdm.innerHTML = renderProximosCumplesHTML(appState.clientes, 60);
-            renderClicsAdmin();
             showVista('vistaAdmin');
         }
 
@@ -3315,10 +3316,12 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.getElementById('adminActividadTab').style.display = tab === 'actividad' ? 'block' : 'none';
             document.getElementById('adminAgentesTab').style.display = tab === 'agentes' ? 'block' : 'none';
             document.getElementById('adminPrestadoresTab').style.display = tab === 'prestadores' ? 'block' : 'none';
+            document.getElementById('adminClicsTab').style.display = tab === 'clics' ? 'block' : 'none';
 
             // Llenar tablas si es necesario
             if (tab === 'basedata') renderBasedataTable();
             if (tab === 'actividad') renderActividadTable();
+            if (tab === 'clics') renderClicsAdmin();
         }
 
         function renderBasedataTable() {
