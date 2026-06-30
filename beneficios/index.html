@@ -1564,15 +1564,8 @@
                 { id: '8', nombre: 'Inox Style', email: 'info@inoxstyle.com.ar', descuento: 20, descripcion: 'Estética y personalización vehicular · 20% OFF', alcance: 'Martínez, Bs. As.', url: 'https://inoxstyle.com.ar/', icono: '🚗', color: '#4a5568', banner: '/beneficios/image/banner-inox.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\n20% de descuento.\n\n📅 VIGENCIA\nAño 2026.\n\n💵 TOPE DE REINTEGRO\n$200.000.\n\n🎫 VALIDEZ DEL CUPÓN\nÚnicamente para el Pack Detailing:\n• Lavado Premium\n• Limpieza Interior Full\n• Limpieza Motor\n• Pulido y abrillantado de carrocería\n\n🚫 EXCEPCIONES\nEl descuento no aplica para productos, vehículos o servicios que no sean el Pack Detailing.\n\n🔄 CÓMO CANJEAR\nComunicate con nosotros por WhatsApp y brindá el código de descuento.\n\n📞 CONTACTO\nWhatsApp / Teléfono: +54 9 11 5801-2856', activo: true },
                 { id: '9', nombre: 'WN Interiores', email: '', descuento: 15, descripcion: 'Interiorismo · 15% OFF', alcance: 'CABA', url: 'https://www.instagram.com/wn.interiores/', icono: '🛋️', color: '#7d7367', banner: '/beneficios/image/banner-wn-interiores.png', vigenciaDias: 10, limite: 'ilimitado', tyc: '💰 BENEFICIO\n15% OFF sobre los honorarios de diseño de WN Interiores.\n\n🎫 VALIDEZ DEL CUPÓN\nEl beneficio podrá utilizarse dentro de los 10 (diez) días corridos posteriores al envío del presupuesto.\n\n🚫 EXCEPCIONES\n• No acumulable con otras promociones o descuentos.\n• No aplica sobre gastos de obra, materiales, mobiliario, traslados ni compras realizadas a terceros.\n• Válido únicamente para nuevos proyectos.\n\n💵 TOPE DEL DESCUENTO\nSin tope de reintegro. El descuento se aplica exclusivamente sobre los honorarios profesionales de diseño.\n\n🔄 ¿CÓMO CANJEARLO?\n1. Solicitar el presupuesto de WN Interiores.\n2. Presentar este cupón antes de la confirmación del proyecto.\n3. Una vez validado, el descuento se aplicará al presupuesto correspondiente.\n\n⚠️ TÉRMINOS IMPORTANTES\n• El descuento aplica únicamente sobre los honorarios de diseño.\n• Una vez aprobada la propuesta y definidos los conceptos de diseño, cualquier modificación sustancial o cambio de alcance solicitado con posterioridad será cotizado por separado.\n• La contratación implica la aceptación de estas condiciones.\n\n📞 CONTACTO\nWN Interiores\nWhatsApp / Teléfono: +54 9 11 5899-7627', activo: true },
             ],
-            clientes: [
-                { id: '1', nombre: 'Juan García', email: 'juan@email.com', telefono: '+54 9 11 1234567', cumple: '1990-05-12', agenteId: '1', validado: true },
-                { id: '2', nombre: 'María López', email: 'maria@email.com', telefono: '+54 9 11 2345678', cumple: '1985-11-03', agenteId: '2', validado: true },
-            ],
-            cupones: [
-                { id: '1', clienteId: '1', prestadorId: '1', agenteId: '1', codigo: 'SCGL-HELIX-ABC123', estado: 'activo', creadoEn: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), expirado: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000), usadoEn: null },
-                { id: '2', clienteId: '1', prestadorId: '2', agenteId: '1', codigo: 'SCGL-IBATH-XYZ789', estado: 'activo', creadoEn: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), expirado: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000), usadoEn: null },
-                { id: '3', clienteId: '1', prestadorId: '5', agenteId: '1', codigo: 'SCGL-ALMC-DEF456', estado: 'usado', creadoEn: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), expirado: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), usadoEn: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
-            ],
+            clientes: [],
+            cupones: [],
         };
 
         // ==================== FUNCIONES CORE ====================
@@ -2846,6 +2839,20 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
                 agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
                 validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+            }));
+
+            // Cargar TODOS los cupones (para la pestaña de actividad). Requiere la policy de admin.
+            const { data: cps, error: errCup } = await supabaseClient
+                .from('cupones').select('*')
+                .order('creado_en', { ascending: false });
+            if (errCup) { console.error('Error al cargar cupones (admin):', errCup); appState.cupones = []; return; }
+            const ahora = new Date();
+            appState.cupones = (cps || []).map(row => ({
+                id: row.id, clienteId: row.cliente_id, prestadorId: row.prestador_id, agenteId: row.agente_id,
+                codigo: row.codigo,
+                estado: row.usado_en ? 'usado' : (new Date(row.vence_en) > ahora ? 'activo' : 'vencido'),
+                creadoEn: new Date(row.creado_en), expirado: new Date(row.vence_en),
+                usadoEn: row.usado_en ? new Date(row.usado_en) : null
             }));
         }
 
