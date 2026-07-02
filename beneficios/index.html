@@ -2129,6 +2129,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                             <th>Nombre</th>
                                             <th>Email</th>
                                             <th>Teléfono</th>
+                                            <th>Operación</th>
+                                            <th>Dirección</th>
                                             <th>Agente</th>
                                             <th>Estado</th>
                                             <th>Acciones</th>
@@ -2973,15 +2975,16 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const clientesPendientes = appState.clientes.filter(c => !c.validado);
             
             if (clientesPendientes.length === 0) {
-                html = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">No hay clientes pendientes de validación</td></tr>';
+                html = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No hay clientes pendientes de validación</td></tr>';
             } else {
                 clientesPendientes.forEach(cliente => {
-                    const agente = appState.agentes.find(a => a.id === cliente.agenteId);
                     html += `
                         <tr>
                             <td>${cliente.nombre}</td>
                             <td>${cliente.email}</td>
                             <td>${cliente.telefono}</td>
+                            <td>${cliente.operacion || '—'}</td>
+                            <td>${cliente.direccion || '—'}</td>
                             <td>${nombresAgentes(cliente)}</td>
                             <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">Pendiente</span></td>
                             <td>
