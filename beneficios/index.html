@@ -3032,6 +3032,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const cliente = appState.clientes.find(c => c.id === clienteId);
             if (!cliente) return;
 
+            // Mostrar los datos clave antes de aprobar (para verificar la operación)
+            const resumen = `¿Aprobar a ${cliente.nombre}?\n\n`
+                + `Operación: ${cliente.operacion || '—'}\n`
+                + `Propiedad: ${cliente.direccion || '—'}\n`
+                + `Agente(s): ${nombresAgentes(cliente)}\n`
+                + `Email: ${cliente.email}`;
+            if (!confirm(resumen)) return;
+
             // Guardar la validación en Supabase (base de datos real)
             const { error } = await supabaseClient.from('clientes')
                 .update({ validado: true })
