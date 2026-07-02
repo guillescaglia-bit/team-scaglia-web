@@ -2259,6 +2259,26 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const cumplesAdm = document.getElementById('cumplesAdminBody');
             if (cumplesAdm) cumplesAdm.innerHTML = renderProximosCumplesHTML(appState.clientes, 60);
             showVista('vistaAdmin');
+            suscribirCambiosAdmin();
+        }
+
+        // Escucha cambios en la base en tiempo real: si entra/cambia un cliente, refresca el panel solo
+        let _canalAdmin = null;
+        function suscribirCambiosAdmin() {
+            if (_canalAdmin) return; // ya está suscripto
+            _canalAdmin = supabaseClient.channel('admin-clientes-rt')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'clientes' }, async () => {
+                    await cargarClientesAdmin();
+                    renderClientes();
+                    const bd = document.getElementById('adminBasedataTab');
+                    if (bd && bd.style.display !== 'none') renderBasedataTable();
+                    const cumplesAdm = document.getElementById('cumplesAdminBody');
+                    if (cumplesAdm) cumplesAdm.innerHTML = renderProximosCumplesHTML(appState.clientes, 60);
+                })
+                .subscribe();
+        }
+        function desuscribirAdmin() {
+            if (_canalAdmin) { try { supabaseClient.removeChannel(_canalAdmin); } catch (e) {} _canalAdmin = null; }
         }
 
         // Vidriera: muestra todos los beneficios en el login, bloqueados (sin canjear)
@@ -3497,6 +3517,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         async function logout() {
             if (!confirm('¿Seguro que querés salir de tu cuenta?')) return;
+            desuscribirAdmin();
             try { await supabaseClient.auth.signOut(); } catch (e) { /* igual cerramos */ }
             appState.usuarioActual = null;
             document.getElementById('header').style.display = 'none';
