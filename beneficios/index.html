@@ -1207,10 +1207,11 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Seleccioná tu agente</label>
-                            <select id="regAgente">
-                                <option value="">-- Elige un agente --</option>
-                            </select>
+                            <label>Seleccioná tu(s) agente(s)</label>
+                            <p style="font-size:11px; color:var(--gray-dark); margin:-2px 0 8px;">Podés marcar más de uno si trabajaste con varios.</p>
+                            <div id="regAgentes" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px; padding:10px 12px;">
+                                <!-- Checkboxes dinámicos -->
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Tipo de operación</label>
@@ -1746,7 +1747,7 @@
             if (filas && filas.length) {
                 const c = filas[0];
                 appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
-                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, agenteIds: c.agente_ids || (c.agente_id ? [c.agente_id] : []), operacion: c.operacion, direccion: c.direccion, validado: c.validado });
                 await cargarCuponesCliente();
                 supabaseClient.rpc('registrar_acceso').then(() => {}, () => {}); // registrar último acceso + contador
                 document.getElementById('vistaLogin').classList.remove('activa');
@@ -1803,13 +1804,13 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const cMes = document.getElementById('regCumpleMes').value;
             const cAnio = document.getElementById('regCumpleAnio').value;
             const cumple = (cDia && cMes && cAnio) ? `${cAnio}-${cMes}-${cDia}` : '';
-            const agenteId = document.getElementById('regAgente').value;
+            const agenteIds = Array.from(document.querySelectorAll('input[name="regAgente"]:checked')).map(c => c.value);
             const operacion = document.getElementById('regOperacion').value;
             const direccion = document.getElementById('regDireccion').value.trim();
             const aceptaTyC = document.getElementById('regTyC').checked;
 
-            if (!nombre || !email || !telefono || !cumple || !agenteId || !operacion || !direccion) {
-                showAlert('vistaLogin', 'Completá todos los campos', 'error');
+            if (!nombre || !email || !telefono || !cumple || !agenteIds.length || !operacion || !direccion) {
+                showAlert('vistaLogin', 'Completá todos los campos (incluí al menos un agente)', 'error');
                 return;
             }
             if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -1841,7 +1842,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (btn) { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
             if (error) { showAlert('vistaLogin', 'No se pudo enviar el código. Probá de nuevo.', 'error'); console.error(error); return; }
 
-            _registroPendiente = { nombre, email, telefono, cumple, agenteId, operacion, direccion };
+            _registroPendiente = { nombre, email, telefono, cumple, agenteIds, operacion, direccion };
             document.getElementById('regEmailDisplay').textContent = email;
             document.getElementById('regPasoDatos').style.display = 'none';
             document.getElementById('regPasoCodigo').style.display = 'block';
@@ -1870,7 +1871,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const r = _registroPendiente;
             const { error } = await supabaseClient.from('clientes').insert({
                 nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
-                agente_id: r.agenteId, operacion: r.operacion, direccion: r.direccion
+                agente_id: r.agenteIds[0], agente_ids: r.agenteIds, operacion: r.operacion, direccion: r.direccion
             });
             if (btn) { btn.disabled = false; btn.textContent = 'Confirmar y registrarme'; }
             if (error) {
@@ -1882,24 +1883,24 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const nuevoCliente = {
                 id: Date.now().toString(),
                 nombre: r.nombre, email: r.email, telefono: r.telefono, cumple: r.cumple,
-                agenteId: r.agenteId, operacion: r.operacion, direccion: r.direccion,
+                agenteId: r.agenteIds[0], agenteIds: r.agenteIds, operacion: r.operacion, direccion: r.direccion,
                 registradoEn: new Date(), validado: false
             };
             appState.clientes.push(nuevoCliente);
             appState.usuarioActual = { id: nuevoCliente.id, nombre: r.nombre, email: r.email, rol: 'cliente', clienteId: nuevoCliente.id };
             supabaseClient.rpc('registrar_acceso').then(() => {}, () => {}); // primer acceso
 
-            // Avisar a info@ y al agente asignado (no bloquea el registro si falla)
+            // Avisar a info@ y a TODOS los agentes asignados (no bloquea el registro si falla)
             try {
-                const agente = appState.agentes.find(a => a.id === r.agenteId);
+                const agentes = r.agenteIds.map(id => appState.agentes.find(a => a.id === id)).filter(Boolean)
+                    .map(a => ({ nombre: a.nombre, email: a.email }));
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 await fetch('/api/notificar-registro', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
                     body: JSON.stringify({
                         nombre: r.nombre, email: r.email, telefono: r.telefono,
-                        operacion: r.operacion, direccion: r.direccion,
-                        agenteNombre: agente?.nombre || '', agenteEmail: agente?.email || ''
+                        operacion: r.operacion, direccion: r.direccion, agentes
                     })
                 });
             } catch (e) { console.error('No se pudo enviar el aviso de registro:', e); }
@@ -1989,7 +1990,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             Tu cuenta está siendo validada por el equipo de Team Scaglia.
                         </p>
                         <p style="color: var(--gray-dark); margin-bottom: 30px; font-size: 14px;">
-                            Tu agente es <strong>${agente.nombre}</strong>. Una vez validado, podrás acceder a todos los beneficios.
+                            Tu(s) agente(s): <strong>${nombresAgentes(cliente)}</strong>. Una vez validado, podrás acceder a todos los beneficios.
                         </p>
                         
                         <div style="background: #f0f4ff; border: 2px solid var(--primary); border-radius: 8px; padding: 20px; margin-bottom: 30px;">
@@ -2009,21 +2010,19 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         async function cargarDatosAgente(agenteId) {
             const { data: cls, error: e1 } = await supabaseClient
                 .from('clientes').select('*')
-                .eq('agente_id', agenteId)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false }); // RLS filtra: trae los clientes (propios y compartidos) del agente
             if (e1) { console.error('Error al cargar clientes del agente:', e1); }
             else {
                 appState.clientes = (cls || []).map(c => ({
                     id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
-                    agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                    agenteId: c.agente_id, agenteIds: c.agente_ids || (c.agente_id ? [c.agente_id] : []), operacion: c.operacion, direccion: c.direccion,
                     validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null,
                     ultimoAcceso: c.ultimo_acceso, accesos: c.accesos || 0
                 }));
             }
             const { data: cps, error: e2 } = await supabaseClient
                 .from('cupones').select('*')
-                .eq('agente_id', agenteId)
-                .order('creado_en', { ascending: false });
+                .order('creado_en', { ascending: false }); // RLS filtra: cupones de los clientes del agente
             if (e2) { console.error('Error al cargar cupones del agente:', e2); }
             else {
                 const ahora = new Date();
@@ -2079,7 +2078,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             renderClientesAgente();
             renderNotificacionesAgente();
             const cumplesAg = document.getElementById('cumplesAgente');
-            if (cumplesAg) cumplesAg.innerHTML = renderProximosCumplesHTML(appState.clientes.filter(c => c.agenteId === appState.usuarioActual.agenteId));
+            if (cumplesAg) cumplesAg.innerHTML = renderProximosCumplesHTML(appState.clientes.filter(c => clienteTieneAgente(c, appState.usuarioActual.agenteId)));
             showVista('vistaDashboardAgente');
         }
 
@@ -2797,6 +2796,19 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
         }
 
+        // ── Helpers de agentes (un cliente puede tener 1 o varios) ──
+        function idsAgentesDe(cliente) {
+            if (cliente.agenteIds && cliente.agenteIds.length) return cliente.agenteIds;
+            return cliente.agenteId ? [cliente.agenteId] : [];
+        }
+        function nombresAgentes(cliente) {
+            const nombres = idsAgentesDe(cliente).map(id => (appState.agentes.find(a => a.id === id) || {}).nombre).filter(Boolean);
+            return nombres.length ? nombres.join(', ') : 'N/A';
+        }
+        function clienteTieneAgente(cliente, agenteId) {
+            return idsAgentesDe(cliente).includes(agenteId);
+        }
+
         // Formatea fecha + hora (para "último acceso"). '—' si no hay.
         function fmtFechaHora(iso) {
             if (!iso) return '—';
@@ -2863,7 +2875,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         // Clientes del agente logueado (solo los que se registraron con él)
         function renderClientesAgente() {
             const agenteId = appState.usuarioActual.agenteId;
-            const clientes = appState.clientes.filter(c => c.agenteId === agenteId);
+            const clientes = appState.clientes.filter(c => clienteTieneAgente(c, agenteId));
             const cont = document.getElementById('clientesAgente');
             const count = document.getElementById('clientesAgenteCount');
             if (count) count.textContent = `${clientes.length} cliente${clientes.length === 1 ? '' : 's'} registrado${clientes.length === 1 ? '' : 's'} con vos`;
@@ -2907,7 +2919,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         function renderNotificacionesAgente() {
             const agenteId = appState.usuarioActual.agenteId;
-            const cuponesPorAgente = appState.cupones.filter(c => c.agenteId === agenteId);
+            const cuponesPorAgente = appState.cupones.filter(c => appState.clientes.some(cl => cl.id === c.clienteId));
 
             let html = '<h3 style="color: #324a70; margin-bottom: 20px;">Actividad de cupones</h3>';
 
@@ -2950,7 +2962,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <td>${cliente.nombre}</td>
                             <td>${cliente.email}</td>
                             <td>${cliente.telefono}</td>
-                            <td>${agente ? agente.nombre : '—'}</td>
+                            <td>${nombresAgentes(cliente)}</td>
                             <td><span class="status-badge" style="background: #fef3c7; color: #92400e;">Pendiente</span></td>
                             <td>
                                 <div class="actions">
@@ -2973,7 +2985,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (error) { console.error('Error al cargar clientes (admin):', error); return; }
             appState.clientes = (data || []).map(c => ({
                 id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
-                agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
+                agenteId: c.agente_id, agenteIds: c.agente_ids || (c.agente_id ? [c.agente_id] : []), operacion: c.operacion, direccion: c.direccion,
                 validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null,
                 ultimoAcceso: c.ultimo_acceso, accesos: c.accesos || 0
             }));
@@ -3024,12 +3036,13 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
         // Envía el mail de validación al cliente + agente (vía la función segura de Vercel)
         async function enviarMailValidacion(cliente) {
-            const agente = appState.agentes.find(a => a.id === cliente.agenteId);
+            const agentes = idsAgentesDe(cliente).map(id => appState.agentes.find(a => a.id === id)).filter(Boolean)
+                .map(a => ({ nombre: a.nombre, email: a.email }));
             const { data: { session } } = await supabaseClient.auth.getSession();
             const resp = await fetch('/api/notificar-validacion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-                body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agenteEmail: agente?.email || '', agenteNombre: agente?.nombre || '' })
+                body: JSON.stringify({ email: cliente.email, nombre: cliente.nombre, agentes })
             });
             if (resp.ok) return { ok: true };
             const det = await resp.json().catch(() => ({}));
@@ -3393,7 +3406,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td>${cliente.email}</td>
                         <td>${cliente.telefono}</td>
                         <td>${fmtFecha(cliente.cumple)}</td>
-                        <td>${agente ? agente.nombre : 'N/A'}</td>
+                        <td>${nombresAgentes(cliente)}</td>
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
                         <td>${cuponesCanjeados}</td>
@@ -3422,7 +3435,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 const row = `
                     <tr>
                         <td>${cliente ? cliente.nombre : 'N/A'}</td>
-                        <td>${agente ? agente.nombre : 'N/A'}</td>
+                        <td>${cliente ? nombresAgentes(cliente) : 'N/A'}</td>
                         <td>${prestador ? prestador.nombre : 'N/A'}</td>
                         <td><strong>${enmascararCodigo(cupone.codigo)}</strong></td>
                         <td><span class="badge ${estado === 'Canjeado' ? 'badge-success' : estado === 'Expirado' ? 'badge-danger' : 'badge-info'}">${estado}</span></td>
@@ -3528,7 +3541,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (filas && filas.length) {
                 const c = filas[0];
                 appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
-                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
+                appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, agenteIds: c.agente_ids || (c.agente_id ? [c.agente_id] : []), operacion: c.operacion, direccion: c.direccion, validado: c.validado });
                 document.getElementById('vistaLogin').classList.remove('activa');
                 await cargarCuponesCliente();
                 showDashboardCliente();
@@ -3654,15 +3667,15 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 restaurarSesion();
             }
 
-            // Llenar dropdown de agentes en registro (si existe el selector)
-            const select = document.getElementById('regAgente');
-            if (select) {
-                appState.agentes.forEach(agente => {
-                    const option = document.createElement('option');
-                    option.value = agente.id;
-                    option.textContent = agente.nombre;
-                    select.appendChild(option);
-                });
+            // Llenar los checkboxes de agentes en el registro
+            const cont = document.getElementById('regAgentes');
+            if (cont) {
+                cont.innerHTML = appState.agentes.filter(a => a.activo !== false).map(agente => `
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:400; font-size:13px; color:var(--text-primary); cursor:pointer;">
+                        <input type="checkbox" name="regAgente" value="${agente.id}" style="width:auto; margin:0; flex-shrink:0;">
+                        ${agente.nombre}
+                    </label>
+                `).join('');
             }
         }
 

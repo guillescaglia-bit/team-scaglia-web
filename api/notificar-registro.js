@@ -47,8 +47,10 @@ module.exports = async (req, res) => {
   const telefono = (body.telefono || '').trim();
   const operacion = (body.operacion || '').trim();
   const direccion = (body.direccion || '').trim();
-  const agenteNombre = (body.agenteNombre || '').trim();
-  const agenteEmail = (body.agenteEmail || '').trim();
+  // Soporta un array `agentes: [{nombre,email}]` o el formato viejo (agenteEmail/agenteNombre)
+  let agentes = Array.isArray(body.agentes) ? body.agentes : [];
+  if (!agentes.length && body.agenteEmail) agentes = [{ nombre: body.agenteNombre || '', email: body.agenteEmail }];
+  const agenteNombre = agentes.map(a => (a && a.nombre) || '').filter(Boolean).join(', ');
   if (!email) return res.status(400).json({ error: 'Falta el email del cliente' });
 
   // Verificar que quien llama es el propio cliente recién registrado (su sesión coincide)
@@ -86,20 +88,23 @@ module.exports = async (req, res) => {
     </div>
   `);
 
-  // Mail al AGENTE asignado
-  const htmlAgente = envoltorio('Nuevo cliente registrado', `
-    <p style="font-size:15px; color:#253C64; margin:0 0 14px;">Hola${agenteNombre ? ', ' + agenteNombre.split(' ')[0] : ''} 👋</p>
-    <p style="font-size:14px; line-height:1.7; color:#444; margin:0;">
-      Tu cliente <strong>${nombre || email}</strong> se registró en el Programa de Beneficios y quedó <strong>pendiente de validación</strong>.
-      Te avisaremos cuando esté aprobado.
-    </p>
-  `);
-
   let enviados = 0;
   try { const r = await enviarMail(RESEND_API_KEY, INFO_EMAIL, `Nuevo cliente pendiente · ${nombre || email}`, htmlInfo); if (r.ok) enviados++; }
   catch (e) { /* seguimos */ }
-  if (agenteEmail) {
-    try { const r = await enviarMail(RESEND_API_KEY, agenteEmail, `Tu cliente ${nombre || ''} se registró · Beneficios`, htmlAgente); if (r.ok) enviados++; }
+
+  // Mail a cada AGENTE asignado
+  for (const ag of agentes) {
+    const agEmail = ((ag && ag.email) || '').trim();
+    if (!agEmail) continue;
+    const agNombre = ((ag && ag.nombre) || '').trim();
+    const htmlAgente = envoltorio('Nuevo cliente registrado', `
+      <p style="font-size:15px; color:#253C64; margin:0 0 14px;">Hola${agNombre ? ', ' + agNombre.split(' ')[0] : ''} 👋</p>
+      <p style="font-size:14px; line-height:1.7; color:#444; margin:0;">
+        Tu cliente <strong>${nombre || email}</strong> se registró en el Programa de Beneficios y quedó <strong>pendiente de validación</strong>.
+        Te avisaremos cuando esté aprobado.
+      </p>
+    `);
+    try { const r = await enviarMail(RESEND_API_KEY, agEmail, `Tu cliente ${nombre || ''} se registró · Beneficios`, htmlAgente); if (r.ok) enviados++; }
     catch (e) { /* seguimos */ }
   }
 

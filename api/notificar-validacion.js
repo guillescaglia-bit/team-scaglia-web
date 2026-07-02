@@ -62,8 +62,9 @@ module.exports = async (req, res) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const email = (body.email || '').trim();
   const nombre = (body.nombre || '').trim();
-  const agenteEmail = (body.agenteEmail || '').trim();
-  const agenteNombre = (body.agenteNombre || '').trim();
+  // Soporta un array `agentes: [{nombre,email}]` o el formato viejo (agenteEmail/agenteNombre)
+  let agentes = Array.isArray(body.agentes) ? body.agentes : [];
+  if (!agentes.length && body.agenteEmail) agentes = [{ nombre: body.agenteNombre || '', email: body.agenteEmail }];
   if (!email) return res.status(400).json({ error: 'Falta el email del cliente' });
 
   const primerNombre = nombre.split(' ')[0] || 'Hola';
@@ -91,16 +92,19 @@ module.exports = async (req, res) => {
     return res.status(502).json({ error: 'No se pudo enviar el mail al cliente' });
   }
 
-  // 3b) Mail al AGENTE (si tenemos su email). No bloquea el resultado si falla.
-  if (agenteEmail) {
+  // 3b) Mail a cada AGENTE del cliente. No bloquea el resultado si falla.
+  for (const ag of agentes) {
+    const agEmail = ((ag && ag.email) || '').trim();
+    if (!agEmail) continue;
+    const agNombre = ((ag && ag.nombre) || '').trim();
     const htmlAgente = envoltorio('Cliente validado', `
-      <p style="font-size:15px; color:#253C64; margin:0 0 14px;">Hola${agenteNombre ? ', ' + agenteNombre.split(' ')[0] : ''} 👋</p>
+      <p style="font-size:15px; color:#253C64; margin:0 0 14px;">Hola${agNombre ? ', ' + agNombre.split(' ')[0] : ''} 👋</p>
       <p style="font-size:14px; line-height:1.7; color:#444; margin:0;">
         Tu cliente <strong>${nombre || email}</strong> fue <strong>validado</strong> en el Programa de Beneficios y ya puede generar sus cupones.
       </p>
     `);
-    try { await enviarMail(RESEND_API_KEY, agenteEmail, `Tu cliente ${nombre || ''} fue validado · Beneficios`, htmlAgente); }
-    catch (e) { /* no frenamos por el mail al agente */ }
+    try { await enviarMail(RESEND_API_KEY, agEmail, `Tu cliente ${nombre || ''} fue validado · Beneficios`, htmlAgente); }
+    catch (e) { /* seguimos con los demás */ }
   }
 
   return res.status(200).json({ ok: true });
