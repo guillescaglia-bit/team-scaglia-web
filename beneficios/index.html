@@ -2970,6 +2970,50 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             document.getElementById('notificacionesAgente').innerHTML = html;
         }
 
+        // Abre un modal para editar los agentes asignados a un cliente
+        function abrirEditarAgentes(clienteId) {
+            const cliente = appState.clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+            const actuales = idsAgentesDe(cliente);
+            const prev = document.getElementById('modalEditAgentes'); if (prev) prev.remove();
+            const checks = appState.agentes.filter(a => a.activo !== false).map(a => `
+                <label style="display:flex; align-items:center; gap:8px; padding:7px 0; cursor:pointer; font-size:14px; color:var(--text-primary);">
+                    <input type="checkbox" value="${a.id}" ${actuales.includes(a.id) ? 'checked' : ''} style="width:auto; margin:0; flex-shrink:0;">
+                    ${a.nombre}
+                </label>`).join('');
+            const html = `
+                <div class="modal activo" id="modalEditAgentes" style="display:flex;">
+                    <div class="modal-content" style="max-width:420px;">
+                        <div class="modal-header">
+                            <h3>Agentes de ${cliente.nombre}</h3>
+                            <button class="btn-close" onclick="document.getElementById('modalEditAgentes').remove()">×</button>
+                        </div>
+                        <div style="padding:8px 4px;">
+                            <p style="font-size:13px; color:var(--gray-dark); margin-bottom:10px;">Marcá los agentes asignados a este cliente.</p>
+                            <div id="editAgentesChecks">${checks}</div>
+                            <div style="display:flex; gap:10px; margin-top:18px;">
+                                <button class="btn btn-secondary" onclick="document.getElementById('modalEditAgentes').remove()" style="flex:1;">Cancelar</button>
+                                <button class="btn btn-primary" onclick="guardarAgentesCliente('${clienteId}')" style="flex:1;">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function guardarAgentesCliente(clienteId) {
+            const checked = Array.from(document.querySelectorAll('#editAgentesChecks input:checked')).map(c => c.value);
+            if (!checked.length) { alert('Elegí al menos un agente.'); return; }
+            const { error } = await supabaseClient.from('clientes').update({ agente_ids: checked, agente_id: checked[0] }).eq('id', clienteId);
+            if (error) { showAlert('vistaAdmin', 'No se pudieron guardar los agentes. Probá de nuevo.', 'error'); console.error(error); return; }
+            const cli = appState.clientes.find(c => c.id === clienteId);
+            if (cli) { cli.agenteIds = checked; cli.agenteId = checked[0]; }
+            const m = document.getElementById('modalEditAgentes'); if (m) m.remove();
+            renderClientes();
+            const bd = document.getElementById('adminBasedataTab'); if (bd && bd.style.display !== 'none') renderBasedataTable();
+            showAlert('vistaAdmin', '✓ Agentes actualizados', 'success');
+        }
+
         function renderClientes() {
             let html = '';
             const clientesPendientes = appState.clientes.filter(c => !c.validado);
@@ -2990,6 +3034,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <td>
                                 <div class="actions">
                                     <button class="btn btn-sm btn-success" onclick="validarCliente('${cliente.id}')">✓ Aprobar</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="abrirEditarAgentes('${cliente.id}')">Agentes</button>
                                     <button class="btn btn-sm btn-danger" onclick="rechazarCliente('${cliente.id}')">✕ Rechazar</button>
                                 </div>
                             </td>
@@ -3443,7 +3488,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td>${cuponesCanjeados}</td>
                         <td>${fmtFechaHora(cliente.ultimoAcceso)}</td>
                         <td>${cliente.accesos || 0}</td>
-                        <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">Reenviar</button>` : '—'}</td>
+                        <td><div class="actions">${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">Reenviar</button>` : ''}<button class="btn btn-sm btn-secondary" onclick="abrirEditarAgentes('${cliente.id}')">Agentes</button></div></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
