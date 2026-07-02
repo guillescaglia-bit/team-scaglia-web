@@ -1746,6 +1746,7 @@
                 appState.usuarioActual = { id: c.id, nombre: c.nombre, email: c.email, rol: 'cliente', clienteId: c.id };
                 appState.clientes.push({ id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple, agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion, validado: c.validado });
                 await cargarCuponesCliente();
+                supabaseClient.rpc('registrar_acceso').then(() => {}, () => {}); // registrar último acceso + contador
                 document.getElementById('vistaLogin').classList.remove('activa');
                 showDashboardCliente();
             } else {
@@ -1884,6 +1885,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             };
             appState.clientes.push(nuevoCliente);
             appState.usuarioActual = { id: nuevoCliente.id, nombre: r.nombre, email: r.email, rol: 'cliente', clienteId: nuevoCliente.id };
+            supabaseClient.rpc('registrar_acceso').then(() => {}, () => {}); // primer acceso
 
             // Avisar a info@ y al agente asignado (no bloquea el registro si falla)
             try {
@@ -2012,7 +2014,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 appState.clientes = (cls || []).map(c => ({
                     id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
                     agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
-                    validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+                    validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null,
+                    ultimoAcceso: c.ultimo_acceso, accesos: c.accesos || 0
                 }));
             }
             const { data: cps, error: e2 } = await supabaseClient
@@ -2155,6 +2158,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                             <th>Estado</th>
                                             <th>Cupones Creados</th>
                                             <th>Cupones Canjeados</th>
+                                            <th>Último acceso</th>
+                                            <th>Accesos</th>
                                             <th>Aviso</th>
                                         </tr>
                                     </thead>
@@ -2790,6 +2795,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f;
         }
 
+        // Formatea fecha + hora (para "último acceso"). '—' si no hay.
+        function fmtFechaHora(iso) {
+            if (!iso) return '—';
+            try {
+                return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) { return '—'; }
+        }
+
         // Días hasta el próximo cumpleaños (0 = es hoy). Null si no hay fecha válida.
         function diasHastaCumple(cumpleStr) {
             if (!cumpleStr) return null;
@@ -2867,6 +2880,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                             <th style="padding:10px 8px;">Operación</th>
                             <th style="padding:10px 8px;">Dirección</th>
                             <th style="padding:10px 8px;">Estado</th>
+                            <th style="padding:10px 8px;">Último acceso</th>
+                            <th style="padding:10px 8px;">Accesos</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2881,6 +2896,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                 <td style="padding:10px 8px;">${c.validado
                                     ? '<span style="color:#2d7a4f; font-weight:600;">Validado</span>'
                                     : '<span style="color:#b8860b; font-weight:600;">Pendiente</span>'}</td>
+                                <td style="padding:10px 8px;">${fmtFechaHora(c.ultimoAcceso)}</td>
+                                <td style="padding:10px 8px;">${c.accesos || 0}</td>
                             </tr>`).join('')}
                     </tbody>
                 </table>`;
@@ -2955,7 +2972,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             appState.clientes = (data || []).map(c => ({
                 id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, cumple: c.cumple,
                 agenteId: c.agente_id, operacion: c.operacion, direccion: c.direccion,
-                validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null
+                validado: c.validado, registradoEn: c.created_at ? new Date(c.created_at) : null,
+                ultimoAcceso: c.ultimo_acceso, accesos: c.accesos || 0
             }));
 
             // Cargar TODOS los cupones (para la pestaña de actividad). Requiere la policy de admin.
@@ -3377,6 +3395,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <td><span class="badge ${cliente.validado ? 'badge-success' : 'badge-warning'}">${cliente.validado ? 'Validado' : 'Pendiente'}</span></td>
                         <td>${cuponesCreadosCount}</td>
                         <td>${cuponesCanjeados}</td>
+                        <td>${fmtFechaHora(cliente.ultimoAcceso)}</td>
+                        <td>${cliente.accesos || 0}</td>
                         <td>${cliente.validado ? `<button class="btn btn-sm btn-secondary" onclick="reenviarValidacion('${cliente.id}', this)">Reenviar</button>` : '—'}</td>
                     </tr>
                 `;
