@@ -1555,7 +1555,7 @@
             ],
             prestadores: [
                 { id: '1', nombre: 'Helixperience Miami', email: 'info@helixperience.com', descuento: 20, descripcion: 'Tours +20% + 5 min extra de vuelo', alcance: 'Miami, EE.UU.', url: 'https://helixperience.com', icono: '✈️', color: '#1e90ff', banner: '/beneficios/image/banner-helix.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF sobre precio de lista. + 5 minutos extra de vuelo.\n\n🛒 APLICACIÓN\nBeneficio aplicable SOLO EN TOURS\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\n+1 (786) 810-6712', activo: true },
-                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', alcance: 'Vicente López · envíos a todo el país', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', vigenciaDias: 30, limite: 'ilimitado', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSin límite de reusos.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
+                { id: '2', nombre: 'iBath', email: 'info@ibath.com', descuento: 15, descripcion: '15% OFF sobre precio de lista', alcance: 'Vicente López · envíos a todo el país', url: 'https://ibath.com.ar', icono: '🚿', color: '#00bcd4', banner: '/beneficios/image/banner-ibath.png', vigenciaDias: 30, limite: 'cooldown', cooldownMeses: 3, tyc: '💰 DESCUENTO\nBeneficio exclusivo del 15% OFF sobre precio de lista.\n\n🛒 APLICACIÓN\nBeneficio aplicable en todo el catálogo. Sin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REUSOS\nSe puede validar 1 cupón cada 3 meses.\n\n🚫 EXCEPCIONES\nNo aplica para productos con descuentos ni acumula descuentos activos.\n\n📞 CONTACTO\nA confirmar.', activo: true },
                 { id: '3', nombre: 'Wilson Tobal', email: 'info@wilsontobal.com', descuento: 15, descripcion: 'Interiorismo 15% precio de lista', alcance: 'Todo el país', url: 'https://wilsontobal.com', icono: '🏠', color: '#8b7355', banner: '/beneficios/image/banner-wilson-tobal.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Aplica a proyectos de interiorismo. Requiere presupuesto previo. Válido 30 días. No acumulable con otras promociones. Consultar disponibilidad de tiempos.', activo: false },
                 { id: '4', nombre: 'Anna Rossatti', email: 'ordonezcamila06@gmail.com', descuento: 20, descripcion: 'Ropa de diseño · 20% OFF', url: 'https://www.annarossatti.com/', icono: '👗', color: '#ff69b4', banner: '/beneficios/image/banner-anna-rossatti.png', vigenciaDias: 30, limite: 'unico', tyc: '💰 DESCUENTO\nBeneficio exclusivo del 20% OFF para clientas validadas.\n\n🛍️ APLICACIÓN\nBeneficio aplicable exclusivamente sobre la línea ready-to-wear de Anna Rossatti, disponible en canal online y/o local físico.\n\n💵 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n🔄 REÚSOS\nUn uso por clienta.\n\n🚫 EXCEPCIONES\nNo aplica para vestidos de fiesta.\n\n📞 CONTACTO\nCamila Ordoñez\nTeléfono: 11 2264-6301\nEmail: ordonezcamila06@gmail.com', activo: true },
                 { id: '5', nombre: 'Almacén 1249', email: 'info@almacen1249.com', descuento: 10, descripcion: 'Picadas premium 10%', alcance: 'CABA', url: 'https://almacen1249.com.ar', icono: '🍽️', color: '#d4af37', banner: '/beneficios/image/banner-almacen.png', vigenciaDias: 30, limite: 'ilimitado', tyc: 'Descuento aplicable a picadas premium. Pedido mínimo requerido. Válido 30 días. Consultar disponibilidad y formas de entrega.', activo: false },
@@ -2363,6 +2363,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function renderCuponesCliente() {
             const clienteId = appState.usuarioActual.clienteId;
             const cuponesDelCliente = appState.cupones.filter(c => c.clienteId === clienteId);
+            const ahora = new Date();
 
             let html = '';
 
@@ -2374,15 +2375,29 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 const cupone = activo || (cuponesPrestador[0] || null);
 
                 const tieneActivo = !!activo;
-                // Bloqueado por límite (sin cupón activo): único ya usado, o mensual ya usado este mes
+                // Bloqueado por límite (sin cupón activo): único ya usado, mensual ya usado este mes, o cooldown post-canje
                 const primerDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
                 const hayEsteMes = cuponesPrestador.some(c => new Date(c.creadoEn) >= primerDiaMes);
+                // Cooldown: fecha de desbloqueo según el último canje
+                let cooldownHasta = null;
+                if (limite === 'cooldown') {
+                    const usadosP = cuponesPrestador.filter(c => c.usadoEn);
+                    if (usadosP.length) {
+                        const ultimoUso = usadosP.reduce((a, b) => new Date(a.usadoEn) > new Date(b.usadoEn) ? a : b);
+                        const d = new Date(ultimoUso.usadoEn);
+                        d.setMonth(d.getMonth() + (prestador.cooldownMeses || 3));
+                        if (d > ahora) cooldownHasta = d;
+                    }
+                }
                 const bloqueadoPorLimite = !activo && (
                     (limite === 'unico' && cuponesPrestador.length > 0) ||
-                    (limite === 'mensual' && hayEsteMes)
+                    (limite === 'mensual' && hayEsteMes) ||
+                    (limite === 'cooldown' && cooldownHasta)
                 );
                 const msgBloqueo = limite === 'unico'
                     ? 'Este beneficio es de un solo uso y ya lo aprovechaste.'
+                    : limite === 'cooldown'
+                    ? `Ya usaste tu beneficio. Vas a poder generar uno nuevo a partir del ${cooldownHasta ? cooldownHasta.toLocaleDateString('es-AR') : ''}.`
                     : 'Ya usaste tu beneficio de este mes. Vas a poder generar uno nuevo el 1° del mes que viene.';
 
                 const inactivo = prestador.activo === false;
@@ -2556,6 +2571,21 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 if (yaEsteMes) {
                     showAlert('vistaDashboardCliente', `❌ Ya generaste tu cupón de ${prestadorNombre} este mes. El límite se renueva el 1° del mes que viene.`, 'error');
                     return;
+                }
+            } else if (limite === 'cooldown') {
+                // 1 cada X meses desde el CANJE: bloquear si se usó uno hace menos de esos meses
+                const meses = prestador.cooldownMeses || 3;
+                const usados = appState.cupones.filter(c =>
+                    c.clienteId === clienteId && c.prestadorId === prestadorId && c.usadoEn
+                );
+                if (usados.length) {
+                    const ultimoUso = usados.reduce((a, b) => new Date(a.usadoEn) > new Date(b.usadoEn) ? a : b);
+                    const desbloqueo = new Date(ultimoUso.usadoEn);
+                    desbloqueo.setMonth(desbloqueo.getMonth() + meses);
+                    if (desbloqueo > hoy) {
+                        showAlert('vistaDashboardCliente', `❌ Ya usaste tu beneficio de ${prestadorNombre}. Vas a poder generar otro a partir del ${desbloqueo.toLocaleDateString('es-AR')}.`, 'error');
+                        return;
+                    }
                 }
             }
             // 'ilimitado': sin tope; solo aplica el chequeo de "cupón activo" de arriba.
