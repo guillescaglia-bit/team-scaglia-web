@@ -69,7 +69,7 @@
   .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
 
   /* Property cards */
-  .props{display:grid;grid-template-columns:1fr;gap:12px}
+  .props{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .prop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
   .prop-name{font-weight:600;font-size:14px}
   .tag{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
@@ -355,6 +355,7 @@ function renderDashboard(invs) {
   const nombre = (invs[0]?.inversor_nombre || '').split(' ')[0] || 'Hola';
   $('saludo').textContent = `Hola, ${nombre} 👋`;
   if (!invs.length) { $('dashInversor').innerHTML = '<div class="empty">Todavía no hay inversiones cargadas a tu nombre.</div>'; return; }
+  _invsInversor = invs;
 
   const cartera = invs.filter(i => estadoDe(i) === 'cartera');
   const vendidas = invs.filter(i => estadoDe(i) === 'vendida');
@@ -370,8 +371,6 @@ function renderDashboard(invs) {
     const est = estadoDe(inv);
     const res = resultadoDe(inv);
     const dias = diasDe(inv);
-    const pts = timelinePropiedad(inv);
-    const ini = pts[0], fin = pts[pts.length - 1];
     return `
       <div class="card prop">
         <div class="prop-head">
@@ -387,14 +386,7 @@ function renderDashboard(invs) {
           <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
         </div>
         <div class="prop-foot">${cuota(inv) < 1 && refTotal(inv) != null ? `Propiedad completa: ${fmtUSD(refTotal(inv))} · tu ${inv.titularidad}% · ` : ''}${dias != null ? dias + ' días' : ''}${inv.tc ? ' · TC compra ' + Number(inv.tc).toLocaleString('es-AR') : ''}</div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)">
-          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px">📈 Evolución del valor (tu parte)</div>
-          ${lineChartSVG(pts)}
-          <div class="legend" style="justify-content:space-between;margin-top:4px">
-            <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
-            <span>${pts.length > 1 ? (est === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
-          </div>
-        </div>
+        <button class="btn btn-sec btn-sm" style="width:100%;margin-top:14px" onclick="verDetalleInversion('${inv.id}')">Ver más detalles →</button>
       </div>`;
   }).join('');
 
@@ -410,7 +402,14 @@ function renderDashboard(invs) {
       </div>
     </div>` : '';
 
+  const banner = (usuario && usuario.rol === 'admin') ?
+    `<div class="alert alert-ok" style="background:#eef2fb;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+       <span>👁 Estás viendo como <b>${invs[0].inversor_nombre || ''}</b> (así lo ve el inversor)</span>
+       <button class="btn btn-sec btn-sm" onclick="volverPanel()">← Volver al panel</button>
+     </div>` : '';
+
   $('dashInversor').innerHTML = `
+    ${banner}
     <div class="kpis">
       <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div></div>
       <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
@@ -597,23 +596,66 @@ async function borrar(id) {
   appAlert('Inversión borrada', 'ok');
 }
 
-// El admin ve el dashboard tal cual lo ve un inversor
+let _invsInversor = [];
+
+// El admin ve el dashboard tal cual lo ve un inversor (el banner lo agrega renderDashboard)
 function verComoInversor(email, nombre) {
   const invs = _inversiones.filter(i => (i.inversor_email || '').toLowerCase() === (email || '').toLowerCase());
   $('panelAdmin').classList.add('oculto');
   $('dashInversor').classList.remove('oculto');
   renderDashboard(invs);
-  $('dashInversor').insertAdjacentHTML('afterbegin',
-    `<div class="alert alert-ok" style="background:#eef2fb;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-       <span>👁 Estás viendo como <b>${nombre || email}</b> (así lo ve el inversor)</span>
-       <button class="btn btn-sec btn-sm" onclick="volverPanel()">← Volver al panel</button>
-     </div>`);
   window.scrollTo(0, 0);
 }
 function volverPanel() {
   $('dashInversor').classList.add('oculto');
   $('panelAdmin').classList.remove('oculto');
   $('saludo').textContent = 'Panel de administración';
+}
+
+// Panel de detalle de UNA inversión (gráfico + info completa)
+function verDetalleInversion(id) {
+  const inv = _invsInversor.find(i => i.id === id);
+  if (!inv) return;
+  const est = estadoDe(inv);
+  const res = resultadoDe(inv);
+  const dias = diasDe(inv);
+  const pts = timelinePropiedad(inv);
+  const ini = pts[0], fin = pts[pts.length - 1];
+  const vals = _valuaciones.filter(x => x.inversion_id === id).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  const histRows = vals.length ? vals.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${fmtFecha(x.fecha)}</span><b>${fmtUSD(Number(x.valor) * cuota(inv))}</b></div>`).join('') : '';
+  $('dashInversor').innerHTML = `
+    <button class="btn btn-sec btn-sm" style="margin-bottom:14px" onclick="volverDashboard()">← Volver</button>
+    <div class="card">
+      <div class="prop-head" style="margin-bottom:16px">
+        <div class="prop-name" style="font-size:18px">${inv.propiedad}</div>
+        <span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span>
+      </div>
+      <div class="prop-grid">
+        <div><span>Titularidad</span><b>${inv.titularidad != null ? inv.titularidad + '%' : '—'}</b></div>
+        <div><span>Fecha de compra</span><b>${fmtFecha(inv.fecha)}</b></div>
+        <div><span>Pagaste</span><b>${fmtUSD(pagadoInv(inv))}</b></div>
+        <div><span>${est === 'vendida' ? 'Vendida en' : 'Vale hoy'} (tu parte)</span><b>${fmtUSD(valorInv(inv))}</b></div>
+        <div><span>Resultado</span><b class="${res >= 0 ? 'green' : ''}">${res == null ? '—' : (res >= 0 ? '+' : '') + fmtUSD(res)}</b></div>
+        <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
+        ${cuota(inv) < 1 && refTotal(inv) != null ? `<div><span>Valor total propiedad</span><b>${fmtUSD(refTotal(inv))}</b></div>` : ''}
+        <div><span>Tiempo</span><b>${dias != null ? dias + ' días' : '—'}</b></div>
+      </div>
+      ${inv.tc ? `<div class="prop-foot">TC al comprar: ${Number(inv.tc).toLocaleString('es-AR')}</div>` : ''}
+    </div>
+    <div class="card">
+      <div class="card-title">📈 Evolución del valor (tu parte)</div>
+      ${lineChartSVG(pts)}
+      <div class="legend" style="justify-content:space-between;margin-top:4px">
+        <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
+        <span>${pts.length > 1 ? (est === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
+      </div>
+    </div>
+    ${histRows ? `<div class="card"><div class="card-title">Historial de valuaciones (tu parte)</div>${histRows}</div>` : ''}`;
+  window.scrollTo(0, 0);
+}
+function volverDashboard() {
+  renderDashboard(_invsInversor);
+  window.scrollTo(0, 0);
 }
 
 // ── Restaurar sesión al recargar ──
