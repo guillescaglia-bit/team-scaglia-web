@@ -354,7 +354,7 @@ function renderDashboard(invs) {
 // ── Panel admin ──
 async function cargarAdmin() {
   const { data, error } = await supa.from('inversiones').select('*').order('creado_en', { ascending: false });
-  if (error) { $('panelAdmin').innerHTML = '<div class="empty">Error al cargar. ¿Corriste el SQL?</div>'; console.error(error); return; }
+  if (error) { $('panelAdmin').innerHTML = `<div class="empty">Error al cargar: ${error.message || 'desconocido'}<br><span style="font-size:12px">(Si dice "schema cache", corré <b>NOTIFY pgrst, 'reload schema';</b> en Supabase.)</span></div>`; console.error(error); return; }
   renderAdmin(data || []);
 }
 
