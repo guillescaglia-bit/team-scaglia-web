@@ -69,7 +69,7 @@
   .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
 
   /* Property cards */
-  .props{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .props{display:grid;grid-template-columns:1fr;gap:12px}
   .prop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
   .prop-name{font-weight:600;font-size:14px}
   .tag{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
@@ -214,6 +214,21 @@ function timelinePropiedad(inv) {
   return pts;
 }
 
+// Valor total de la cartera del inversor en el tiempo (suma de todas sus propiedades)
+function timelineGlobal(invs) {
+  const series = invs.map(inv => timelinePropiedad(inv));
+  const allT = [...new Set(series.flat().map(p => p.t.getTime()))].sort((a, b) => a - b);
+  return allT.map(t => {
+    let sum = 0;
+    series.forEach(pts => {
+      let val = 0;
+      for (const p of pts) { if (p.t.getTime() <= t) val = p.v; else break; }
+      sum += val;
+    });
+    return { t: new Date(t), v: sum };
+  });
+}
+
 // Gráfico de línea (sparkline) simple, responsive
 function lineChartSVG(points) {
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
@@ -350,20 +365,13 @@ function renderDashboard(invs) {
   const invCartera = cartera.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
   const invVend = vendidas.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
 
-  // barras
-  const conRes = invs.map(i => ({ i, r: resultadoDe(i) || 0 })).sort((a, b) => b.r - a.r);
-  const maxRes = Math.max(1, ...conRes.map(x => Math.abs(x.r)));
-  const barras = conRes.map(({ i, r }) => `
-    <div class="bar-row">
-      <div class="bar-name">${i.propiedad}</div>
-      <div class="bar-track"><div class="bar-fill ${estadoDe(i) === 'vendida' ? 'navy-bg' : 'green-bg'}" style="width:${Math.max(4, Math.abs(r) / maxRes * 100)}%"></div></div>
-      <div class="bar-val ${r >= 0 ? 'green' : ''}">${r >= 0 ? '+' : ''}${Number(r).toLocaleString('es-AR', { maximumFractionDigits: 0 })}</div>
-    </div>`).join('');
-
+  // Cada card: resumen + info + su gráfico de evolución adentro
   const cards = invs.map(inv => {
     const est = estadoDe(inv);
     const res = resultadoDe(inv);
     const dias = diasDe(inv);
+    const pts = timelinePropiedad(inv);
+    const ini = pts[0], fin = pts[pts.length - 1];
     return `
       <div class="card prop">
         <div class="prop-head">
@@ -379,35 +387,38 @@ function renderDashboard(invs) {
           <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
         </div>
         <div class="prop-foot">${cuota(inv) < 1 && refTotal(inv) != null ? `Propiedad completa: ${fmtUSD(refTotal(inv))} · tu ${inv.titularidad}% · ` : ''}${dias != null ? dias + ' días' : ''}${inv.tc ? ' · TC compra ' + Number(inv.tc).toLocaleString('es-AR') : ''}</div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px">📈 Evolución del valor (tu parte)</div>
+          ${lineChartSVG(pts)}
+          <div class="legend" style="justify-content:space-between;margin-top:4px">
+            <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
+            <span>${pts.length > 1 ? (est === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
+          </div>
+        </div>
       </div>`;
   }).join('');
 
-  const evolucion = invs.map(inv => {
-    const pts = timelinePropiedad(inv);
-    const ini = pts[0], fin = pts[pts.length - 1];
-    return `<div style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;margin-bottom:6px">
-        <span>${inv.propiedad}</span>
-        <span class="green">${fin ? fmtUSD(fin.v) : ''}</span>
-      </div>
-      ${lineChartSVG(pts)}
+  // Gráfico global: valor total de toda la cartera del inversor en el tiempo
+  const gpts = timelineGlobal(invs);
+  const globalChart = gpts.length > 1 ? `
+    <div class="card">
+      <div class="card-title">📊 Evolución total de tus inversiones</div>
+      ${lineChartSVG(gpts)}
       <div class="legend" style="justify-content:space-between;margin-top:4px">
-        <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
-        <span>${pts.length > 1 ? (estadoDe(inv) === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
+        <span>${fmtFecha(gpts[0].t.toISOString().slice(0, 10))} · ${fmtUSD(gpts[0].v)}</span>
+        <span>Hoy · ${fmtUSD(gpts[gpts.length - 1].v)}</span>
       </div>
-    </div>`;
-  }).join('');
+    </div>` : '';
 
   $('dashInversor').innerHTML = `
     <div class="kpis">
       <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div></div>
       <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
-      <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy).replace('US$ ', 'US$ ')}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
-      <div class="kpi"><div class="kpi-label">Ganancia realizada</div><div class="kpi-val green">+${fmtUSD(ganReal).replace('US$ ', 'US$ ')}</div><div class="kpi-sub green">${invVend ? fmtPct(ganReal / invVend * 100) + ' · vendidas' : 'sin ventas aún'}</div></div>
+      <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy)}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
+      <div class="kpi"><div class="kpi-label">Ganancia realizada</div><div class="kpi-val green">+${fmtUSD(ganReal)}</div><div class="kpi-sub green">${invVend ? fmtPct(ganReal / invVend * 100) + ' · vendidas' : 'sin ventas aún'}</div></div>
     </div>
-    ${barras ? `<div class="card"><div class="card-title">Ganancia por propiedad (US$)</div>${barras}<div class="legend"><span><i class="green-bg"></i>En cartera (proyectada)</span><span><i class="navy-bg"></i>Vendida (realizada)</span></div></div>` : ''}
-    <div class="card"><div class="card-title">📈 Evolución del valor</div>${evolucion}</div>
-    <div class="props">${cards}</div>`;
+    <div class="props">${cards}</div>
+    ${globalChart}`;
 }
 
 // ── Panel admin ──
