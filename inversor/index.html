@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Inversores · Team Scaglia</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --navy:#253C64; --green:#15925a; --danger:#dc2626;
+    --card:#ffffff; --page:#f4f5f7; --tx:#1b2540; --muted:#6b7280; --bd:#e7e9f0; --track:#eef0f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Montserrat',sans-serif;background:var(--page);color:var(--tx);-webkit-font-smoothing:antialiased;min-height:100vh}
+  .oculto{display:none!important}
+  .container{max-width:900px;margin:0 auto;padding:20px}
+
+  /* Header */
+  header{background:var(--navy);color:#fff;padding:16px 0}
+  header .container{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.75}
+  .hi{font-size:19px;font-weight:600;margin-top:3px}
+  .hbtns{display:flex;align-items:center;gap:16px}
+  .hbtn{background:none;border:none;color:#fff;font-size:12px;font-weight:500;cursor:pointer;opacity:.85}
+  .hbtn:hover{opacity:1}
+
+  /* Login */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .login-box{background:var(--card);border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:36px 32px;width:100%;max-width:400px;text-align:center}
+  .login-box .lbrand{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--navy);opacity:.7;margin-bottom:6px}
+  .login-box h1{font-size:26px;font-weight:600;color:var(--navy);margin-bottom:6px}
+  .login-box .sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+  label{display:block;text-align:left;font-size:12px;font-weight:600;color:var(--tx);margin-bottom:6px}
+  input{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:14px}
+  input:focus{outline:none;border-color:var(--navy)}
+  .btn{width:100%;padding:12px;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s}
+  .btn:hover{opacity:.9}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-sec{background:#eef0f5;color:var(--tx)}
+  .btn-sm{padding:7px 12px;font-size:12px;width:auto}
+  .btn-danger{background:var(--danger);color:#fff}
+  .err{color:var(--danger);font-size:12px;text-align:left;margin:-8px 0 12px;display:none}
+  .linkline{font-size:12px;color:var(--muted);margin-top:14px}
+  .linkline button{background:none;border:none;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline;font-size:12px}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+  .kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
+  .kpi-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .kpi-val{font-size:19px;font-weight:700;margin-top:6px}
+  .kpi-sub{font-size:12px;margin-top:2px}
+  .green{color:var(--green)} .muted{color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+  .card-title{font-size:14px;font-weight:600;margin-bottom:14px}
+
+  /* Bars */
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-name{width:190px;font-size:12px;flex-shrink:0}
+  .bar-track{flex:1;background:var(--track);border-radius:6px;height:22px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px}
+  .green-bg{background:var(--green)} .navy-bg{background:var(--navy)}
+  .bar-val{width:88px;text-align:right;font-size:13px;font-weight:700}
+  .legend{display:flex;gap:18px;font-size:11px;color:var(--muted);margin-top:4px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+  /* Property cards */
+  .props{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .prop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+  .prop-name{font-weight:600;font-size:14px}
+  .tag{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+  .tag-hold{background:rgba(21,146,90,.15);color:var(--green)}
+  .tag-sold{background:rgba(37,60,100,.16);color:#4a6aa5}
+  .prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+  .prop-grid>div{display:flex;flex-direction:column;gap:2px}
+  .prop-grid span{font-size:11px;color:var(--muted)}
+  .prop-grid b{font-size:14px}
+  .prop-foot{font-size:11px;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)}
+
+  /* Admin table */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  .tbl-wrap{overflow-x:auto}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+  .modal-content{background:var(--card);border-radius:12px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+  .modal-content h3{color:var(--navy);margin-bottom:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+
+  .alert{padding:12px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:500}
+  .alert-ok{background:#dcfce7;color:#166534} .alert-err{background:#fee2e2;color:#991b1b}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px}
+
+  @media (max-width:640px){
+    .kpis{grid-template-columns:1fr 1fr}
+    .props{grid-template-columns:1fr}
+    .bar-name{width:120px}
+    .grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="vistaLogin" class="login-wrap">
+  <div class="login-box">
+    <div class="lbrand">Team Scaglia</div>
+    <h1>Portal de Inversores</h1>
+    <p class="sub">Accedé para ver tus inversiones.</p>
+
+    <div id="pasoEmail">
+      <label>Email</label>
+      <input type="email" id="inEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')continuar()">
+      <p class="err" id="errEmail"></p>
+      <button class="btn btn-primary" id="btnContinuar" onclick="continuar()">Continuar</button>
+    </div>
+
+    <div id="pasoCodigo" class="oculto">
+      <p class="sub">Te enviamos un código a <strong id="emailShow"></strong>.</p>
+      <label>Código de 6 dígitos</label>
+      <input type="text" id="inCodigo" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center;letter-spacing:8px;font-size:20px" onkeydown="if(event.key==='Enter')verificarCodigo()">
+      <p class="err" id="errCodigo"></p>
+      <button class="btn btn-primary" onclick="verificarCodigo()">Ingresar</button>
+      <p class="linkline">¿No te llegó? <button id="btnReenviar" onclick="reenviar()">Reenviar código</button></p>
+      <button class="btn btn-sec" style="margin-top:6px" onclick="volverEmail()">Cambiar email</button>
+    </div>
+
+    <div id="pasoPass" class="oculto">
+      <p class="sub">Ingresá tu contraseña de admin.</p>
+      <label>Contraseña</label>
+      <input type="password" id="inPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginPass()">
+      <p class="err" id="errPass"></p>
+      <button class="btn btn-primary" onclick="loginPass()">Ingresar</button>
+      <button class="btn btn-sec" style="margin-top:6px" onclick="volverEmail()">Cambiar email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ APP (logueado) ══════ -->
+<div id="vistaApp" class="oculto">
+  <header>
+    <div class="container">
+      <div>
+        <div class="brand">Team Scaglia · Inversores</div>
+        <div class="hi" id="saludo"></div>
+      </div>
+      <div class="hbtns">
+        <button class="hbtn" onclick="salir()">Salir</button>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    <div id="appAlert"></div>
+    <div id="dashInversor" class="oculto"></div>
+    <div id="panelAdmin" class="oculto"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://fgipdqcxsbmrjvozalqn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
+const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const ADMIN_EMAIL = 'info@teamscaglia.com';
+const esAdmin = (e) => (e || '').trim().toLowerCase() === ADMIN_EMAIL;
+
+let usuario = null; // { email, rol }
+
+// ── Helpers ──
+const $ = (id) => document.getElementById(id);
+const fmtUSD = (n) => (n == null || isNaN(n)) ? '—' : 'US$ ' + Number(n).toLocaleString('es-AR', { maximumFractionDigits: 0 });
+const fmtFecha = (f) => { if (!f) return '—'; const p = f.split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f; };
+function diasDe(inv) {
+  if (!inv.fecha) return null;
+  const hasta = inv.precio_venta != null ? new Date(inv.creado_en) : new Date();
+  return Math.max(0, Math.round((hasta - new Date(inv.fecha)) / 86400000));
+}
+const estadoDe = (inv) => (inv.precio_venta != null && inv.precio_venta !== '') ? 'vendida' : 'cartera';
+function resultadoDe(inv) {
+  const ref = estadoDe(inv) === 'vendida' ? inv.precio_venta : inv.precio_mercado;
+  if (ref == null || ref === '' || inv.pagado == null) return null;
+  return Number(ref) - Number(inv.pagado);
+}
+function pctDe(inv) { const r = resultadoDe(inv); return (r == null || !inv.pagado) ? null : (r / Number(inv.pagado)) * 100; }
+const fmtPct = (p) => p == null ? '—' : (p >= 0 ? '+' : '') + p.toFixed(0) + '%';
+
+function showErr(id, msg) { const e = $(id); e.textContent = msg; e.style.display = 'block'; }
+function clearErr(id) { const e = $(id); e.style.display = 'none'; }
+function appAlert(msg, tipo) {
+  $('appAlert').innerHTML = `<div class="alert alert-${tipo === 'error' ? 'err' : 'ok'}">${msg}</div>`;
+  setTimeout(() => { $('appAlert').innerHTML = ''; }, 4000);
+}
+
+// ── Login ──
+async function continuar() {
+  const email = $('inEmail').value.trim();
+  clearErr('errEmail');
+  if (!/^\S+@\S+\.\S+$/.test(email)) { showErr('errEmail', 'Ingresá un email válido.'); return; }
+  if (esAdmin(email)) {
+    $('pasoEmail').classList.add('oculto');
+    $('pasoPass').classList.remove('oculto');
+    $('inPass').focus();
+    return;
+  }
+  const btn = $('btnContinuar'); btn.disabled = true; btn.textContent = 'Verificando...';
+  const { data: existe, error } = await supa.rpc('inversor_existe', { p_email: email });
+  if (error) { btn.disabled = false; btn.textContent = 'Continuar'; showErr('errEmail', 'No se pudo verificar. Probá de nuevo.'); return; }
+  if (!existe) { btn.disabled = false; btn.textContent = 'Continuar'; showErr('errEmail', 'Este email no tiene inversiones registradas.'); return; }
+  btn.textContent = 'Enviando...';
+  const { error: e2 } = await supa.auth.signInWithOtp({ email });
+  btn.disabled = false; btn.textContent = 'Continuar';
+  if (e2) { showErr('errEmail', 'No se pudo enviar el código. Probá de nuevo.'); return; }
+  $('emailShow').textContent = email;
+  $('pasoEmail').classList.add('oculto');
+  $('pasoCodigo').classList.remove('oculto');
+  $('inCodigo').focus();
+  cooldown(60);
+}
+
+async function verificarCodigo() {
+  const email = $('inEmail').value.trim();
+  const token = $('inCodigo').value.trim();
+  clearErr('errCodigo');
+  if (token.length < 6) { showErr('errCodigo', 'Ingresá el código de 6 dígitos.'); return; }
+  const { error } = await supa.auth.verifyOtp({ email, token, type: 'email' });
+  if (error) { showErr('errCodigo', 'Código incorrecto o vencido.'); return; }
+  usuario = { email, rol: 'inversor' };
+  entrar();
+}
+
+async function loginPass() {
+  const email = $('inEmail').value.trim();
+  const password = $('inPass').value;
+  clearErr('errPass');
+  if (!password) { showErr('errPass', 'Ingresá tu contraseña.'); return; }
+  const { error } = await supa.auth.signInWithPassword({ email, password });
+  if (error) { showErr('errPass', 'Contraseña incorrecta.'); return; }
+  usuario = { email, rol: 'admin' };
+  entrar();
+}
+
+async function reenviar() {
+  const email = $('inEmail').value.trim();
+  const { error } = await supa.auth.signInWithOtp({ email });
+  if (!error) cooldown(60);
+}
+let _t = null;
+function cooldown(s) {
+  const b = $('btnReenviar'); if (!b) return;
+  if (_t) clearInterval(_t);
+  b.disabled = true; b.style.opacity = '.55';
+  b.textContent = `Reenviar en ${s}s`;
+  _t = setInterval(() => { s--; if (s <= 0) { clearInterval(_t); b.disabled = false; b.style.opacity = '1'; b.textContent = 'Reenviar código'; } else b.textContent = `Reenviar en ${s}s`; }, 1000);
+}
+
+function volverEmail() {
+  $('pasoCodigo').classList.add('oculto');
+  $('pasoPass').classList.add('oculto');
+  $('pasoEmail').classList.remove('oculto');
+  $('inCodigo').value = ''; $('inPass').value = '';
+}
+
+async function salir() {
+  if (!confirm('¿Seguro que querés salir?')) return;
+  try { await supa.auth.signOut(); } catch (e) {}
+  usuario = null;
+  location.reload();
+}
+
+function entrar() {
+  $('vistaLogin').classList.add('oculto');
+  $('vistaApp').classList.remove('oculto');
+  if (usuario.rol === 'admin') {
+    $('saludo').textContent = 'Panel de administración';
+    $('panelAdmin').classList.remove('oculto');
+    $('dashInversor').classList.add('oculto');
+    cargarAdmin();
+  } else {
+    $('dashInversor').classList.remove('oculto');
+    $('panelAdmin').classList.add('oculto');
+    cargarDashboard();
+  }
+}
+
+// ── Dashboard del inversor ──
+async function cargarDashboard() {
+  const { data, error } = await supa.from('inversiones').select('*').order('fecha', { ascending: false });
+  if (error) { $('dashInversor').innerHTML = '<div class="empty">No se pudieron cargar tus inversiones.</div>'; console.error(error); return; }
+  renderDashboard(data || []);
+}
+
+function renderDashboard(invs) {
+  const nombre = (invs[0]?.inversor_nombre || '').split(' ')[0] || 'Hola';
+  $('saludo').textContent = `Hola, ${nombre} 👋`;
+  if (!invs.length) { $('dashInversor').innerHTML = '<div class="empty">Todavía no hay inversiones cargadas a tu nombre.</div>'; return; }
+
+  const cartera = invs.filter(i => estadoDe(i) === 'cartera');
+  const totalInvertido = invs.reduce((a, i) => a + (Number(i.pagado) || 0), 0);
+  const valorHoy = cartera.reduce((a, i) => a + (Number(i.precio_mercado) || 0), 0);
+  const ganProy = cartera.reduce((a, i) => a + (resultadoDe(i) || 0), 0);
+  const ganReal = invs.filter(i => estadoDe(i) === 'vendida').reduce((a, i) => a + (resultadoDe(i) || 0), 0);
+  const invCartera = cartera.reduce((a, i) => a + (Number(i.pagado) || 0), 0);
+  const invVend = invs.filter(i => estadoDe(i) === 'vendida').reduce((a, i) => a + (Number(i.pagado) || 0), 0);
+
+  // barras
+  const conRes = invs.map(i => ({ i, r: resultadoDe(i) || 0 })).sort((a, b) => b.r - a.r);
+  const maxRes = Math.max(1, ...conRes.map(x => Math.abs(x.r)));
+  const barras = conRes.map(({ i, r }) => `
+    <div class="bar-row">
+      <div class="bar-name">${i.propiedad}</div>
+      <div class="bar-track"><div class="bar-fill ${estadoDe(i) === 'vendida' ? 'navy-bg' : 'green-bg'}" style="width:${Math.max(4, Math.abs(r) / maxRes * 100)}%"></div></div>
+      <div class="bar-val ${r >= 0 ? 'green' : ''}">${r >= 0 ? '+' : ''}${Number(r).toLocaleString('es-AR', { maximumFractionDigits: 0 })}</div>
+    </div>`).join('');
+
+  const cards = invs.map(inv => {
+    const est = estadoDe(inv);
+    const res = resultadoDe(inv);
+    const dias = diasDe(inv);
+    return `
+      <div class="card prop">
+        <div class="prop-head">
+          <div class="prop-name">${inv.propiedad}</div>
+          <span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span>
+        </div>
+        <div class="prop-grid">
+          <div><span>Titularidad</span><b>${inv.titularidad != null ? inv.titularidad + '%' : '—'}</b></div>
+          <div><span>Fecha</span><b>${fmtFecha(inv.fecha)}</b></div>
+          <div><span>Pagado</span><b>${fmtUSD(inv.pagado)}</b></div>
+          <div><span>${est === 'vendida' ? 'Vendida en' : 'Valor hoy'}</span><b>${fmtUSD(est === 'vendida' ? inv.precio_venta : inv.precio_mercado)}</b></div>
+          <div><span>Resultado</span><b class="${res >= 0 ? 'green' : ''}">${res == null ? '—' : (res >= 0 ? '+' : '') + fmtUSD(res).replace('US$ ', 'US$ ')}</b></div>
+          <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
+        </div>
+        <div class="prop-foot">${dias != null ? dias + ' días' : ''}${inv.tc ? ' · TC compra ' + Number(inv.tc).toLocaleString('es-AR') : ''}</div>
+      </div>`;
+  }).join('');
+
+  $('dashInversor').innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div></div>
+      <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
+      <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy).replace('US$ ', 'US$ ')}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
+      <div class="kpi"><div class="kpi-label">Ganancia realizada</div><div class="kpi-val green">+${fmtUSD(ganReal).replace('US$ ', 'US$ ')}</div><div class="kpi-sub green">${invVend ? fmtPct(ganReal / invVend * 100) + ' · vendidas' : 'sin ventas aún'}</div></div>
+    </div>
+    ${barras ? `<div class="card"><div class="card-title">Ganancia por propiedad (US$)</div>${barras}<div class="legend"><span><i class="green-bg"></i>En cartera (proyectada)</span><span><i class="navy-bg"></i>Vendida (realizada)</span></div></div>` : ''}
+    <div class="props">${cards}</div>`;
+}
+
+// ── Panel admin ──
+async function cargarAdmin() {
+  const { data, error } = await supa.from('inversiones').select('*').order('creado_en', { ascending: false });
+  if (error) { $('panelAdmin').innerHTML = '<div class="empty">Error al cargar. ¿Corriste el SQL?</div>'; console.error(error); return; }
+  renderAdmin(data || []);
+}
+
+let _inversiones = [];
+function renderAdmin(invs) {
+  _inversiones = invs;
+  const filas = invs.map(inv => `
+    <tr>
+      <td>${inv.inversor_nombre}</td>
+      <td>${inv.propiedad}</td>
+      <td>${fmtFecha(inv.fecha)}</td>
+      <td>${fmtUSD(inv.pagado)}</td>
+      <td>${fmtUSD(inv.precio_mercado)}</td>
+      <td>${fmtUSD(inv.precio_venta)}</td>
+      <td class="${(resultadoDe(inv) || 0) >= 0 ? 'green' : ''}">${resultadoDe(inv) == null ? '—' : fmtPct(pctDe(inv))}</td>
+      <td><span class="tag ${estadoDe(inv) === 'vendida' ? 'tag-sold' : 'tag-hold'}">${estadoDe(inv) === 'vendida' ? 'Vendida' : 'Cartera'}</span></td>
+      <td><div class="actions">
+        <button class="btn btn-sec btn-sm" onclick="abrirForm('${inv.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="borrar('${inv.id}')">Borrar</button>
+      </div></td>
+    </tr>`).join('');
+  $('panelAdmin').innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+        <div class="card-title" style="margin:0">Inversiones cargadas (${invs.length})</div>
+        <button class="btn btn-primary btn-sm" onclick="abrirForm()">+ Agregar inversión</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Inversor</th><th>Propiedad</th><th>Fecha</th><th>Pagado</th><th>Mercado</th><th>Venta</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>${filas || '<tr><td colspan="9" class="empty">Todavía no hay inversiones. Agregá la primera.</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function abrirForm(id) {
+  const inv = id ? _inversiones.find(i => i.id === id) : {};
+  const v = (x) => (x == null ? '' : x);
+  const prev = $('modalInv'); if (prev) prev.remove();
+  const html = `
+    <div class="modal" id="modalInv">
+      <div class="modal-content">
+        <h3>${id ? 'Editar' : 'Agregar'} inversión</h3>
+        <label>Nombre del inversor</label>
+        <input type="text" id="fNombre" value="${v(inv.inversor_nombre)}" placeholder="Juan García">
+        <label>Email del inversor <span class="muted" style="font-weight:400">(con el que ingresa)</span></label>
+        <input type="email" id="fEmail" value="${v(inv.inversor_email)}" placeholder="juan@email.com">
+        <label>Propiedad</label>
+        <input type="text" id="fProp" value="${v(inv.propiedad)}" placeholder="3 de Febrero 2781 5C">
+        <div class="grid2">
+          <div><label>Titularidad (%)</label><input type="number" id="fTit" value="${v(inv.titularidad)}" placeholder="100"></div>
+          <div><label>Fecha</label><input type="date" id="fFecha" value="${v(inv.fecha)}"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Pagado (USD)</label><input type="number" id="fPagado" value="${v(inv.pagado)}" placeholder="60000"></div>
+          <div><label>TC (referencia)</label><input type="number" id="fTC" value="${v(inv.tc)}" placeholder="1170"></div>
+        </div>
+        <div class="grid2">
+          <div><label>P. de Mercado (USD)</label><input type="number" id="fMercado" value="${v(inv.precio_mercado)}" placeholder="90210"></div>
+          <div><label>Precio venta (USD)</label><input type="number" id="fVenta" value="${v(inv.precio_venta)}" placeholder="(si se vendió)"></div>
+        </div>
+        <p class="muted" style="font-size:11px;margin:2px 0 14px">Cargá <b>P. de Mercado</b> si está en cartera. Cargá <b>Precio venta</b> solo cuando se vendió.</p>
+        <p class="err" id="fErr"></p>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-sec" onclick="document.getElementById('modalInv').remove()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardar('${id || ''}')">Guardar</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+const numOrNull = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
+
+async function guardar(id) {
+  const nombre = $('fNombre').value.trim();
+  const email = $('fEmail').value.trim();
+  const propiedad = $('fProp').value.trim();
+  clearErr('fErr');
+  if (!nombre || !email || !propiedad) { showErr('fErr', 'Completá nombre, email y propiedad.'); return; }
+  const datos = {
+    inversor_nombre: nombre,
+    inversor_email: email,
+    propiedad,
+    titularidad: numOrNull('fTit'),
+    fecha: $('fFecha').value || null,
+    pagado: numOrNull('fPagado'),
+    tc: numOrNull('fTC'),
+    precio_mercado: numOrNull('fMercado'),
+    precio_venta: numOrNull('fVenta')
+  };
+  const q = id ? supa.from('inversiones').update(datos).eq('id', id) : supa.from('inversiones').insert(datos);
+  const { error } = await q;
+  if (error) { showErr('fErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
+  $('modalInv').remove();
+  await cargarAdmin();
+  appAlert('✓ Inversión guardada', 'ok');
+}
+
+async function borrar(id) {
+  if (!confirm('¿Borrar esta inversión? No se puede deshacer.')) return;
+  const { error } = await supa.from('inversiones').delete().eq('id', id);
+  if (error) { appAlert('No se pudo borrar.', 'error'); console.error(error); return; }
+  await cargarAdmin();
+  appAlert('Inversión borrada', 'ok');
+}
+
+// ── Restaurar sesión al recargar ──
+(async function init() {
+  const { data: { session } } = await supa.auth.getSession();
+  if (session && session.user) {
+    usuario = { email: session.user.email, rol: esAdmin(session.user.email) ? 'admin' : 'inversor' };
+    entrar();
+  }
+})();
+</script>
+</body>
+</html>
