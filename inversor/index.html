@@ -182,12 +182,14 @@ function diasDe(inv) {
   return Math.max(0, Math.round((hasta - new Date(inv.fecha)) / 86400000));
 }
 const estadoDe = (inv) => (inv.precio_venta != null && inv.precio_venta !== '') ? 'vendida' : 'cartera';
-function resultadoDe(inv) {
-  const ref = estadoDe(inv) === 'vendida' ? inv.precio_venta : inv.precio_mercado;
-  if (ref == null || ref === '' || inv.pagado == null) return null;
-  return Number(ref) - Number(inv.pagado);
-}
-function pctDe(inv) { const r = resultadoDe(inv); return (r == null || !inv.pagado) ? null : (r / Number(inv.pagado)) * 100; }
+// Los montos guardados (pagado / mercado / venta) son el TOTAL de la propiedad.
+// La titularidad (%) define la PARTE que le corresponde al inversor.
+const cuota = (inv) => ((inv.titularidad == null || inv.titularidad === '') ? 100 : Number(inv.titularidad)) / 100;
+const refTotal = (inv) => { const v = estadoDe(inv) === 'vendida' ? inv.precio_venta : inv.precio_mercado; return (v == null || v === '') ? null : Number(v); };
+const pagadoInv = (inv) => (inv.pagado == null || inv.pagado === '') ? null : Number(inv.pagado) * cuota(inv);
+const valorInv = (inv) => { const v = refTotal(inv); return v == null ? null : v * cuota(inv); };
+function resultadoDe(inv) { const p = pagadoInv(inv), v = valorInv(inv); return (p == null || v == null) ? null : v - p; }
+function pctDe(inv) { const r = resultadoDe(inv), p = pagadoInv(inv); return (r == null || !p) ? null : (r / p) * 100; }
 const fmtPct = (p) => p == null ? '—' : (p >= 0 ? '+' : '') + p.toFixed(0) + '%';
 
 function showErr(id, msg) { const e = $(id); e.textContent = msg; e.style.display = 'block'; }
@@ -301,12 +303,13 @@ function renderDashboard(invs) {
   if (!invs.length) { $('dashInversor').innerHTML = '<div class="empty">Todavía no hay inversiones cargadas a tu nombre.</div>'; return; }
 
   const cartera = invs.filter(i => estadoDe(i) === 'cartera');
-  const totalInvertido = invs.reduce((a, i) => a + (Number(i.pagado) || 0), 0);
-  const valorHoy = cartera.reduce((a, i) => a + (Number(i.precio_mercado) || 0), 0);
+  const vendidas = invs.filter(i => estadoDe(i) === 'vendida');
+  const totalInvertido = invs.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
+  const valorHoy = cartera.reduce((a, i) => a + (valorInv(i) || 0), 0);
   const ganProy = cartera.reduce((a, i) => a + (resultadoDe(i) || 0), 0);
-  const ganReal = invs.filter(i => estadoDe(i) === 'vendida').reduce((a, i) => a + (resultadoDe(i) || 0), 0);
-  const invCartera = cartera.reduce((a, i) => a + (Number(i.pagado) || 0), 0);
-  const invVend = invs.filter(i => estadoDe(i) === 'vendida').reduce((a, i) => a + (Number(i.pagado) || 0), 0);
+  const ganReal = vendidas.reduce((a, i) => a + (resultadoDe(i) || 0), 0);
+  const invCartera = cartera.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
+  const invVend = vendidas.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
 
   // barras
   const conRes = invs.map(i => ({ i, r: resultadoDe(i) || 0 })).sort((a, b) => b.r - a.r);
@@ -331,12 +334,12 @@ function renderDashboard(invs) {
         <div class="prop-grid">
           <div><span>Titularidad</span><b>${inv.titularidad != null ? inv.titularidad + '%' : '—'}</b></div>
           <div><span>Fecha</span><b>${fmtFecha(inv.fecha)}</b></div>
-          <div><span>Pagado</span><b>${fmtUSD(inv.pagado)}</b></div>
-          <div><span>${est === 'vendida' ? 'Vendida en' : 'Valor hoy'}</span><b>${fmtUSD(est === 'vendida' ? inv.precio_venta : inv.precio_mercado)}</b></div>
-          <div><span>Resultado</span><b class="${res >= 0 ? 'green' : ''}">${res == null ? '—' : (res >= 0 ? '+' : '') + fmtUSD(res).replace('US$ ', 'US$ ')}</b></div>
+          <div><span>Pagaste</span><b>${fmtUSD(pagadoInv(inv))}</b></div>
+          <div><span>${est === 'vendida' ? 'Vendida en' : 'Vale hoy'} (tu parte)</span><b>${fmtUSD(valorInv(inv))}</b></div>
+          <div><span>Resultado</span><b class="${res >= 0 ? 'green' : ''}">${res == null ? '—' : (res >= 0 ? '+' : '') + fmtUSD(res)}</b></div>
           <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
         </div>
-        <div class="prop-foot">${dias != null ? dias + ' días' : ''}${inv.tc ? ' · TC compra ' + Number(inv.tc).toLocaleString('es-AR') : ''}</div>
+        <div class="prop-foot">${cuota(inv) < 1 && refTotal(inv) != null ? `Propiedad completa: ${fmtUSD(refTotal(inv))} · tu ${inv.titularidad}% · ` : ''}${dias != null ? dias + ' días' : ''}${inv.tc ? ' · TC compra ' + Number(inv.tc).toLocaleString('es-AR') : ''}</div>
       </div>`;
   }).join('');
 
@@ -365,6 +368,7 @@ function renderAdmin(invs) {
     <tr>
       <td>${inv.inversor_nombre}</td>
       <td>${inv.propiedad}</td>
+      <td>${inv.titularidad != null ? inv.titularidad + '%' : '100%'}</td>
       <td>${fmtFecha(inv.fecha)}</td>
       <td>${fmtUSD(inv.pagado)}</td>
       <td>${fmtUSD(inv.precio_mercado)}</td>
@@ -384,8 +388,8 @@ function renderAdmin(invs) {
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Inversor</th><th>Propiedad</th><th>Fecha</th><th>Pagado</th><th>Mercado</th><th>Venta</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>${filas || '<tr><td colspan="9" class="empty">Todavía no hay inversiones. Agregá la primera.</td></tr>'}</tbody>
+          <thead><tr><th>Inversor</th><th>Propiedad</th><th>%</th><th>Fecha</th><th>Pagado (total)</th><th>Mercado (total)</th><th>Venta (total)</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>${filas || '<tr><td colspan="10" class="empty">Todavía no hay inversiones. Agregá la primera.</td></tr>'}</tbody>
         </table>
       </div>
     </div>`;
@@ -406,18 +410,19 @@ function abrirForm(id) {
         <label>Propiedad</label>
         <input type="text" id="fProp" value="${v(inv.propiedad)}" placeholder="3 de Febrero 2781 5C">
         <div class="grid2">
-          <div><label>Titularidad (%)</label><input type="number" id="fTit" value="${v(inv.titularidad)}" placeholder="100"></div>
+          <div><label>Titularidad del inversor (%)</label><input type="number" id="fTit" value="${v(inv.titularidad)}" placeholder="100" oninput="prevParte()"></div>
           <div><label>Fecha</label><input type="date" id="fFecha" value="${v(inv.fecha)}"></div>
         </div>
         <div class="grid2">
-          <div><label>Pagado (USD)</label><input type="number" id="fPagado" value="${v(inv.pagado)}" placeholder="60000"></div>
+          <div><label>Pagado — total propiedad (USD)</label><input type="number" id="fPagado" value="${v(inv.pagado)}" placeholder="80000" oninput="prevParte()"></div>
           <div><label>TC (referencia)</label><input type="number" id="fTC" value="${v(inv.tc)}" placeholder="1170"></div>
         </div>
         <div class="grid2">
-          <div><label>P. de Mercado (USD)</label><input type="number" id="fMercado" value="${v(inv.precio_mercado)}" placeholder="90210"></div>
-          <div><label>Precio venta (USD)</label><input type="number" id="fVenta" value="${v(inv.precio_venta)}" placeholder="(si se vendió)"></div>
+          <div><label>P. de Mercado — total (USD)</label><input type="number" id="fMercado" value="${v(inv.precio_mercado)}" placeholder="141552" oninput="prevParte()"></div>
+          <div><label>Precio venta — total (USD)</label><input type="number" id="fVenta" value="${v(inv.precio_venta)}" placeholder="(si se vendió)" oninput="prevParte()"></div>
         </div>
-        <p class="muted" style="font-size:11px;margin:2px 0 14px">Cargá <b>P. de Mercado</b> si está en cartera. Cargá <b>Precio venta</b> solo cuando se vendió.</p>
+        <p class="muted" style="font-size:11px;margin:2px 0 6px">Poné el valor <b>TOTAL de la propiedad</b>. Según la titularidad %, se calcula la parte del inversor.</p>
+        <div id="fPreview" style="font-size:12.5px;font-weight:600;margin:0 0 14px;color:var(--navy)"></div>
         <p class="err" id="fErr"></p>
         <div style="display:flex;gap:10px">
           <button class="btn btn-sec" onclick="document.getElementById('modalInv').remove()">Cancelar</button>
@@ -426,6 +431,27 @@ function abrirForm(id) {
       </div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
+  prevParte();
+}
+
+// Vista previa: muestra la parte que le corresponde al inversor según su titularidad
+function prevParte() {
+  if (!$('fTit')) return;
+  const tit = parseFloat($('fTit').value) || 100;
+  const c = tit / 100;
+  const pag = parseFloat($('fPagado').value);
+  const merc = parseFloat($('fMercado').value);
+  const vent = parseFloat($('fVenta').value);
+  const ref = !isNaN(vent) ? vent : merc;
+  let txt = '';
+  if (!isNaN(pag)) {
+    txt = `Parte del inversor (${tit}%): pagó ${fmtUSD(pag * c)}`;
+    if (!isNaN(ref)) {
+      const res = (ref - pag) * c;
+      txt += ` · ${!isNaN(vent) ? 'vendió en' : 'vale'} ${fmtUSD(ref * c)} · resultado ${res >= 0 ? '+' : ''}${fmtUSD(res)} (${fmtPct((ref - pag) / pag * 100)})`;
+    }
+  }
+  $('fPreview').textContent = txt;
 }
 
 const numOrNull = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
