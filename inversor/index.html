@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
     --navy:#253C64; --green:#15925a; --danger:#dc2626;
@@ -229,20 +230,59 @@ function timelineGlobal(invs) {
   });
 }
 
-// Gráfico de línea (sparkline) simple, responsive
-function lineChartSVG(points) {
+// ── Gráficos con Chart.js (eje X por fechas reales, tooltips al pasar el mouse) ──
+let _chartSeq = 0, _pendingCharts = [];
+const _charts = {};
+
+// Devuelve el HTML (un <canvas>) y encola el gráfico para dibujarlo con flushCharts()
+function chartHTML(points, height) {
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
-  const W = 320, H = 80, pad = 4;
-  const ts = points.map(p => p.t.getTime()), vs = points.map(p => p.v);
-  const tmin = Math.min(...ts), tmax = Math.max(...ts), vmin = Math.min(...vs), vmax = Math.max(...vs);
-  const x = t => pad + (tmax === tmin ? 0 : (t - tmin) / (tmax - tmin)) * (W - 2 * pad);
-  const y = v => (H - pad) - (vmax === vmin ? 0.5 : (v - vmin) / (vmax - vmin)) * (H - 2 * pad);
-  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(p.t.getTime()).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
-  const area = `M${x(tmin).toFixed(1)},${H - pad} ` + points.map(p => `L${x(p.t.getTime()).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ') + ` L${x(tmax).toFixed(1)},${H - pad} Z`;
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:80px;display:block">
-    <path d="${area}" fill="rgba(21,146,90,.10)"/>
-    <path d="${line}" fill="none" stroke="#15925a" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-  </svg>`;
+  const id = 'chart_' + (++_chartSeq);
+  _pendingCharts.push({ id, points: points.slice() });
+  return `<div style="position:relative;height:${height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
+}
+
+// Dibuja (o redibuja) todos los canvas que se agregaron al DOM
+function flushCharts() {
+  if (!window.Chart) { _pendingCharts = []; return; }
+  const fmtAxis = v => (Math.abs(v) >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + Math.round(v));
+  _pendingCharts.forEach(({ id, points }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+    _charts[id] = new Chart(el, {
+      type: 'line',
+      data: { datasets: [{
+        data: points.map(p => ({ x: p.t.getTime(), y: p.v })),
+        borderColor: '#15925a', backgroundColor: 'rgba(21,146,90,.10)',
+        borderWidth: 2, fill: true, tension: 0.25,
+        pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#15925a'
+      }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            padding: 10, displayColors: false,
+            callbacks: {
+              title: items => fmtFecha(new Date(items[0].parsed.x).toISOString().slice(0, 10)),
+              label: item => 'Valor: ' + fmtUSD(item.parsed.y)
+            }
+          }
+        },
+        scales: {
+          x: { type: 'linear',
+               ticks: { maxTicksLimit: 5, color: '#94a3b8', font: { size: 10 }, maxRotation: 0,
+                        callback: v => fmtFecha(new Date(v).toISOString().slice(0, 10)) },
+               grid: { display: false } },
+          y: { ticks: { maxTicksLimit: 5, color: '#94a3b8', font: { size: 10 }, callback: fmtAxis },
+               grid: { color: 'rgba(0,0,0,.05)' } }
+        }
+      }
+    });
+  });
+  _pendingCharts = [];
 }
 
 function showErr(id, msg) { const e = $(id); e.textContent = msg; e.style.display = 'block'; }
@@ -395,11 +435,7 @@ function renderDashboard(invs) {
   const globalChart = gpts.length > 1 ? `
     <div class="card">
       <div class="card-title">📊 Evolución total de tus inversiones</div>
-      ${lineChartSVG(gpts)}
-      <div class="legend" style="justify-content:space-between;margin-top:4px">
-        <span>${fmtFecha(gpts[0].t.toISOString().slice(0, 10))} · ${fmtUSD(gpts[0].v)}</span>
-        <span>Hoy · ${fmtUSD(gpts[gpts.length - 1].v)}</span>
-      </div>
+      ${chartHTML(gpts)}
     </div>` : '';
 
   const banner = (usuario && usuario.rol === 'admin') ?
@@ -418,6 +454,7 @@ function renderDashboard(invs) {
     </div>
     <div class="props">${cards}</div>
     ${globalChart}`;
+  flushCharts();
 }
 
 // ── Panel admin ──
@@ -528,8 +565,10 @@ async function addValuacion(invId) {
   const fecha = $('vFecha').value;
   const valor = $('vValor').value.trim();
   if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
-  const { error } = await supa.from('valuaciones').insert({ inversion_id: invId, fecha, valor: Number(valor) });
+  const { data, error } = await supa.from('valuaciones').insert({ inversion_id: invId, fecha, valor: Number(valor) }).select();
   if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
+  if (!data || !data.length) { alert('Se guardó, pero no puedo leerla de vuelta (faltan permisos de LECTURA en la tabla "valuaciones"). Corré el SQL que te pasé.'); }
+  $('vFecha').value = ''; $('vValor').value = '';
   await cargarValuaciones();
   renderHistValor(invId);
 }
@@ -583,6 +622,11 @@ async function guardar(id) {
   const q = id ? supa.from('inversiones').update(datos).eq('id', id) : supa.from('inversiones').insert(datos);
   const { error } = await q;
   if (error) { showErr('fErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
+  // Si quedó una valuación cargada en los campos sin tocar "+ Agregar", la guardamos igual
+  if (id && $('vFecha') && $('vFecha').value && $('vValor') && $('vValor').value.trim() !== '') {
+    const { error: eVal } = await supa.from('valuaciones').insert({ inversion_id: id, fecha: $('vFecha').value, valor: Number($('vValor').value) });
+    if (eVal) { showErr('fErr', 'La inversión se guardó, pero la valuación no: ' + (eVal.message || '')); console.error(eVal); return; }
+  }
   $('modalInv').remove();
   await cargarAdmin();
   appAlert('✓ Inversión guardada', 'ok');
@@ -620,7 +664,6 @@ function verDetalleInversion(id) {
   const res = resultadoDe(inv);
   const dias = diasDe(inv);
   const pts = timelinePropiedad(inv);
-  const ini = pts[0], fin = pts[pts.length - 1];
   const vals = _valuaciones.filter(x => x.inversion_id === id).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
   const histRows = vals.length ? vals.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${fmtFecha(x.fecha)}</span><b>${fmtUSD(Number(x.valor) * cuota(inv))}</b></div>`).join('') : '';
   $('dashInversor').innerHTML = `
@@ -644,13 +687,10 @@ function verDetalleInversion(id) {
     </div>
     <div class="card">
       <div class="card-title">📈 Evolución del valor (tu parte)</div>
-      ${lineChartSVG(pts)}
-      <div class="legend" style="justify-content:space-between;margin-top:4px">
-        <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
-        <span>${pts.length > 1 ? (est === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
-      </div>
+      ${chartHTML(pts)}
     </div>
     ${histRows ? `<div class="card"><div class="card-title">Historial de valuaciones (tu parte)</div>${histRows}</div>` : ''}`;
+  flushCharts();
   window.scrollTo(0, 0);
 }
 function volverDashboard() {
