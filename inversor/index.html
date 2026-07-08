@@ -192,6 +192,44 @@ function resultadoDe(inv) { const p = pagadoInv(inv), v = valorInv(inv); return 
 function pctDe(inv) { const r = resultadoDe(inv), p = pagadoInv(inv); return (r == null || !p) ? null : (r / p) * 100; }
 const fmtPct = (p) => p == null ? '—' : (p >= 0 ? '+' : '') + p.toFixed(0) + '%';
 
+let _valuaciones = [];
+async function cargarValuaciones() {
+  const { data } = await supa.from('valuaciones').select('*').order('fecha', { ascending: true });
+  _valuaciones = data || [];
+}
+
+// Puntos de la línea de tiempo del valor de una propiedad (la PARTE del inversor)
+function timelinePropiedad(inv) {
+  const c = cuota(inv);
+  const pts = [];
+  if (inv.fecha && inv.pagado != null && inv.pagado !== '') pts.push({ t: new Date(inv.fecha), v: Number(inv.pagado) * c });
+  _valuaciones.filter(x => x.inversion_id === inv.id).forEach(x => pts.push({ t: new Date(x.fecha), v: Number(x.valor) * c }));
+  const ref = refTotal(inv);
+  if (ref != null) {
+    const fref = estadoDe(inv) === 'vendida' ? new Date(inv.creado_en) : new Date();
+    fref.setHours(0, 0, 0, 0);
+    if (!pts.some(p => Math.abs(p.t - fref) < 43200000)) pts.push({ t: fref, v: ref * c });
+  }
+  pts.sort((a, b) => a.t - b.t);
+  return pts;
+}
+
+// Gráfico de línea (sparkline) simple, responsive
+function lineChartSVG(points) {
+  if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
+  const W = 320, H = 80, pad = 4;
+  const ts = points.map(p => p.t.getTime()), vs = points.map(p => p.v);
+  const tmin = Math.min(...ts), tmax = Math.max(...ts), vmin = Math.min(...vs), vmax = Math.max(...vs);
+  const x = t => pad + (tmax === tmin ? 0 : (t - tmin) / (tmax - tmin)) * (W - 2 * pad);
+  const y = v => (H - pad) - (vmax === vmin ? 0.5 : (v - vmin) / (vmax - vmin)) * (H - 2 * pad);
+  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(p.t.getTime()).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const area = `M${x(tmin).toFixed(1)},${H - pad} ` + points.map(p => `L${x(p.t.getTime()).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ') + ` L${x(tmax).toFixed(1)},${H - pad} Z`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:80px;display:block">
+    <path d="${area}" fill="rgba(21,146,90,.10)"/>
+    <path d="${line}" fill="none" stroke="#15925a" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+  </svg>`;
+}
+
 function showErr(id, msg) { const e = $(id); e.textContent = msg; e.style.display = 'block'; }
 function clearErr(id) { const e = $(id); e.style.display = 'none'; }
 function appAlert(msg, tipo) {
@@ -294,6 +332,7 @@ function entrar() {
 async function cargarDashboard() {
   const { data, error } = await supa.from('inversiones').select('*').order('fecha', { ascending: false });
   if (error) { $('dashInversor').innerHTML = '<div class="empty">No se pudieron cargar tus inversiones.</div>'; console.error(error); return; }
+  await cargarValuaciones();
   renderDashboard(data || []);
 }
 
@@ -343,6 +382,22 @@ function renderDashboard(invs) {
       </div>`;
   }).join('');
 
+  const evolucion = invs.map(inv => {
+    const pts = timelinePropiedad(inv);
+    const ini = pts[0], fin = pts[pts.length - 1];
+    return `<div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;margin-bottom:6px">
+        <span>${inv.propiedad}</span>
+        <span class="green">${fin ? fmtUSD(fin.v) : ''}</span>
+      </div>
+      ${lineChartSVG(pts)}
+      <div class="legend" style="justify-content:space-between;margin-top:4px">
+        <span>${ini ? fmtFecha(inv.fecha) + ' · ' + fmtUSD(ini.v) : ''}</span>
+        <span>${pts.length > 1 ? (estadoDe(inv) === 'vendida' ? 'Venta' : 'Hoy') + ' · ' + fmtUSD(fin.v) : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
   $('dashInversor').innerHTML = `
     <div class="kpis">
       <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div></div>
@@ -351,6 +406,7 @@ function renderDashboard(invs) {
       <div class="kpi"><div class="kpi-label">Ganancia realizada</div><div class="kpi-val green">+${fmtUSD(ganReal).replace('US$ ', 'US$ ')}</div><div class="kpi-sub green">${invVend ? fmtPct(ganReal / invVend * 100) + ' · vendidas' : 'sin ventas aún'}</div></div>
     </div>
     ${barras ? `<div class="card"><div class="card-title">Ganancia por propiedad (US$)</div>${barras}<div class="legend"><span><i class="green-bg"></i>En cartera (proyectada)</span><span><i class="navy-bg"></i>Vendida (realizada)</span></div></div>` : ''}
+    <div class="card"><div class="card-title">📈 Evolución del valor</div>${evolucion}</div>
     <div class="props">${cards}</div>`;
 }
 
@@ -358,6 +414,7 @@ function renderDashboard(invs) {
 async function cargarAdmin() {
   const { data, error } = await supa.from('inversiones').select('*').order('creado_en', { ascending: false });
   if (error) { $('panelAdmin').innerHTML = `<div class="empty">Error al cargar: ${error.message || 'desconocido'}<br><span style="font-size:12px">(Si dice "schema cache", corré <b>NOTIFY pgrst, 'reload schema';</b> en Supabase.)</span></div>`; console.error(error); return; }
+  await cargarValuaciones();
   renderAdmin(data || []);
 }
 
@@ -424,6 +481,7 @@ function abrirForm(id) {
         </div>
         <p class="muted" style="font-size:11px;margin:2px 0 6px">Poné el valor <b>TOTAL de la propiedad</b>. Según la titularidad %, se calcula la parte del inversor.</p>
         <div id="fPreview" style="font-size:12.5px;font-weight:600;margin:0 0 14px;color:var(--navy)"></div>
+        <div id="histValor"></div>
         <p class="err" id="fErr"></p>
         <div style="display:flex;gap:10px">
           <button class="btn btn-sec" onclick="document.getElementById('modalInv').remove()">Cancelar</button>
@@ -433,6 +491,44 @@ function abrirForm(id) {
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
   prevParte();
+  if (id) renderHistValor(id);
+}
+
+// Historial de valuaciones de una inversión (dentro del modal de edición)
+function renderHistValor(id) {
+  const cont = $('histValor'); if (!cont) return;
+  const vals = _valuaciones.filter(x => x.inversion_id === id).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  const lista = vals.map(x => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span>${fmtFecha(x.fecha)} — ${fmtUSD(x.valor)}</span>
+      <button class="btn btn-danger btn-sm" onclick="delValuacion('${x.id}','${id}')">×</button>
+    </div>`).join('') || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas todavía.</p>';
+  cont.innerHTML = `
+    <hr style="border:none;border-top:1px solid var(--bd);margin:16px 0 12px">
+    <label>📈 Historial de valor (para el gráfico de evolución)</label>
+    <p class="muted" style="font-size:11px;margin:-2px 0 8px">Cargá el valor TOTAL de la propiedad en distintas fechas. Cada punto arma la curva.</p>
+    <div>${lista}</div>
+    <div class="grid2" style="margin-top:10px">
+      <div><input type="date" id="vFecha"></div>
+      <div><input type="number" id="vValor" placeholder="Valor total (USD)"></div>
+    </div>
+    <button class="btn btn-sec btn-sm" onclick="addValuacion('${id}')">+ Agregar valuación</button>`;
+}
+
+async function addValuacion(invId) {
+  const fecha = $('vFecha').value;
+  const valor = $('vValor').value.trim();
+  if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
+  const { error } = await supa.from('valuaciones').insert({ inversion_id: invId, fecha, valor: Number(valor) });
+  if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
+  await cargarValuaciones();
+  renderHistValor(invId);
+}
+
+async function delValuacion(id, invId) {
+  const { error } = await supa.from('valuaciones').delete().eq('id', id);
+  if (error) { alert('No se pudo borrar.'); console.error(error); return; }
+  await cargarValuaciones();
+  renderHistValor(invId);
 }
 
 // Vista previa: muestra la parte que le corresponde al inversor según su titularidad
