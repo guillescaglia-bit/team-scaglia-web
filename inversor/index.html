@@ -215,19 +215,29 @@ function timelinePropiedad(inv) {
   return pts;
 }
 
-// Valor total de la cartera del inversor en el tiempo (suma de todas sus propiedades)
+// Valor total de la cartera del inversor en el tiempo (suma de todas sus propiedades).
+// En la fecha en que ARRANCA una propiedad (aporte de capital) se agrega un "escalón":
+// un punto con el total ANTES del aporte y otro con el total DESPUÉS, para que se vea el salto.
 function timelineGlobal(invs) {
-  const series = invs.map(inv => timelinePropiedad(inv));
-  const allT = [...new Set(series.flat().map(p => p.t.getTime()))].sort((a, b) => a - b);
-  return allT.map(t => {
-    let sum = 0;
-    series.forEach(pts => {
-      let val = 0;
-      for (const p of pts) { if (p.t.getTime() <= t) val = p.v; else break; }
-      sum += val;
-    });
-    return { t: new Date(t), v: sum };
+  const series = invs.map(inv => {
+    const pts = timelinePropiedad(inv);
+    return { start: pts.length ? pts[0].t.getTime() : null, pts };
+  }).filter(s => s.start != null);
+  // valor de una propiedad en el momento t (0 si todavía no la había comprado)
+  const valAt = (pts, t) => { let v = 0; for (const p of pts) { if (p.t.getTime() <= t) v = p.v; else break; } return v; };
+  const allT = [...new Set(series.flatMap(s => s.pts.map(p => p.t.getTime())))].sort((a, b) => a - b);
+  const out = [];
+  allT.forEach(t => {
+    const hayAporte = series.some(s => s.start === t);
+    // Punto "justo antes": total contando solo las propiedades que YA tenías (sin el aporte de hoy)
+    if (hayAporte && out.length) {
+      const pre = series.filter(s => s.start < t).reduce((sum, s) => sum + valAt(s.pts, t), 0);
+      out.push({ t: new Date(t), v: pre });
+    }
+    const total = series.reduce((sum, s) => sum + valAt(s.pts, t), 0);
+    out.push({ t: new Date(t), v: total });
   });
+  return out;
 }
 
 // ── Gráficos con Chart.js (eje X por fechas reales, tooltips al pasar el mouse) ──
@@ -235,18 +245,19 @@ let _chartSeq = 0, _pendingCharts = [];
 const _charts = {};
 
 // Devuelve el HTML (un <canvas>) y encola el gráfico para dibujarlo con flushCharts()
-function chartHTML(points, height) {
+function chartHTML(points, opts) {
+  opts = opts || {};
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
   const id = 'chart_' + (++_chartSeq);
-  _pendingCharts.push({ id, points: points.slice() });
-  return `<div style="position:relative;height:${height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
+  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.25 });
+  return `<div style="position:relative;height:${opts.height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
 }
 
 // Dibuja (o redibuja) todos los canvas que se agregaron al DOM
 function flushCharts() {
   if (!window.Chart) { _pendingCharts = []; return; }
   const fmtAxis = v => (Math.abs(v) >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + Math.round(v));
-  _pendingCharts.forEach(({ id, points }) => {
+  _pendingCharts.forEach(({ id, points, tension }) => {
     const el = document.getElementById(id);
     if (!el) return;
     if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
@@ -255,7 +266,7 @@ function flushCharts() {
       data: { datasets: [{
         data: points.map(p => ({ x: p.t.getTime(), y: p.v })),
         borderColor: '#15925a', backgroundColor: 'rgba(21,146,90,.10)',
-        borderWidth: 2, fill: true, tension: 0.25,
+        borderWidth: 2, fill: true, tension: tension != null ? tension : 0.25,
         pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#15925a'
       }] },
       options: {
@@ -435,7 +446,8 @@ function renderDashboard(invs) {
   const globalChart = gpts.length > 1 ? `
     <div class="card">
       <div class="card-title">📊 Evolución total de tus inversiones</div>
-      ${chartHTML(gpts)}
+      ${chartHTML(gpts, { tension: 0 })}
+      <p class="muted" style="font-size:11px;margin:8px 0 0">Los saltos verticales son aportes de capital (cuando sumás una propiedad nueva).</p>
     </div>` : '';
 
   const banner = (usuario && usuario.rol === 'admin') ?
