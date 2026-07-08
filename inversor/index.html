@@ -376,6 +376,7 @@ function renderAdmin(invs) {
       <td class="${(resultadoDe(inv) || 0) >= 0 ? 'green' : ''}">${resultadoDe(inv) == null ? '—' : fmtPct(pctDe(inv))}</td>
       <td><span class="tag ${estadoDe(inv) === 'vendida' ? 'tag-sold' : 'tag-hold'}">${estadoDe(inv) === 'vendida' ? 'Vendida' : 'Cartera'}</span></td>
       <td><div class="actions">
+        <button class="btn btn-sec btn-sm" onclick="verComoInversor('${inv.inversor_email}', '${(inv.inversor_nombre || '').replace(/'/g, "\\'")}')">Ver</button>
         <button class="btn btn-sec btn-sm" onclick="abrirForm('${inv.id}')">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="borrar('${inv.id}')">Borrar</button>
       </div></td>
@@ -487,6 +488,25 @@ async function borrar(id) {
   if (error) { appAlert('No se pudo borrar.', 'error'); console.error(error); return; }
   await cargarAdmin();
   appAlert('Inversión borrada', 'ok');
+}
+
+// El admin ve el dashboard tal cual lo ve un inversor
+function verComoInversor(email, nombre) {
+  const invs = _inversiones.filter(i => (i.inversor_email || '').toLowerCase() === (email || '').toLowerCase());
+  $('panelAdmin').classList.add('oculto');
+  $('dashInversor').classList.remove('oculto');
+  renderDashboard(invs);
+  $('dashInversor').insertAdjacentHTML('afterbegin',
+    `<div class="alert alert-ok" style="background:#eef2fb;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+       <span>👁 Estás viendo como <b>${nombre || email}</b> (así lo ve el inversor)</span>
+       <button class="btn btn-sec btn-sm" onclick="volverPanel()">← Volver al panel</button>
+     </div>`);
+  window.scrollTo(0, 0);
+}
+function volverPanel() {
+  $('dashInversor').classList.add('oculto');
+  $('panelAdmin').classList.remove('oculto');
+  $('saludo').textContent = 'Panel de administración';
 }
 
 // ── Restaurar sesión al recargar ──
