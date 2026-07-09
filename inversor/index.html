@@ -524,6 +524,12 @@ function filasAdmin(list) {
 function aplicarFiltroAdmin() {
   const el = $('qAdmin');
   _qAdmin = el ? el.value : '';
+  if (_vistaAdmin === 'propiedad') {
+    const g = propGroupsFiltradas();
+    if ($('propWrap')) $('propWrap').innerHTML = tarjetasPropiedad(g);
+    if ($('propCount')) $('propCount').textContent = g.length;
+    return;
+  }
   const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
   const list = _inversiones.filter(inv => {
     const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
@@ -548,19 +554,22 @@ function toggleVistaHTML() {
 }
 
 function pintarAdmin() {
+  const qEsc = _qAdmin.replace(/"/g, '&quot;');
   if (_vistaAdmin === 'propiedad') {
+    const total = propGroups().length;
+    const gF = propGroupsFiltradas();
     $('panelAdmin').innerHTML = `
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap">
-          <div class="card-title" style="margin:0">Propiedades (${propGroups().length})</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+          <div class="card-title" style="margin:0">Propiedades (<span id="propCount">${gF.length}</span> de ${total})</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva inversión</button></div>
         </div>
+        <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar por propiedad, nombre, mail…" style="margin-bottom:12px">
         <p class="muted" style="font-size:12px;margin:0">Actualizá el valor de una propiedad una sola vez y se recalcula la parte de cada propietario según su %.</p>
       </div>
-      ${tarjetasPropiedad()}`;
+      <div id="propWrap">${tarjetasPropiedad(gF)}</div>`;
     return;
   }
-  const qEsc = _qAdmin.replace(/"/g, '&quot;');
   $('panelAdmin').innerHTML = `
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
@@ -585,9 +594,18 @@ function propGroups() {
   return [...map.entries()].map(([prop, rows]) => ({ prop, rows })).sort((a, b) => a.prop.localeCompare(b.prop));
 }
 
-function tarjetasPropiedad() {
-  const groups = propGroups();
-  if (!groups.length) return '<div class="card"><div class="empty">Todavía no hay propiedades.</div></div>';
+function propGroupsFiltradas() {
+  const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
+  if (!toks.length) return propGroups();
+  return propGroups().filter(g => {
+    const hay = normTxt([g.prop, ...g.rows.map(r => (r.inversor_nombre || '') + ' ' + (r.inversor_email || ''))].join(' '));
+    return toks.every(t => hay.includes(t));
+  });
+}
+
+function tarjetasPropiedad(groups) {
+  groups = groups || propGroups();
+  if (!groups.length) return `<div class="card"><div class="empty">${_qAdmin ? 'No hay propiedades para “' + _qAdmin + '”.' : 'Todavía no hay propiedades.'}</div></div>`;
   return groups.map(({ prop, rows }) => {
     const ref = rows[0];
     const est = estadoDe(ref);
