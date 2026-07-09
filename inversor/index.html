@@ -195,7 +195,7 @@ const fmtUSD = (n) => (n == null || isNaN(n)) ? '—' : 'US$ ' + Number(n).toLoc
 const fmtFecha = (f) => { if (!f) return '—'; const p = f.split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : f; };
 function diasDe(inv) {
   if (!inv.fecha) return null;
-  const hasta = inv.precio_venta != null ? new Date(inv.creado_en) : new Date();
+  const hasta = estadoDe(inv) === 'vendida' ? new Date(inv.fecha_venta || inv.creado_en) : new Date();
   return Math.max(0, Math.round((hasta - new Date(inv.fecha)) / 86400000));
 }
 const estadoDe = (inv) => (inv.precio_venta != null && inv.precio_venta !== '') ? 'vendida' : 'cartera';
@@ -223,7 +223,7 @@ function timelinePropiedad(inv) {
   _valuaciones.filter(x => x.inversion_id === inv.id).forEach(x => pts.push({ t: new Date(x.fecha), v: Number(x.valor) * c }));
   const ref = refTotal(inv);
   if (ref != null) {
-    const fref = estadoDe(inv) === 'vendida' ? new Date(inv.creado_en) : new Date();
+    const fref = estadoDe(inv) === 'vendida' ? new Date(inv.fecha_venta || inv.creado_en) : new Date();
     fref.setHours(0, 0, 0, 0);
     if (!pts.some(p => Math.abs(p.t - fref) < 43200000)) pts.push({ t: fref, v: ref * c });
   }
@@ -556,6 +556,10 @@ function abrirForm(id) {
           <div><label>P. de Mercado — total (USD)</label><input type="number" id="fMercado" value="${v(inv.precio_mercado)}" placeholder="141552" oninput="prevParte()"></div>
           <div><label>Precio venta — total (USD)</label><input type="number" id="fVenta" value="${v(inv.precio_venta)}" placeholder="(si se vendió)" oninput="prevParte()"></div>
         </div>
+        <div class="grid2">
+          <div><label>Fecha de venta</label><input type="date" id="fVentaFecha" value="${v(inv.fecha_venta)}"></div>
+          <div></div>
+        </div>
         <p class="muted" style="font-size:11px;margin:2px 0 6px">Poné el valor <b>TOTAL de la propiedad</b>. Según la titularidad %, se calcula la parte del inversor.</p>
         <div id="fPreview" style="font-size:12.5px;font-weight:600;margin:0 0 14px;color:var(--navy)"></div>
         <div id="histValor"></div>
@@ -647,7 +651,8 @@ async function guardar(id) {
     pagado: numOrNull('fPagado'),
     tc: numOrNull('fTC'),
     precio_mercado: numOrNull('fMercado'),
-    precio_venta: numOrNull('fVenta')
+    precio_venta: numOrNull('fVenta'),
+    fecha_venta: $('fVentaFecha').value || null
   };
   const q = id ? supa.from('inversiones').update(datos).eq('id', id) : supa.from('inversiones').insert(datos);
   const { error } = await q;
@@ -708,12 +713,13 @@ function verDetalleInversion(id) {
       <div class="prop-grid">
         <div><span>Titularidad</span><b>${inv.titularidad != null ? inv.titularidad + '%' : '—'}</b></div>
         <div><span>Fecha de compra</span><b>${fmtFecha(inv.fecha)}</b></div>
+        ${est === 'vendida' ? `<div><span>Fecha de venta</span><b>${fmtFecha(inv.fecha_venta)}</b></div>` : ''}
         <div><span>Pagaste</span><b>${fmtUSD(pagadoInv(inv))}</b></div>
         <div><span>${est === 'vendida' ? 'Vendida en' : 'Vale hoy'} (tu parte)</span><b>${fmtUSD(valorInv(inv))}</b></div>
         <div><span>Resultado</span><b class="${res >= 0 ? 'green' : ''}">${res == null ? '—' : (res >= 0 ? '+' : '') + fmtUSD(res)}</b></div>
         <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
         ${cuota(inv) < 1 && refTotal(inv) != null ? `<div><span>Valor total propiedad</span><b>${fmtUSD(refTotal(inv))}</b></div>` : ''}
-        <div><span>Tiempo</span><b>${dias != null ? dias + ' días' : '—'}</b></div>
+        <div><span>${est === 'vendida' ? 'Tiempo hasta la venta' : 'Tiempo'}</span><b>${dias != null ? dias + ' días' : '—'}</b></div>
       </div>
       ${inv.tc ? `<div class="prop-foot">TC al comprar: ${Number(inv.tc).toLocaleString('es-AR')}</div>` : ''}
     </div>
