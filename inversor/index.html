@@ -635,6 +635,7 @@ function abrirPropiedad(prop) {
     <div style="background:var(--page);border-radius:8px;padding:10px 12px;margin:2px 0 14px">
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">Parte de cada propietario</div>${duenos}
     </div>
+    <div id="histProp"></div>
     <p class="err" id="pErr"></p>
     <div style="display:flex;gap:10px">
       <button class="btn btn-sec" onclick="document.getElementById('modalProp').remove()">Cancelar</button>
@@ -642,6 +643,53 @@ function abrirPropiedad(prop) {
     </div>
   </div>`;
   document.body.appendChild(modal);
+  renderHistProp(prop);
+}
+
+// Historial de valuaciones a nivel PROPIEDAD: una fecha+valor total se aplica a todos los dueños
+function renderHistProp(prop) {
+  const cont = $('histProp'); if (!cont) return;
+  const pe = prop.replace(/'/g, "\\'");
+  const ids = _inversiones.filter(i => i.propiedad === prop).map(r => r.id);
+  const byDate = new Map();
+  _valuaciones.filter(x => ids.includes(x.inversion_id)).forEach(x => { if (!byDate.has(x.fecha)) byDate.set(x.fecha, Number(x.valor)); });
+  const fechas = [...byDate.entries()].sort((a, b) => new Date(a[0]) - new Date(b[0]));
+  const lista = fechas.map(([f, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span>${fmtFecha(f)} — <b>${fmtUSD(v)}</b> <span class="muted">total</span></span>
+      <button class="btn btn-danger btn-sm" onclick="delValuacionProp('${pe}','${f}')">×</button>
+    </div>`).join('') || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas todavía.</p>';
+  cont.innerHTML = `
+    <hr style="border:none;border-top:1px solid var(--bd);margin:16px 0 12px">
+    <label>📈 Historial de valor por fecha (para el gráfico de evolución)</label>
+    <p class="muted" style="font-size:11px;margin:-2px 0 8px">Cargá el valor <b>TOTAL</b> de la propiedad en distintas fechas. Se aplica a <b>todos</b> los propietarios (cada uno ve su %).</p>
+    <div>${lista}</div>
+    <div class="grid2" style="margin-top:10px">
+      <div><input type="date" id="pvFecha"></div>
+      <div><input type="number" id="pvValor" placeholder="Valor total (USD)"></div>
+    </div>
+    <button class="btn btn-sec btn-sm" onclick="addValuacionProp('${pe}')">+ Agregar valuación</button>`;
+}
+
+async function addValuacionProp(prop) {
+  const fecha = $('pvFecha').value;
+  const valor = $('pvValor').value.trim();
+  if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
+  const rows = _inversiones.filter(i => i.propiedad === prop);
+  const payload = rows.map(r => ({ inversion_id: r.id, fecha, valor: Number(valor) }));
+  const { data, error } = await supa.from('valuaciones').insert(payload).select();
+  if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
+  if (!data || !data.length) { alert('Se guardó, pero no puedo leerla de vuelta (faltan permisos de LECTURA en "valuaciones"). Corré el SQL que te pasé.'); }
+  $('pvFecha').value = ''; $('pvValor').value = '';
+  await cargarValuaciones();
+  renderHistProp(prop);
+}
+
+async function delValuacionProp(prop, fecha) {
+  const ids = _inversiones.filter(i => i.propiedad === prop).map(r => r.id);
+  const { error } = await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha);
+  if (error) { alert('No se pudo borrar.'); console.error(error); return; }
+  await cargarValuaciones();
+  renderHistProp(prop);
 }
 
 function prevProp(prop) {
