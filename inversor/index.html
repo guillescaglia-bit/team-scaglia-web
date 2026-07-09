@@ -408,6 +408,7 @@ function entrar() {
     $('dashInversor').classList.remove('oculto');
     $('panelAdmin').classList.add('oculto');
     document.body.classList.remove('wide');
+    supa.rpc('registrar_acceso_inversor').then(() => {}, () => {}); // último acceso + contador
     cargarDashboard();
   }
 }
@@ -492,7 +493,16 @@ async function cargarAdmin() {
   const { data, error } = await supa.from('inversiones').select('*').order('creado_en', { ascending: false });
   if (error) { $('panelAdmin').innerHTML = `<div class="empty">Error al cargar: ${error.message || 'desconocido'}<br><span style="font-size:12px">(Si dice "schema cache", corré <b>NOTIFY pgrst, 'reload schema';</b> en Supabase.)</span></div>`; console.error(error); return; }
   await cargarValuaciones();
+  await cargarAccesos();
   renderAdmin(data || []);
+}
+
+// Accesos de los inversores (cuántas veces entró + último acceso)
+let _accesos = {};
+async function cargarAccesos() {
+  const { data } = await supa.from('accesos_inversor').select('*');
+  _accesos = {};
+  (data || []).forEach(a => { _accesos[(a.email || '').toLowerCase()] = a; });
 }
 
 let _inversiones = [];
@@ -530,6 +540,12 @@ function aplicarFiltroAdmin() {
     if ($('propCount')) $('propCount').textContent = g.length;
     return;
   }
+  if (_vistaAdmin === 'clientes') {
+    const l = clientesFiltrados();
+    if ($('cliBody')) $('cliBody').innerHTML = filasClientes(l);
+    if ($('cliCount')) $('cliCount').textContent = l.length;
+    return;
+  }
   const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
   const list = _inversiones.filter(inv => {
     const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
@@ -537,6 +553,49 @@ function aplicarFiltroAdmin() {
   });
   if ($('admBody')) $('admBody').innerHTML = filasAdmin(list);
   if ($('admCount')) $('admCount').textContent = list.length;
+}
+
+// ── Vista "Clientes": un cliente por email, con sus accesos ──
+const fmtFechaHora = (t) => {
+  if (!t) return 'Nunca entró';
+  const d = new Date(t);
+  return d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+};
+
+function clientesConAccesos() {
+  const map = new Map();
+  _inversiones.forEach(i => {
+    const email = (i.inversor_email || '').trim();
+    if (!email || email.toLowerCase() === 'pendiente@teamscaglia.com') return;
+    const k = email.toLowerCase();
+    if (!map.has(k)) map.set(k, { nombre: i.inversor_nombre || '', email, invs: 0 });
+    map.get(k).invs++;
+  });
+  return [...map.values()].map(c => {
+    const a = _accesos[c.email.toLowerCase()] || {};
+    return { ...c, accesos: a.accesos || 0, ultimo: a.ultimo_acceso || null };
+  }).sort((a, b) => (b.ultimo ? new Date(b.ultimo).getTime() : 0) - (a.ultimo ? new Date(a.ultimo).getTime() : 0));
+}
+
+function clientesFiltrados() {
+  const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
+  if (!toks.length) return clientesConAccesos();
+  return clientesConAccesos().filter(c => {
+    const hay = normTxt(c.nombre + ' ' + c.email);
+    return toks.every(t => hay.includes(t));
+  });
+}
+
+function filasClientes(list) {
+  if (!list.length) return `<tr><td colspan="5" class="empty">${_qAdmin ? 'No hay clientes para “' + _qAdmin + '”.' : 'Todavía no hay clientes.'}</td></tr>`;
+  return list.map(c => `
+    <tr>
+      <td>${c.nombre || '—'}</td>
+      <td>${c.email}</td>
+      <td>${c.invs}</td>
+      <td><b>${c.accesos}</b></td>
+      <td class="${c.ultimo ? '' : 'muted'}">${fmtFechaHora(c.ultimo)}</td>
+    </tr>`).join('');
 }
 
 function renderAdmin(invs) {
@@ -547,14 +606,37 @@ function renderAdmin(invs) {
 function setVistaAdmin(v) { _vistaAdmin = v; pintarAdmin(); }
 
 function toggleVistaHTML() {
-  return `<div style="display:flex;gap:6px">
+  return `<div style="display:flex;gap:6px;flex-wrap:wrap">
     <button class="btn btn-sm ${_vistaAdmin === 'inversor' ? 'btn-primary' : 'btn-sec'}" onclick="setVistaAdmin('inversor')">Por inversor</button>
     <button class="btn btn-sm ${_vistaAdmin === 'propiedad' ? 'btn-primary' : 'btn-sec'}" onclick="setVistaAdmin('propiedad')">Por propiedad</button>
+    <button class="btn btn-sm ${_vistaAdmin === 'clientes' ? 'btn-primary' : 'btn-sec'}" onclick="setVistaAdmin('clientes')">Clientes</button>
   </div>`;
 }
 
 function pintarAdmin() {
   const qEsc = _qAdmin.replace(/"/g, '&quot;');
+  if (_vistaAdmin === 'clientes') {
+    const total = clientesConAccesos().length;
+    const lista = clientesFiltrados();
+    $('panelAdmin').innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+          <div class="card-title" style="margin:0">Clientes (<span id="cliCount">${lista.length}</span> de ${total})</div>
+          ${toggleVistaHTML()}
+        </div>
+        <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar cliente por nombre o mail…" style="margin-bottom:12px">
+        <p class="muted" style="font-size:12px;margin:0">Cuántas veces entró cada inversor a su portal y cuándo fue la última vez.</p>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>Email</th><th>Inversiones</th><th>Accesos</th><th>Último acceso</th></tr></thead>
+            <tbody id="cliBody">${filasClientes(lista)}</tbody>
+          </table>
+        </div>
+      </div>`;
+    return;
+  }
   if (_vistaAdmin === 'propiedad') {
     const total = propGroups().length;
     const gF = propGroupsFiltradas();
