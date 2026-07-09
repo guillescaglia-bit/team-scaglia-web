@@ -497,6 +497,7 @@ async function cargarAdmin() {
 
 let _inversiones = [];
 let _qAdmin = '';
+let _vistaAdmin = 'inversor';
 const normTxt = (s) => (s == null ? '' : '' + s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 function filasAdmin(list) {
@@ -534,22 +535,135 @@ function aplicarFiltroAdmin() {
 
 function renderAdmin(invs) {
   _inversiones = invs;
+  pintarAdmin();
+}
+
+function setVistaAdmin(v) { _vistaAdmin = v; pintarAdmin(); }
+
+function toggleVistaHTML() {
+  return `<div style="display:flex;gap:6px">
+    <button class="btn btn-sm ${_vistaAdmin === 'inversor' ? 'btn-primary' : 'btn-sec'}" onclick="setVistaAdmin('inversor')">Por inversor</button>
+    <button class="btn btn-sm ${_vistaAdmin === 'propiedad' ? 'btn-primary' : 'btn-sec'}" onclick="setVistaAdmin('propiedad')">Por propiedad</button>
+  </div>`;
+}
+
+function pintarAdmin() {
+  if (_vistaAdmin === 'propiedad') {
+    $('panelAdmin').innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap">
+          <div class="card-title" style="margin:0">Propiedades (${propGroups().length})</div>
+          ${toggleVistaHTML()}
+        </div>
+        <p class="muted" style="font-size:12px;margin:0">Actualizá el valor de una propiedad una sola vez y se recalcula la parte de cada propietario según su %.</p>
+      </div>
+      ${tarjetasPropiedad()}`;
+    return;
+  }
   const qEsc = _qAdmin.replace(/"/g, '&quot;');
   $('panelAdmin').innerHTML = `
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
-        <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${invs.length}</span> de ${invs.length})</div>
-        <button class="btn btn-primary btn-sm" onclick="abrirForm()">+ Agregar inversión</button>
+        <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${_inversiones.length}</span> de ${_inversiones.length})</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirForm()">+ Agregar inversión</button></div>
       </div>
       <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar por nombre, dirección, mail…" style="margin-bottom:14px">
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>Inversor</th><th>Propiedad</th><th>%</th><th>Fecha</th><th>Pagado (total)</th><th>Mercado (total)</th><th>Venta (total)</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="admBody">${filasAdmin(invs)}</tbody>
+          <tbody id="admBody">${filasAdmin(_inversiones)}</tbody>
         </table>
       </div>
     </div>`;
   if (_qAdmin) aplicarFiltroAdmin();
+}
+
+// ── Vista "por propiedad": agrupa los inversores de una misma unidad ──
+function propGroups() {
+  const map = new Map();
+  _inversiones.forEach(inv => { if (!map.has(inv.propiedad)) map.set(inv.propiedad, []); map.get(inv.propiedad).push(inv); });
+  return [...map.entries()].map(([prop, rows]) => ({ prop, rows })).sort((a, b) => a.prop.localeCompare(b.prop));
+}
+
+function tarjetasPropiedad() {
+  const groups = propGroups();
+  if (!groups.length) return '<div class="card"><div class="empty">Todavía no hay propiedades.</div></div>';
+  return groups.map(({ prop, rows }) => {
+    const ref = rows[0];
+    const est = estadoDe(ref);
+    const sumaTit = rows.reduce((s, r) => s + (r.titularidad == null || r.titularidad === '' ? 100 : Number(r.titularidad)), 0);
+    const totalActual = est === 'vendida' ? ref.precio_venta : ref.precio_mercado;
+    const duenos = rows.map(r => `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--bd)">
+        <span>${r.inversor_nombre} · <b>${r.titularidad != null ? r.titularidad + '%' : '100%'}</b></span>
+        <b>${fmtUSD(valorInv(r))}</b>
+      </div>`).join('');
+    return `<div class="card">
+      <div class="prop-head"><div class="prop-name">${prop}</div><span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span></div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;margin-bottom:12px">
+        <div><div class="muted">Pagado total</div><b>${fmtUSD(ref.pagado)}</b></div>
+        <div><div class="muted">${est === 'vendida' ? 'Venta total' : 'Mercado total'}</div><b>${fmtUSD(totalActual)}</b></div>
+        <div><div class="muted">Titularidad cargada</div><b${sumaTit !== 100 ? ' style="color:var(--danger)"' : ''}>${sumaTit}%</b></div>
+      </div>
+      <div>${duenos}</div>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="abrirPropiedad('${prop.replace(/'/g, "\\'")}')">Actualizar valor</button>
+    </div>`;
+  }).join('');
+}
+
+function abrirPropiedad(prop) {
+  const rows = _inversiones.filter(i => i.propiedad === prop);
+  if (!rows.length) return;
+  const ref = rows[0];
+  const val = x => (x == null ? '' : x);
+  const pe = prop.replace(/'/g, "\\'");
+  const duenos = rows.map(r => `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--bd)">
+      <span>${r.inversor_nombre} (${r.titularidad != null ? r.titularidad + '%' : '100%'})</span>
+      <b id="pvShare_${r.id}">${fmtUSD(valorInv(r))}</b>
+    </div>`).join('');
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'modalProp';
+  modal.innerHTML = `<div class="modal-content">
+    <h3>Actualizar propiedad</h3>
+    <p style="font-weight:600;margin-bottom:2px">${prop}</p>
+    <p class="muted" style="font-size:12px;margin-bottom:16px">Cambiás el valor <b>TOTAL</b> y se actualiza la parte de cada propietario según su %.</p>
+    <div class="grid2">
+      <div><label>Valor de mercado — total (USD)</label><input type="number" id="pMercado" value="${val(ref.precio_mercado)}" oninput="prevProp('${pe}')"></div>
+      <div><label>Precio venta — total (USD)</label><input type="number" id="pVenta" value="${val(ref.precio_venta)}" placeholder="(si se vendió)" oninput="prevProp('${pe}')"></div>
+    </div>
+    <div class="grid2"><div><label>Fecha de venta</label><input type="date" id="pVentaFecha" value="${val(ref.fecha_venta)}"></div><div></div></div>
+    <div style="background:var(--page);border-radius:8px;padding:10px 12px;margin:2px 0 14px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">Parte de cada propietario</div>${duenos}
+    </div>
+    <p class="err" id="pErr"></p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-sec" onclick="document.getElementById('modalProp').remove()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarPropiedad('${pe}')">Guardar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function prevProp(prop) {
+  const rows = _inversiones.filter(i => i.propiedad === prop);
+  const merc = parseFloat($('pMercado').value);
+  const vent = parseFloat($('pVenta').value);
+  const ref = !isNaN(vent) ? vent : merc;
+  rows.forEach(r => {
+    const c = (r.titularidad == null || r.titularidad === '' ? 100 : Number(r.titularidad)) / 100;
+    const el = document.getElementById('pvShare_' + r.id);
+    if (el) el.textContent = isNaN(ref) ? '—' : fmtUSD(ref * c);
+  });
+}
+
+async function guardarPropiedad(prop) {
+  const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
+  const datos = { precio_mercado: num('pMercado'), precio_venta: num('pVenta'), fecha_venta: $('pVentaFecha').value || null };
+  const { error } = await supa.from('inversiones').update(datos).eq('propiedad', prop);
+  if (error) { showErr('pErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
+  const m = document.getElementById('modalProp'); if (m) m.remove();
+  await cargarAdmin();
+  appAlert('✓ Propiedad actualizada', 'ok');
 }
 
 function abrirForm(id) {
