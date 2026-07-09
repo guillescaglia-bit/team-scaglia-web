@@ -553,7 +553,7 @@ function pintarAdmin() {
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap">
           <div class="card-title" style="margin:0">Propiedades (${propGroups().length})</div>
-          ${toggleVistaHTML()}
+          <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva inversión</button></div>
         </div>
         <p class="muted" style="font-size:12px;margin:0">Actualizá el valor de una propiedad una sola vez y se recalcula la parte de cada propietario según su %.</p>
       </div>
@@ -565,7 +565,7 @@ function pintarAdmin() {
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
         <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${_inversiones.length}</span> de ${_inversiones.length})</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirForm()">+ Agregar inversión</button></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva inversión</button></div>
       </div>
       <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar por nombre, dirección, mail…" style="margin-bottom:14px">
       <div class="tbl-wrap">
@@ -712,6 +712,126 @@ async function guardarPropiedad(prop) {
   const m = document.getElementById('modalProp'); if (m) m.remove();
   await cargarAdmin();
   appAlert('✓ Propiedad actualizada', 'ok');
+}
+
+// ── Nueva inversión: una propiedad + varios propietarios (cliente + %) en una sola carga ──
+let _ownerSeq = 0;
+
+// Clientes ya cargados (para elegirlos con el mail ya relacionado). Se derivan de las inversiones.
+function clientesActivos() {
+  const map = new Map();
+  _inversiones.forEach(i => {
+    const email = (i.inversor_email || '').trim();
+    if (!email || email.toLowerCase() === 'pendiente@teamscaglia.com') return;
+    const k = email.toLowerCase();
+    if (!map.has(k)) map.set(k, { nombre: i.inversor_nombre || '', email });
+  });
+  return [...map.values()].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+}
+
+function ownerRowHTML() {
+  const i = ++_ownerSeq;
+  return `<div class="owner-row" id="ow_${i}" style="border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:10px">
+    <input class="oNombre" list="dlClientes" placeholder="Nombre del cliente" oninput="autofillCliente('ow_${i}')" style="margin-bottom:8px">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input class="oEmail" type="email" placeholder="Email" style="flex:1;margin:0">
+      <input class="oPct" type="number" placeholder="%" oninput="prevNueva()" style="width:78px;margin:0">
+      <button type="button" class="btn btn-danger btn-sm" onclick="quitarOwner('ow_${i}')">×</button>
+    </div>
+  </div>`;
+}
+
+function agregarOwner() { const c = $('owners'); if (c) { c.insertAdjacentHTML('beforeend', ownerRowHTML()); prevNueva(); } }
+function quitarOwner(rid) { const el = document.getElementById(rid); if (el) el.remove(); prevNueva(); }
+
+function autofillCliente(rid) {
+  const row = document.getElementById(rid); if (!row) return;
+  const nombre = row.querySelector('.oNombre').value.trim().toLowerCase();
+  const emailEl = row.querySelector('.oEmail');
+  const found = clientesActivos().find(c => (c.nombre || '').toLowerCase() === nombre);
+  if (found && !emailEl.value.trim()) emailEl.value = found.email;
+}
+
+function prevNueva() {
+  const rows = [...document.querySelectorAll('#owners .owner-row')];
+  let suma = 0;
+  rows.forEach(r => { const p = parseFloat(r.querySelector('.oPct').value); if (!isNaN(p)) suma += p; });
+  const el = $('nPrev');
+  if (el) {
+    let txt = `Titularidad total: <b style="${suma === 100 ? '' : 'color:var(--danger)'}">${suma || 0}%</b>`;
+    if (suma !== 100) txt += ' <span class="muted">(lo ideal es que sume 100%)</span>';
+    el.innerHTML = txt;
+  }
+}
+
+function abrirNueva() {
+  _ownerSeq = 0;
+  const opts = clientesActivos().map(c => `<option value="${(c.nombre || '').replace(/"/g, '&quot;')}">`).join('');
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'modalNueva';
+  modal.innerHTML = `<div class="modal-content">
+    <h3>Nueva inversión</h3>
+    <datalist id="dlClientes">${opts}</datalist>
+    <label>Propiedad</label>
+    <input type="text" id="nProp" placeholder="3 de Febrero 2781 6E">
+    <div class="grid2">
+      <div><label>Fecha de compra</label><input type="date" id="nFecha"></div>
+      <div><label>TC (referencia)</label><input type="number" id="nTC" placeholder="1170"></div>
+    </div>
+    <div class="grid2">
+      <div><label>Pagado — total propiedad (USD)</label><input type="number" id="nPagado" placeholder="80000"></div>
+      <div><label>P. de Mercado — total (USD)</label><input type="number" id="nMercado" placeholder="141552"></div>
+    </div>
+    <div class="grid2">
+      <div><label>Precio venta — total (USD)</label><input type="number" id="nVenta" placeholder="(si se vendió)"></div>
+      <div><label>Fecha de venta</label><input type="date" id="nVentaFecha"></div>
+    </div>
+    <p class="muted" style="font-size:11px;margin:2px 0 12px">Poné los valores <b>TOTALES</b> de la propiedad. Abajo definís quiénes son los dueños y su %.</p>
+    <label>Propietarios (elegí un cliente o escribí uno nuevo)</label>
+    <div id="owners"></div>
+    <button type="button" class="btn btn-sec btn-sm" onclick="agregarOwner()">+ Agregar propietario</button>
+    <div id="nPrev" style="font-size:12.5px;font-weight:600;margin:12px 0;color:var(--navy)"></div>
+    <p class="err" id="nErr"></p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-sec" onclick="document.getElementById('modalNueva').remove()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarNueva()">Guardar inversión</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  agregarOwner();
+}
+
+async function guardarNueva() {
+  const propiedad = $('nProp').value.trim();
+  clearErr('nErr');
+  if (!propiedad) { showErr('nErr', 'Poné la propiedad.'); return; }
+  const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
+  const base = {
+    propiedad,
+    fecha: $('nFecha').value || null,
+    pagado: num('nPagado'),
+    tc: num('nTC'),
+    precio_mercado: num('nMercado'),
+    precio_venta: num('nVenta'),
+    fecha_venta: $('nVentaFecha').value || null
+  };
+  const rows = [...document.querySelectorAll('#owners .owner-row')];
+  const owners = [];
+  for (const r of rows) {
+    const nombre = r.querySelector('.oNombre').value.trim();
+    const email = r.querySelector('.oEmail').value.trim();
+    const pct = r.querySelector('.oPct').value.trim();
+    if (!nombre && !email && pct === '') continue;
+    if (!nombre || !email) { showErr('nErr', 'Cada propietario necesita nombre y email.'); return; }
+    owners.push({ ...base, inversor_nombre: nombre, inversor_email: email, titularidad: pct === '' ? 100 : Number(pct) });
+  }
+  if (!owners.length) { showErr('nErr', 'Agregá al menos un propietario.'); return; }
+  const { error } = await supa.from('inversiones').insert(owners);
+  if (error) { showErr('nErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
+  const m = document.getElementById('modalNueva'); if (m) m.remove();
+  await cargarAdmin();
+  appAlert('✓ Inversión cargada (' + owners.length + ' propietario' + (owners.length > 1 ? 's' : '') + ')', 'ok');
 }
 
 function abrirForm(id) {
