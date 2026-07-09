@@ -496,9 +496,12 @@ async function cargarAdmin() {
 }
 
 let _inversiones = [];
-function renderAdmin(invs) {
-  _inversiones = invs;
-  const filas = invs.map(inv => `
+let _qAdmin = '';
+const normTxt = (s) => (s == null ? '' : '' + s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+function filasAdmin(list) {
+  if (!list.length) return `<tr><td colspan="11" class="empty">${_qAdmin ? 'No hay resultados para “' + _qAdmin + '”.' : 'Todavía no hay inversiones. Agregá la primera.'}</td></tr>`;
+  return list.map(inv => `
     <tr>
       <td>${inv.inversor_nombre}</td>
       <td>${inv.propiedad}</td>
@@ -515,19 +518,38 @@ function renderAdmin(invs) {
         <button class="btn btn-danger btn-sm" onclick="borrar('${inv.id}')">Borrar</button>
       </div></td>
     </tr>`).join('');
+}
+
+function aplicarFiltroAdmin() {
+  const el = $('qAdmin');
+  _qAdmin = el ? el.value : '';
+  const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
+  const list = _inversiones.filter(inv => {
+    const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
+    return toks.every(t => hay.includes(t));
+  });
+  if ($('admBody')) $('admBody').innerHTML = filasAdmin(list);
+  if ($('admCount')) $('admCount').textContent = list.length;
+}
+
+function renderAdmin(invs) {
+  _inversiones = invs;
+  const qEsc = _qAdmin.replace(/"/g, '&quot;');
   $('panelAdmin').innerHTML = `
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
-        <div class="card-title" style="margin:0">Inversiones cargadas (${invs.length})</div>
+        <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${invs.length}</span> de ${invs.length})</div>
         <button class="btn btn-primary btn-sm" onclick="abrirForm()">+ Agregar inversión</button>
       </div>
+      <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar por nombre, dirección, mail…" style="margin-bottom:14px">
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>Inversor</th><th>Propiedad</th><th>%</th><th>Fecha</th><th>Pagado (total)</th><th>Mercado (total)</th><th>Venta (total)</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody>${filas || '<tr><td colspan="10" class="empty">Todavía no hay inversiones. Agregá la primera.</td></tr>'}</tbody>
+          <tbody id="admBody">${filasAdmin(invs)}</tbody>
         </table>
       </div>
     </div>`;
+  if (_qAdmin) aplicarFiltroAdmin();
 }
 
 function abrirForm(id) {
