@@ -693,6 +693,9 @@ async function addValuacionProp(prop) {
   const valor = $('pvValor').value.trim();
   if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
   const rows = _inversiones.filter(i => i.propiedad === prop);
+  const ids = rows.map(r => r.id);
+  // Primero borro esa fecha en TODOS los dueños (por si alguno ya la tenía) para que quede pareja y sin duplicados
+  await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha);
   const payload = rows.map(r => ({ inversion_id: r.id, fecha, valor: Number(valor) }));
   const { data, error } = await supa.from('valuaciones').insert(payload).select();
   if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
@@ -897,43 +900,18 @@ function abrirForm(id) {
   if (id) renderHistValor(id);
 }
 
-// Historial de valuaciones de una inversión (dentro del modal de edición)
+// Historial de valuaciones (solo lectura). Se cargan/editan desde la vista "Por propiedad".
 function renderHistValor(id) {
   const cont = $('histValor'); if (!cont) return;
   const vals = _valuaciones.filter(x => x.inversion_id === id).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-  const lista = vals.map(x => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
-      <span>${fmtFecha(x.fecha)} — ${fmtUSD(x.valor)}</span>
-      <button class="btn btn-danger btn-sm" onclick="delValuacion('${x.id}','${id}')">×</button>
-    </div>`).join('') || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas todavía.</p>';
+  const lista = vals.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span>${fmtFecha(x.fecha)}</span><b>${fmtUSD(x.valor)} <span class="muted" style="font-weight:400">total</span></b>
+    </div>`).join('') || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas.</p>';
   cont.innerHTML = `
     <hr style="border:none;border-top:1px solid var(--bd);margin:16px 0 12px">
-    <label>📈 Historial de valor (para el gráfico de evolución)</label>
-    <p class="muted" style="font-size:11px;margin:-2px 0 8px">Cargá el valor TOTAL de la propiedad en distintas fechas. Cada punto arma la curva.</p>
-    <div>${lista}</div>
-    <div class="grid2" style="margin-top:10px">
-      <div><input type="date" id="vFecha"></div>
-      <div><input type="number" id="vValor" placeholder="Valor total (USD)"></div>
-    </div>
-    <button class="btn btn-sec btn-sm" onclick="addValuacion('${id}')">+ Agregar valuación</button>`;
-}
-
-async function addValuacion(invId) {
-  const fecha = $('vFecha').value;
-  const valor = $('vValor').value.trim();
-  if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
-  const { data, error } = await supa.from('valuaciones').insert({ inversion_id: invId, fecha, valor: Number(valor) }).select();
-  if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
-  if (!data || !data.length) { alert('Se guardó, pero no puedo leerla de vuelta (faltan permisos de LECTURA en la tabla "valuaciones"). Corré el SQL que te pasé.'); }
-  $('vFecha').value = ''; $('vValor').value = '';
-  await cargarValuaciones();
-  renderHistValor(invId);
-}
-
-async function delValuacion(id, invId) {
-  const { error } = await supa.from('valuaciones').delete().eq('id', id);
-  if (error) { alert('No se pudo borrar.'); console.error(error); return; }
-  await cargarValuaciones();
-  renderHistValor(invId);
+    <label>📈 Historial de valor por fecha</label>
+    <p class="muted" style="font-size:11px;margin:-2px 0 10px">Las valuaciones se cargan y editan desde la vista <b>“Por propiedad”</b> → <b>Actualizar valor</b> (se aplican a todos los dueños juntos).</p>
+    <div>${lista}</div>`;
 }
 
 // Vista previa: muestra la parte que le corresponde al inversor según su titularidad
@@ -979,11 +957,6 @@ async function guardar(id) {
   const q = id ? supa.from('inversiones').update(datos).eq('id', id) : supa.from('inversiones').insert(datos);
   const { error } = await q;
   if (error) { showErr('fErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
-  // Si quedó una valuación cargada en los campos sin tocar "+ Agregar", la guardamos igual
-  if (id && $('vFecha') && $('vFecha').value && $('vValor') && $('vValor').value.trim() !== '') {
-    const { error: eVal } = await supa.from('valuaciones').insert({ inversion_id: id, fecha: $('vFecha').value, valor: Number($('vValor').value) });
-    if (eVal) { showErr('fErr', 'La inversión se guardó, pero la valuación no: ' + (eVal.message || '')); console.error(eVal); return; }
-  }
   $('modalInv').remove();
   await cargarAdmin();
   appAlert('✓ Inversión guardada', 'ok');
