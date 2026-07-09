@@ -265,7 +265,7 @@ function chartHTML(points, opts) {
   opts = opts || {};
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
   const id = 'chart_' + (++_chartSeq);
-  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.25 });
+  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.4 });
   return `<div style="position:relative;height:${opts.height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
 }
 
