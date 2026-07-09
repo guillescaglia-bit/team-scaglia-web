@@ -34,6 +34,7 @@
   body{font-family:'Montserrat',sans-serif;background:var(--page);color:var(--tx);-webkit-font-smoothing:antialiased;min-height:100vh}
   .oculto{display:none!important}
   .container{max-width:900px;margin:0 auto;padding:20px}
+  body.wide .container{max-width:1320px}
 
   /* Header */
   header{background:var(--navy);color:#fff;padding:16px 0}
@@ -172,7 +173,7 @@
       </div>
     </div>
   </header>
-  <div class="container">
+  <div class="container" id="mainWrap">
     <div id="appAlert"></div>
     <div id="dashInversor" class="oculto"></div>
     <div id="panelAdmin" class="oculto"></div>
@@ -401,10 +402,12 @@ function entrar() {
     $('saludo').textContent = 'Panel de administración';
     $('panelAdmin').classList.remove('oculto');
     $('dashInversor').classList.add('oculto');
+    document.body.classList.add('wide');
     cargarAdmin();
   } else {
     $('dashInversor').classList.remove('oculto');
     $('panelAdmin').classList.add('oculto');
+    document.body.classList.remove('wide');
     cargarDashboard();
   }
 }
@@ -674,12 +677,14 @@ function verComoInversor(email, nombre) {
   const invs = _inversiones.filter(i => (i.inversor_email || '').toLowerCase() === (email || '').toLowerCase());
   $('panelAdmin').classList.add('oculto');
   $('dashInversor').classList.remove('oculto');
+  document.body.classList.remove('wide');
   renderDashboard(invs);
   window.scrollTo(0, 0);
 }
 function volverPanel() {
   $('dashInversor').classList.add('oculto');
   $('panelAdmin').classList.remove('oculto');
+  document.body.classList.add('wide');
   $('saludo').textContent = 'Panel de administración';
 }
 
