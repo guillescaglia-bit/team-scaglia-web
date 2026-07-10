@@ -489,7 +489,7 @@ function renderDashboard(invs) {
   $('dashInversor').innerHTML = `
     ${banner}
     <div class="kpis">
-      <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div>${invVend ? `<div class="kpi-sub muted">Neto invertido: ${fmtUSD(invCartera)}</div>` : `<div class="kpi-sub muted">Volumen invertido</div>`}</div>
+      <div class="kpi">${invVend ? `<div class="kpi-label">Neto invertido</div><div class="kpi-val">${fmtUSD(invCartera)}</div><div class="kpi-sub muted">Total invertido: ${fmtUSD(totalInvertido)}</div>` : `<div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div><div class="kpi-sub muted">Volumen invertido</div>`}</div>
       <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
       <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy)}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
       <div class="kpi"><div class="kpi-label">Importe cobrado</div><div class="kpi-val">${fmtUSD(importeCobrado)}</div><div class="kpi-sub green">${invVend ? '+' + fmtUSD(ganReal) + ' · ' + fmtPct(ganReal / invVend * 100) + ' · ventas' : 'sin ventas aún'}</div></div>
