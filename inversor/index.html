@@ -519,7 +519,56 @@ async function cargarAccesos() {
 let _inversiones = [];
 let _qAdmin = '';
 let _vistaAdmin = 'inversor';
+let _sortCol = null, _sortDir = 1; // 1 = menor a mayor, -1 = mayor a menor
 const normTxt = (s) => (s == null ? '' : '' + s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// C\u00f3mo se ordena cada columna de la tabla "Por inversor"
+const SORT_EXTRACT = {
+  inversor: i => (i.inversor_nombre || '').toLowerCase(),
+  propiedad: i => (i.propiedad || '').toLowerCase(),
+  pct: i => (i.titularidad == null || i.titularidad === '') ? 100 : Number(i.titularidad),
+  fecha: i => i.fecha || '',
+  pagado: i => (i.pagado == null || i.pagado === '') ? -Infinity : Number(i.pagado),
+  mercado: i => (i.precio_mercado == null || i.precio_mercado === '') ? -Infinity : Number(i.precio_mercado),
+  venta: i => (i.precio_venta == null || i.precio_venta === '') ? -Infinity : Number(i.precio_venta),
+  ganancia: i => { const p = pctDe(i); return p == null ? -Infinity : p; },
+  estado: i => estadoDe(i)
+};
+
+function ordenarInvs(list) {
+  if (!_sortCol || !SORT_EXTRACT[_sortCol]) return list;
+  const ex = SORT_EXTRACT[_sortCol];
+  return [...list].sort((a, b) => {
+    const va = ex(a), vb = ex(b);
+    if (va < vb) return -_sortDir;
+    if (va > vb) return _sortDir;
+    return 0;
+  });
+}
+
+function setSortAdmin(col) {
+  if (_sortCol === col) _sortDir = -_sortDir; else { _sortCol = col; _sortDir = 1; }
+  pintarAdmin();
+}
+
+// Lista filtrada (por buscador) + ordenada (por columna), para la tabla "Por inversor"
+function listaInversorAdmin() {
+  const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
+  const filtrada = _inversiones.filter(inv => {
+    const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
+    return toks.every(t => hay.includes(t));
+  });
+  return ordenarInvs(filtrada);
+}
+
+function thSort(col, label) {
+  const flecha = _sortCol === col ? (_sortDir === 1 ? ' \u25b2' : ' \u25bc') : '';
+  return `<th onclick="setSortAdmin('${col}')" style="cursor:pointer;user-select:none;white-space:nowrap">${label}<span style="color:var(--navy)">${flecha}</span></th>`;
+}
+
+function theadAdmin() {
+  return `<tr>${thSort('inversor', 'Inversor')}${thSort('propiedad', 'Propiedad')}${thSort('pct', '%')}${thSort('fecha', 'Fecha')}${thSort('pagado', 'Pagado (total)')}${thSort('mercado', 'Mercado (total)')}${thSort('venta', 'Venta (total)')}${thSort('ganancia', 'Ganancia')}${thSort('estado', 'Estado')}<th>Acciones</th></tr>`;
+}
 
 function filasAdmin(list) {
   if (!list.length) return `<tr><td colspan="11" class="empty">${_qAdmin ? 'No hay resultados para “' + _qAdmin + '”.' : 'Todavía no hay inversiones. Agregá la primera.'}</td></tr>`;
@@ -557,11 +606,7 @@ function aplicarFiltroAdmin() {
     if ($('cliCount')) $('cliCount').textContent = l.length;
     return;
   }
-  const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
-  const list = _inversiones.filter(inv => {
-    const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
-    return toks.every(t => hay.includes(t));
-  });
+  const list = listaInversorAdmin();
   if ($('admBody')) $('admBody').innerHTML = filasAdmin(list);
   if ($('admCount')) $('admCount').textContent = list.length;
 }
@@ -678,21 +723,22 @@ function pintarAdmin() {
       <div id="propWrap">${tarjetasPropiedad(gF)}</div>`;
     return;
   }
+  const listaInv = listaInversorAdmin();
   $('panelAdmin').innerHTML = `
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
-        <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${_inversiones.length}</span> de ${_inversiones.length})</div>
+        <div class="card-title" style="margin:0">Inversiones cargadas (<span id="admCount">${listaInv.length}</span> de ${_inversiones.length})</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">${toggleVistaHTML()}<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva inversión</button></div>
       </div>
       <input type="text" id="qAdmin" value="${qEsc}" oninput="aplicarFiltroAdmin()" placeholder="🔎 Buscar por nombre, dirección, mail…" style="margin-bottom:14px">
+      <p class="muted" style="font-size:11px;margin:-6px 0 12px">Tocá un título de columna para ordenar (▲ menor a mayor · ▼ mayor a menor).</p>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Inversor</th><th>Propiedad</th><th>%</th><th>Fecha</th><th>Pagado (total)</th><th>Mercado (total)</th><th>Venta (total)</th><th>Ganancia</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="admBody">${filasAdmin(_inversiones)}</tbody>
+          <thead>${theadAdmin()}</thead>
+          <tbody id="admBody">${filasAdmin(listaInv)}</tbody>
         </table>
       </div>
     </div>`;
-  if (_qAdmin) aplicarFiltroAdmin();
 }
 
 // ── Vista "por propiedad": agrupa los inversores de una misma unidad ──
