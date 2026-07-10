@@ -624,9 +624,23 @@ function toggleVistaHTML() {
   </div>`;
 }
 
+// Accesos de mails que entraron pero NO están asignados a ninguna inversión (mail sin enlazar)
+function accesosHuerfanos() {
+  const emails = new Set(clientesConAccesos().map(c => c.email.toLowerCase()));
+  return Object.values(_accesos)
+    .filter(a => { const e = (a.email || '').toLowerCase(); return e && !esAdmin(e) && !emails.has(e); })
+    .sort((a, b) => new Date(b.ultimo_acceso || 0) - new Date(a.ultimo_acceso || 0));
+}
+
 function pintarAdmin() {
   const qEsc = _qAdmin.replace(/"/g, '&quot;');
   if (_vistaAdmin === 'clientes') {
+    const huerfanos = accesosHuerfanos();
+    const cardHuerfanos = huerfanos.length ? `<div class="card">
+        <div class="card-title" style="color:var(--danger);margin-bottom:6px">⚠ Entraron pero su mail no está en ninguna inversión (${huerfanos.length})</div>
+        <p class="muted" style="font-size:12px;margin:0 0 10px">Estas personas ingresaron al portal pero su mail todavía no está asignado a una inversión. Asignáselo (en “Por inversor” → Editar → Email) para enlazarlo.</p>
+        ${huerfanos.map(a => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${a.email}</span><span class="muted">${a.accesos} acceso(s) · ${fmtFechaHora(a.ultimo_acceso)}</span></div>`).join('')}
+      </div>` : '';
     const total = clientesConAccesos().length;
     const lista = clientesFiltrados();
     $('panelAdmin').innerHTML = `
@@ -645,7 +659,8 @@ function pintarAdmin() {
             <tbody id="cliBody">${filasClientes(lista)}</tbody>
           </table>
         </div>
-      </div>`;
+      </div>
+      ${cardHuerfanos}`;
     return;
   }
   if (_vistaAdmin === 'propiedad') {
