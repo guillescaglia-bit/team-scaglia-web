@@ -340,6 +340,12 @@
             max-width: 400px;
         }
 
+        /* En modo noche la tarjeta se oscurece (si no, queda texto claro sobre blanco) */
+        body.dark-mode .login-box {
+            background: var(--bg-secondary);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
         .login-box h1 {
             font-family: 'Cormorant Garamond', serif;
             color: var(--primary);
