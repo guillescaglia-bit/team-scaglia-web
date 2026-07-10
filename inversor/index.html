@@ -445,6 +445,7 @@ function renderDashboard(invs) {
   const ganReal = vendidas.reduce((a, i) => a + (resultadoDe(i) || 0), 0);
   const invCartera = cartera.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
   const invVend = vendidas.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
+  const importeCobrado = vendidas.reduce((a, i) => a + (valorInv(i) || 0), 0); // lo que cobraste por las ventas (tu parte)
 
   // Cada card: resumen + info + su gráfico de evolución adentro
   const cards = invs.map(inv => {
@@ -488,10 +489,10 @@ function renderDashboard(invs) {
   $('dashInversor').innerHTML = `
     ${banner}
     <div class="kpis">
-      <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div></div>
+      <div class="kpi"><div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div>${invVend ? `<div class="kpi-sub muted">incl. ${fmtUSD(invVend)} ya cobrados</div>` : `<div class="kpi-sub muted">Volumen invertido</div>`}</div>
       <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
       <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy)}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
-      <div class="kpi"><div class="kpi-label">Ganancia realizada</div><div class="kpi-val green">+${fmtUSD(ganReal)}</div><div class="kpi-sub green">${invVend ? fmtPct(ganReal / invVend * 100) + ' · vendidas' : 'sin ventas aún'}</div></div>
+      <div class="kpi"><div class="kpi-label">Importe cobrado</div><div class="kpi-val">${fmtUSD(importeCobrado)}</div><div class="kpi-sub green">${invVend ? '+' + fmtUSD(ganReal) + ' · ' + fmtPct(ganReal / invVend * 100) + ' · ventas' : 'sin ventas aún'}</div></div>
     </div>
     <div class="props">${cards}</div>
     ${globalChart}`;
