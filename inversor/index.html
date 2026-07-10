@@ -215,12 +215,12 @@ async function cargarValuaciones() {
   _valuaciones = data || [];
 }
 
-// Puntos de la línea de tiempo del valor de una propiedad (la PARTE del inversor)
+// Puntos de la línea de tiempo del valor REAL de una propiedad (la PARTE del inversor)
 function timelinePropiedad(inv) {
   const c = cuota(inv);
   const pts = [];
   if (inv.fecha && inv.pagado != null && inv.pagado !== '') pts.push({ t: new Date(inv.fecha), v: Number(inv.pagado) * c });
-  _valuaciones.filter(x => x.inversion_id === inv.id).forEach(x => pts.push({ t: new Date(x.fecha), v: Number(x.valor) * c }));
+  _valuaciones.filter(x => x.inversion_id === inv.id && !x.proyectado).forEach(x => pts.push({ t: new Date(x.fecha), v: Number(x.valor) * c }));
   const ref = refTotal(inv);
   if (ref != null) {
     const fref = estadoDe(inv) === 'vendida' ? new Date(inv.fecha_venta || inv.creado_en) : new Date();
@@ -229,6 +229,18 @@ function timelinePropiedad(inv) {
   }
   pts.sort((a, b) => a.t - b.t);
   return pts;
+}
+
+// Puntos de PROYECCIÓN a futuro (línea punteada). Arranca en el último valor real para conectar.
+function timelineProyeccion(inv) {
+  const c = cuota(inv);
+  const proy = _valuaciones.filter(x => x.inversion_id === inv.id && x.proyectado)
+    .map(x => ({ t: new Date(x.fecha), v: Number(x.valor) * c }))
+    .sort((a, b) => a.t - b.t);
+  if (!proy.length) return [];
+  const real = timelinePropiedad(inv);
+  const ancla = real.length ? real[real.length - 1] : null;
+  return ancla ? [ancla, ...proy] : proy;
 }
 
 // Valor total de la cartera del inversor en el tiempo (suma de las propiedades que TIENE en cada momento).
@@ -275,7 +287,7 @@ function chartHTML(points, opts) {
   opts = opts || {};
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
   const id = 'chart_' + (++_chartSeq);
-  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.4 });
+  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.4, proj: (opts.proj || []).slice() });
   return `<div style="position:relative;height:${opts.height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
 }
 
@@ -283,18 +295,30 @@ function chartHTML(points, opts) {
 function flushCharts() {
   if (!window.Chart) { _pendingCharts = []; return; }
   const fmtAxis = v => (Math.abs(v) >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + Math.round(v));
-  _pendingCharts.forEach(({ id, points, tension }) => {
+  _pendingCharts.forEach(({ id, points, tension, proj }) => {
     const el = document.getElementById(id);
     if (!el) return;
     if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+    const tens = tension != null ? tension : 0.4;
+    const datasets = [{
+      data: points.map(p => ({ x: p.t.getTime(), y: p.v })),
+      borderColor: '#15925a', backgroundColor: 'rgba(21,146,90,.10)',
+      borderWidth: 2, fill: true, tension: tens,
+      pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#15925a'
+    }];
+    if (proj && proj.length >= 2) {
+      datasets.push({
+        data: proj.map(p => ({ x: p.t.getTime(), y: p.v })),
+        borderColor: '#9ca3af', borderDash: [6, 5], backgroundColor: 'rgba(0,0,0,0)',
+        borderWidth: 2, fill: false, tension: tens,
+        pointRadius: proj.map((p, i) => i === 0 ? 0 : 3),      // oculto el punto ancla (se pisa con el real)
+        pointHoverRadius: proj.map((p, i) => i === 0 ? 0 : 6),
+        pointBackgroundColor: '#9ca3af'
+      });
+    }
     _charts[id] = new Chart(el, {
       type: 'line',
-      data: { datasets: [{
-        data: points.map(p => ({ x: p.t.getTime(), y: p.v })),
-        borderColor: '#15925a', backgroundColor: 'rgba(21,146,90,.10)',
-        borderWidth: 2, fill: true, tension: tension != null ? tension : 0.25,
-        pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#15925a'
-      }] },
+      data: { datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
         interaction: { intersect: false, mode: 'index' },
@@ -304,7 +328,7 @@ function flushCharts() {
             padding: 10, displayColors: false,
             callbacks: {
               title: items => fmtFecha(new Date(items[0].parsed.x).toISOString().slice(0, 10)),
-              label: item => 'Valor: ' + fmtUSD(item.parsed.y)
+              label: item => (item.datasetIndex === 1 ? 'Proyectado: ' : 'Valor: ') + fmtUSD(item.parsed.y)
             }
           }
         },
@@ -808,6 +832,7 @@ function abrirPropiedad(prop) {
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">Parte de cada propietario</div>${duenos}
     </div>
     <div id="histProp"></div>
+    <div id="proyProp"></div>
     <p class="err" id="pErr"></p>
     <div style="display:flex;gap:10px">
       <button class="btn btn-sec" onclick="document.getElementById('modalProp').remove()">Cancelar</button>
@@ -816,20 +841,27 @@ function abrirPropiedad(prop) {
   </div>`;
   document.body.appendChild(modal);
   renderHistProp(prop);
+  renderProyProp(prop);
 }
 
-// Historial de valuaciones a nivel PROPIEDAD: una fecha+valor total se aplica a todos los dueños
-function renderHistProp(prop) {
-  const cont = $('histProp'); if (!cont) return;
+// Lista de valores por fecha a nivel PROPIEDAD (real o proyectado), se aplica a todos los dueños
+function _listaValProp(prop, proyectado) {
   const pe = prop.replace(/'/g, "\\'");
   const ids = _inversiones.filter(i => i.propiedad === prop).map(r => r.id);
   const byDate = new Map();
-  _valuaciones.filter(x => ids.includes(x.inversion_id)).forEach(x => { if (!byDate.has(x.fecha)) byDate.set(x.fecha, Number(x.valor)); });
+  _valuaciones.filter(x => ids.includes(x.inversion_id) && (!!x.proyectado === !!proyectado)).forEach(x => { if (!byDate.has(x.fecha)) byDate.set(x.fecha, Number(x.valor)); });
   const fechas = [...byDate.entries()].sort((a, b) => new Date(a[0]) - new Date(b[0]));
-  const lista = fechas.map(([f, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
+  return fechas.map(([f, v]) => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)">
       <span>${fmtFecha(f)} — <b>${fmtUSD(v)}</b> <span class="muted">total</span></span>
-      <button class="btn btn-danger btn-sm" onclick="delValuacionProp('${pe}','${f}')">×</button>
-    </div>`).join('') || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas todavía.</p>';
+      <button class="btn btn-danger btn-sm" onclick="delValuacionProp('${pe}','${f}',${proyectado ? 'true' : 'false'})">×</button>
+    </div>`).join('');
+}
+
+// Historial de valor REAL por fecha
+function renderHistProp(prop) {
+  const cont = $('histProp'); if (!cont) return;
+  const pe = prop.replace(/'/g, "\\'");
+  const lista = _listaValProp(prop, false) || '<p class="muted" style="font-size:12px;margin:6px 0">Sin valuaciones cargadas todavía.</p>';
   cont.innerHTML = `
     <hr style="border:none;border-top:1px solid var(--bd);margin:16px 0 12px">
     <label>📈 Historial de valor por fecha (para el gráfico de evolución)</label>
@@ -839,32 +871,50 @@ function renderHistProp(prop) {
       <div><input type="date" id="pvFecha"></div>
       <div><input type="number" id="pvValor" placeholder="Valor total (USD)"></div>
     </div>
-    <button class="btn btn-sec btn-sm" onclick="addValuacionProp('${pe}')">+ Agregar valuación</button>`;
+    <button class="btn btn-sec btn-sm" onclick="addValuacionProp('${pe}',false)">+ Agregar valuación</button>`;
 }
 
-async function addValuacionProp(prop) {
-  const fecha = $('pvFecha').value;
-  const valor = $('pvValor').value.trim();
+// Proyección a FUTURO (línea punteada gris)
+function renderProyProp(prop) {
+  const cont = $('proyProp'); if (!cont) return;
+  const pe = prop.replace(/'/g, "\\'");
+  const lista = _listaValProp(prop, true) || '<p class="muted" style="font-size:12px;margin:6px 0">Sin proyección cargada.</p>';
+  cont.innerHTML = `
+    <hr style="border:none;border-top:1px dashed var(--bd);margin:16px 0 12px">
+    <label>🔮 Proyección a futuro (se dibuja punteada en gris)</label>
+    <p class="muted" style="font-size:11px;margin:-2px 0 8px">Cargá el valor <b>TOTAL</b> estimado en fechas <b>futuras</b> (ej: fin 2026, fin 2027). Cada inversor ve su parte según el %.</p>
+    <div>${lista}</div>
+    <div class="grid2" style="margin-top:10px">
+      <div><input type="date" id="pyFecha"></div>
+      <div><input type="number" id="pyValor" placeholder="Valor total estimado (USD)"></div>
+    </div>
+    <button class="btn btn-sec btn-sm" onclick="addValuacionProp('${pe}',true)">+ Agregar proyección</button>`;
+}
+
+async function addValuacionProp(prop, proyectado) {
+  const fIn = proyectado ? 'pyFecha' : 'pvFecha', vIn = proyectado ? 'pyValor' : 'pvValor';
+  const fecha = $(fIn).value;
+  const valor = $(vIn).value.trim();
   if (!fecha || valor === '') { alert('Poné fecha y valor.'); return; }
   const rows = _inversiones.filter(i => i.propiedad === prop);
   const ids = rows.map(r => r.id);
-  // Primero borro esa fecha en TODOS los dueños (por si alguno ya la tenía) para que quede pareja y sin duplicados
-  await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha);
-  const payload = rows.map(r => ({ inversion_id: r.id, fecha, valor: Number(valor) }));
+  // Borro esa fecha (del mismo tipo) en TODOS los dueños para que quede pareja y sin duplicados
+  await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha).eq('proyectado', !!proyectado);
+  const payload = rows.map(r => ({ inversion_id: r.id, fecha, valor: Number(valor), proyectado: !!proyectado }));
   const { data, error } = await supa.from('valuaciones').insert(payload).select();
   if (error) { alert('No se pudo agregar: ' + (error.message || '')); console.error(error); return; }
   if (!data || !data.length) { alert('Se guardó, pero no puedo leerla de vuelta (faltan permisos de LECTURA en "valuaciones"). Corré el SQL que te pasé.'); }
-  $('pvFecha').value = ''; $('pvValor').value = '';
+  $(fIn).value = ''; $(vIn).value = '';
   await cargarValuaciones();
-  renderHistProp(prop);
+  if (proyectado) renderProyProp(prop); else renderHistProp(prop);
 }
 
-async function delValuacionProp(prop, fecha) {
+async function delValuacionProp(prop, fecha, proyectado) {
   const ids = _inversiones.filter(i => i.propiedad === prop).map(r => r.id);
-  const { error } = await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha);
+  const { error } = await supa.from('valuaciones').delete().in('inversion_id', ids).eq('fecha', fecha).eq('proyectado', !!proyectado);
   if (error) { alert('No se pudo borrar.'); console.error(error); return; }
   await cargarValuaciones();
-  renderHistProp(prop);
+  if (proyectado) renderProyProp(prop); else renderHistProp(prop);
 }
 
 function prevProp(prop) {
@@ -1150,7 +1200,9 @@ function verDetalleInversion(id) {
   const res = resultadoDe(inv);
   const dias = diasDe(inv);
   const pts = timelinePropiedad(inv);
-  const vals = _valuaciones.filter(x => x.inversion_id === id).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  const proy = timelineProyeccion(inv);
+  const proyFin = proy.length ? proy[proy.length - 1] : null;
+  const vals = _valuaciones.filter(x => x.inversion_id === id && !x.proyectado).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
   const histRows = vals.length ? vals.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${fmtFecha(x.fecha)}</span><b>${fmtUSD(Number(x.valor) * cuota(inv))}</b></div>`).join('') : '';
   $('dashInversor').innerHTML = `
     <button class="btn btn-sec btn-sm" style="margin-bottom:14px" onclick="volverDashboard()">← Volver</button>
@@ -1174,7 +1226,8 @@ function verDetalleInversion(id) {
     </div>
     <div class="card">
       <div class="card-title">📈 Evolución del valor (tu parte)</div>
-      ${chartHTML(pts)}
+      ${chartHTML(pts, { proj: proy })}
+      ${proyFin ? `<p class="muted" style="font-size:11px;margin:8px 0 0"><span style="color:#9ca3af">- - -</span> Proyección · a <b>${fmtFecha(proyFin.t.toISOString().slice(0, 10))}</b> estimado en <b>${fmtUSD(proyFin.v)}</b> (tu parte)</p>` : ''}
     </div>
     ${histRows ? `<div class="card"><div class="card-title">Historial de valuaciones (tu parte)</div>${histRows}</div>` : ''}`;
   flushCharts();
