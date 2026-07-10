@@ -231,27 +231,37 @@ function timelinePropiedad(inv) {
   return pts;
 }
 
-// Valor total de la cartera del inversor en el tiempo (suma de todas sus propiedades).
-// En la fecha en que ARRANCA una propiedad (aporte de capital) se agrega un "escalón":
-// un punto con el total ANTES del aporte y otro con el total DESPUÉS, para que se vea el salto.
+// Valor total de la cartera del inversor en el tiempo (suma de las propiedades que TIENE en cada momento).
+// - En la fecha en que COMPRA una propiedad (aporte de capital) → escalón hacia ARRIBA.
+// - En la fecha en que VENDE una propiedad → esa plata sale del portfolio → escalón hacia ABAJO.
 function timelineGlobal(invs) {
   const series = invs.map(inv => {
     const pts = timelinePropiedad(inv);
-    return { start: pts.length ? pts[0].t.getTime() : null, pts };
+    let saleT = null;
+    if (estadoDe(inv) === 'vendida') { const d = new Date(inv.fecha_venta || inv.creado_en); d.setHours(0, 0, 0, 0); saleT = d.getTime(); }
+    return { start: pts.length ? pts[0].t.getTime() : null, saleT, pts };
   }).filter(s => s.start != null);
-  // valor de una propiedad en el momento t (0 si todavía no la había comprado)
-  const valAt = (pts, t) => { let v = 0; for (const p of pts) { if (p.t.getTime() <= t) v = p.v; else break; } return v; };
+  // valor de una propiedad en el momento t: 0 antes de comprarla y 0 después de venderla
+  const valAt = (s, t) => {
+    if (t < s.start) return 0;
+    if (s.saleT != null && t > s.saleT) return 0;
+    let v = 0; for (const p of s.pts) { if (p.t.getTime() <= t) v = p.v; else break; } return v;
+  };
   const allT = [...new Set(series.flatMap(s => s.pts.map(p => p.t.getTime())))].sort((a, b) => a - b);
   const out = [];
   allT.forEach(t => {
-    const hayAporte = series.some(s => s.start === t);
-    // Punto "justo antes": total contando solo las propiedades que YA tenías (sin el aporte de hoy)
-    if (hayAporte && out.length) {
-      const pre = series.filter(s => s.start < t).reduce((sum, s) => sum + valAt(s.pts, t), 0);
+    // Compra (aporte): punto "justo antes" contando solo lo que YA tenías → escalón hacia arriba
+    if (series.some(s => s.start === t) && out.length) {
+      const pre = series.reduce((sum, s) => sum + (s.start < t ? valAt(s, t) : 0), 0);
       out.push({ t: new Date(t), v: pre });
     }
-    const total = series.reduce((sum, s) => sum + valAt(s.pts, t), 0);
+    const total = series.reduce((sum, s) => sum + valAt(s, t), 0);
     out.push({ t: new Date(t), v: total });
+    // Venta: punto "justo después" sin la propiedad vendida → escalón hacia abajo
+    if (series.some(s => s.saleT === t)) {
+      const totalDespues = series.reduce((sum, s) => sum + (s.saleT === t ? 0 : valAt(s, t)), 0);
+      out.push({ t: new Date(t), v: totalDespues });
+    }
   });
   return out;
 }
