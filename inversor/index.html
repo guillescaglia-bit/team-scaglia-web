@@ -482,7 +482,10 @@ function renderDashboard(invs) {
       <div class="card prop">
         <div class="prop-head">
           <div class="prop-name">${inv.propiedad}</div>
-          <span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span>
+            ${condTag(inv.condicion)}
+          </div>
         </div>
         <div class="prop-grid">
           <div><span>Titularidad</span><b>${inv.titularidad != null ? inv.titularidad + '%' : '—'}</b></div>
@@ -1232,6 +1235,7 @@ function verDetalleInversion(id) {
         <div><span>Ganancia</span><b class="${(pctDe(inv) || 0) >= 0 ? 'green' : ''}">${fmtPct(pctDe(inv))}</b></div>
         ${cuota(inv) < 1 && refTotal(inv) != null ? `<div><span>Valor total propiedad</span><b>${fmtUSD(refTotal(inv))}</b></div>` : ''}
         <div><span>${est === 'vendida' ? 'Tiempo hasta la venta' : 'Tiempo'}</span><b>${dias != null ? dias + ' días' : '—'}</b></div>
+        <div><span>Condición</span><b>${condTag(inv.condicion)} ${(inv.condicion === 'B') ? 'No declarada' : 'Declarada'}</b></div>
       </div>
       ${inv.tc ? `<div class="prop-foot">TC al comprar: ${Number(inv.tc).toLocaleString('es-AR')}</div>` : ''}
     </div>
