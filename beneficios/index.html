@@ -1210,7 +1210,7 @@
                             <div style="display:flex; gap:8px;">
                                 <select id="regCumpleDia" style="flex:1;"><option value="">Día</option></select>
                                 <select id="regCumpleMes" style="flex:1.5;"><option value="">Mes</option></select>
-                                <select id="regCumpleAnio" style="flex:1.2;"><option value="">Año</option></select>
+                                <input type="number" id="regCumpleAnio" style="flex:1.2;" placeholder="Año" inputmode="numeric">
                             </div>
                         </div>
                         <div class="form-group">
@@ -1818,6 +1818,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
 
             if (!nombre || !email || !telefono || !cumple || !agenteIds.length || !operacion || !direccion) {
                 showAlert('vistaLogin', 'Completá todos los campos (incluí al menos un agente)', 'error');
+                return;
+            }
+            const anioNum = parseInt(cAnio, 10);
+            if (!anioNum || anioNum < 1920 || anioNum > new Date().getFullYear() - 16) {
+                showAlert('vistaLogin', 'Revisá el año de nacimiento (poné el año completo, ej: 1985).', 'error');
                 return;
             }
             if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -2897,8 +2902,10 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
             for (let d = 1; d <= 31; d++) dia.innerHTML += `<option value="${String(d).padStart(2,'0')}">${d}</option>`;
             meses.forEach((m, i) => mes.innerHTML += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
+            // El año es un campo para escribir (más cómodo en mobile que un desplegable largo)
             const hoy = new Date().getFullYear();
-            for (let y = hoy - 16; y >= 1940; y--) anio.innerHTML += `<option value="${y}">${y}</option>`;
+            anio.min = 1920;
+            anio.max = hoy - 16;
         }
 
         // Clientes del agente logueado (solo los que se registraron con él)
