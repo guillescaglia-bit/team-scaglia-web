@@ -208,6 +208,8 @@ const valorInv = (inv) => { const v = refTotal(inv); return v == null ? null : v
 function resultadoDe(inv) { const p = pagadoInv(inv), v = valorInv(inv); return (p == null || v == null) ? null : v - p; }
 function pctDe(inv) { const r = resultadoDe(inv), p = pagadoInv(inv); return (r == null || !p) ? null : (r / p) * 100; }
 const fmtPct = (p) => p == null ? '—' : (p >= 0 ? '+' : '') + p.toFixed(0) + '%';
+// Etiqueta de condición de la operación: A = declarada, B = no declarada (uso interno del admin)
+const condTag = (c) => { const v = (c === 'B') ? 'B' : 'A'; const decl = v === 'A'; return `<span class="tag" style="background:${decl ? 'rgba(21,146,90,.15)' : 'rgba(180,120,10,.18)'};color:${decl ? 'var(--green)' : '#9a6a00'}" title="${decl ? 'Declarada' : 'No declarada'}">${v}</span>`; };
 
 let _valuaciones = [];
 async function cargarValuaciones() {
@@ -556,7 +558,8 @@ const SORT_EXTRACT = {
   mercado: i => (i.precio_mercado == null || i.precio_mercado === '') ? -Infinity : Number(i.precio_mercado),
   venta: i => (i.precio_venta == null || i.precio_venta === '') ? -Infinity : Number(i.precio_venta),
   ganancia: i => { const p = pctDe(i); return p == null ? -Infinity : p; },
-  estado: i => estadoDe(i)
+  estado: i => estadoDe(i),
+  condicion: i => (i.condicion || 'A')
 };
 
 function ordenarInvs(list) {
@@ -579,7 +582,7 @@ function setSortAdmin(col) {
 function listaInversorAdmin() {
   const toks = normTxt(_qAdmin).split(/\s+/).filter(Boolean);
   const filtrada = _inversiones.filter(inv => {
-    const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera'].join(' '));
+    const hay = normTxt([inv.inversor_nombre, inv.propiedad, inv.inversor_email, inv.titularidad, estadoDe(inv) === 'vendida' ? 'vendida' : 'cartera', inv.condicion === 'B' ? 'condicion b no declarada' : 'condicion a declarada'].join(' '));
     return toks.every(t => hay.includes(t));
   });
   return ordenarInvs(filtrada);
@@ -591,7 +594,7 @@ function thSort(col, label) {
 }
 
 function theadAdmin() {
-  return `<tr>${thSort('inversor', 'Inversor')}${thSort('propiedad', 'Propiedad')}${thSort('pct', '%')}${thSort('fecha', 'Fecha')}${thSort('pagado', 'Pagado (total)')}${thSort('mercado', 'Mercado (total)')}${thSort('venta', 'Venta (total)')}${thSort('ganancia', 'Ganancia')}${thSort('estado', 'Estado')}<th>Acciones</th></tr>`;
+  return `<tr>${thSort('inversor', 'Inversor')}${thSort('propiedad', 'Propiedad')}${thSort('pct', '%')}${thSort('fecha', 'Fecha')}${thSort('pagado', 'Pagado (total)')}${thSort('mercado', 'Mercado (total)')}${thSort('venta', 'Venta (total)')}${thSort('ganancia', 'Ganancia')}${thSort('estado', 'Estado')}${thSort('condicion', 'Cond.')}<th>Acciones</th></tr>`;
 }
 
 function filasAdmin(list) {
@@ -607,6 +610,7 @@ function filasAdmin(list) {
       <td>${fmtUSD(inv.precio_venta)}</td>
       <td class="${(resultadoDe(inv) || 0) >= 0 ? 'green' : ''}">${resultadoDe(inv) == null ? '—' : fmtPct(pctDe(inv))}</td>
       <td><span class="tag ${estadoDe(inv) === 'vendida' ? 'tag-sold' : 'tag-hold'}">${estadoDe(inv) === 'vendida' ? 'Vendida' : 'Cartera'}</span></td>
+      <td>${condTag(inv.condicion)}</td>
       <td><div class="actions">
         <button class="btn btn-sec btn-sm" onclick="verComoInversor('${inv.inversor_email}', '${(inv.inversor_nombre || '').replace(/'/g, "\\'")}')">Ver</button>
         <button class="btn btn-sec btn-sm" onclick="abrirForm('${inv.id}')">Editar</button>
@@ -799,6 +803,7 @@ function tarjetasPropiedad(groups) {
         <div><div class="muted">Pagado total</div><b>${fmtUSD(ref.pagado)}</b></div>
         <div><div class="muted">${est === 'vendida' ? 'Venta total' : 'Mercado total'}</div><b>${fmtUSD(totalActual)}</b></div>
         <div><div class="muted">Titularidad cargada</div><b${sumaTit !== 100 ? ' style="color:var(--danger)"' : ''}>${sumaTit}%</b></div>
+        <div><div class="muted">Condición</div>${condTag(ref.condicion)}</div>
       </div>
       <div>${duenos}</div>
       <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="abrirPropiedad('${prop.replace(/'/g, "\\'")}')">Actualizar valor</button>
@@ -827,7 +832,7 @@ function abrirPropiedad(prop) {
       <div><label>Valor de mercado — total (USD)</label><input type="number" id="pMercado" value="${val(ref.precio_mercado)}" oninput="prevProp('${pe}')"></div>
       <div><label>Precio venta — total (USD)</label><input type="number" id="pVenta" value="${val(ref.precio_venta)}" placeholder="(si se vendió)" oninput="prevProp('${pe}')"></div>
     </div>
-    <div class="grid2"><div><label>Fecha de venta</label><input type="date" id="pVentaFecha" value="${val(ref.fecha_venta)}"></div><div></div></div>
+    <div class="grid2"><div><label>Fecha de venta</label><input type="date" id="pVentaFecha" value="${val(ref.fecha_venta)}"></div><div><label>Condición</label><select id="pCondicion"><option value="A"${(ref.condicion || 'A') === 'A' ? ' selected' : ''}>A · Declarada</option><option value="B"${ref.condicion === 'B' ? ' selected' : ''}>B · No declarada</option></select></div></div>
     <div style="background:var(--page);border-radius:8px;padding:10px 12px;margin:2px 0 14px">
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">Parte de cada propietario</div>${duenos}
     </div>
@@ -931,7 +936,7 @@ function prevProp(prop) {
 
 async function guardarPropiedad(prop) {
   const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
-  const datos = { precio_mercado: num('pMercado'), precio_venta: num('pVenta'), fecha_venta: $('pVentaFecha').value || null };
+  const datos = { precio_mercado: num('pMercado'), precio_venta: num('pVenta'), fecha_venta: $('pVentaFecha').value || null, condicion: $('pCondicion').value || 'A' };
   const { error } = await supa.from('inversiones').update(datos).eq('propiedad', prop);
   if (error) { showErr('pErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
   const m = document.getElementById('modalProp'); if (m) m.remove();
@@ -1012,6 +1017,10 @@ function abrirNueva() {
       <div><label>Precio venta — total (USD)</label><input type="number" id="nVenta" placeholder="(si se vendió)"></div>
       <div><label>Fecha de venta</label><input type="date" id="nVentaFecha"></div>
     </div>
+    <div class="grid2">
+      <div><label>Condición de la operación</label><select id="nCondicion"><option value="A">A · Declarada</option><option value="B">B · No declarada</option></select></div>
+      <div></div>
+    </div>
     <p class="muted" style="font-size:11px;margin:2px 0 12px">Poné los valores <b>TOTALES</b> de la propiedad. Abajo definís quiénes son los dueños y su %.</p>
     <label>Propietarios (elegí un cliente o escribí uno nuevo)</label>
     <div id="owners"></div>
@@ -1039,7 +1048,8 @@ async function guardarNueva() {
     tc: num('nTC'),
     precio_mercado: num('nMercado'),
     precio_venta: num('nVenta'),
-    fecha_venta: $('nVentaFecha').value || null
+    fecha_venta: $('nVentaFecha').value || null,
+    condicion: $('nCondicion').value || 'A'
   };
   const rows = [...document.querySelectorAll('#owners .owner-row')];
   const owners = [];
@@ -1087,7 +1097,7 @@ function abrirForm(id) {
         </div>
         <div class="grid2">
           <div><label>Fecha de venta</label><input type="date" id="fVentaFecha" value="${v(inv.fecha_venta)}"></div>
-          <div></div>
+          <div><label>Condición</label><select id="fCondicion"><option value="A"${(inv.condicion || 'A') === 'A' ? ' selected' : ''}>A · Declarada</option><option value="B"${inv.condicion === 'B' ? ' selected' : ''}>B · No declarada</option></select></div>
         </div>
         <p class="muted" style="font-size:11px;margin:2px 0 6px">Poné el valor <b>TOTAL de la propiedad</b>. Según la titularidad %, se calcula la parte del inversor.</p>
         <div id="fPreview" style="font-size:12.5px;font-weight:600;margin:0 0 14px;color:var(--navy)"></div>
@@ -1156,7 +1166,8 @@ async function guardar(id) {
     tc: numOrNull('fTC'),
     precio_mercado: numOrNull('fMercado'),
     precio_venta: numOrNull('fVenta'),
-    fecha_venta: $('fVentaFecha').value || null
+    fecha_venta: $('fVentaFecha').value || null,
+    condicion: $('fCondicion').value || 'A'
   };
   const q = id ? supa.from('inversiones').update(datos).eq('id', id) : supa.from('inversiones').insert(datos);
   const { error } = await q;
