@@ -1210,7 +1210,7 @@
                             <div style="display:flex; gap:8px;">
                                 <select id="regCumpleDia" style="flex:1;"><option value="">Día</option></select>
                                 <select id="regCumpleMes" style="flex:1.5;"><option value="">Mes</option></select>
-                                <input type="number" id="regCumpleAnio" list="listaAnios" style="flex:1.2;" placeholder="Año" inputmode="numeric">
+                                <input type="text" id="regCumpleAnio" list="listaAnios" style="flex:1.2;" placeholder="Año" inputmode="numeric" maxlength="4" pattern="\d*" autocomplete="bday-year">
                                 <datalist id="listaAnios"></datalist>
                             </div>
                         </div>
