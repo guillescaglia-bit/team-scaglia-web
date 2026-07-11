@@ -392,6 +392,14 @@
             background-size: 12px;
             padding-right: 30px;
         }
+        /* Oculto la flechita NATIVA (Android/Chrome la agrega) para no tener dos */
+        .year-input::-webkit-calendar-picker-indicator,
+        .year-input::-webkit-list-button {
+            display: none !important;
+            opacity: 0;
+            -webkit-appearance: none;
+            appearance: none;
+        }
 
         textarea {
             width: 100%;
