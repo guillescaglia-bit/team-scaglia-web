@@ -960,6 +960,45 @@ async function guardarPropiedad(prop) {
   appAlert('✓ Propiedad actualizada', 'ok');
 }
 
+// ── Editor de gastos de compra (monto de la unidad + gastos con concepto y precio) ──
+let _gastoSeq = 0;
+function gastoRowHTML(concepto, monto) {
+  const i = ++_gastoSeq;
+  return `<div class="gasto-row" id="ga_${i}" style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+    <input class="gConcepto" placeholder="Concepto (ej: Comisión, Sellos)" value="${(concepto == null ? '' : ('' + concepto)).replace(/"/g, '&quot;')}" style="flex:1;margin:0">
+    <input class="gMonto" type="number" placeholder="0" value="${monto == null ? '' : monto}" oninput="recalcInv()" style="width:110px;margin:0">
+    <button type="button" class="btn btn-danger btn-sm" onclick="quitarGasto('ga_${i}')">×</button>
+  </div>`;
+}
+function gastosEditorHTML(montoUnidad, gastosArr) {
+  _gastoSeq = 0;
+  const rows = (Array.isArray(gastosArr) ? gastosArr : []).map(g => gastoRowHTML(g.concepto, g.monto)).join('');
+  return `
+    <label>Monto de la unidad — total (USD)</label>
+    <input type="number" id="montoUnidad" value="${montoUnidad == null ? '' : montoUnidad}" placeholder="100000" oninput="recalcInv()">
+    <label style="margin-top:2px">Gastos adicionales <span class="muted" style="font-weight:400">(comisión, sellos, etc.)</span></label>
+    <div id="gastos">${rows}</div>
+    <button type="button" class="btn btn-sec btn-sm" onclick="agregarGasto('','')">+ Agregar gasto</button>
+    <div id="totalInvPrev" style="font-size:13px;font-weight:600;margin:10px 0 2px;color:var(--navy)"></div>`;
+}
+function agregarGasto(concepto, monto) { const c = $('gastos'); if (c) { c.insertAdjacentHTML('beforeend', gastoRowHTML(concepto, monto)); recalcInv(); } }
+function quitarGasto(rid) { const el = document.getElementById(rid); if (el) el.remove(); recalcInv(); }
+function leerGastos() {
+  return [...document.querySelectorAll('#gastos .gasto-row')]
+    .map(r => ({ concepto: r.querySelector('.gConcepto').value.trim(), monto: Number(r.querySelector('.gMonto').value) || 0 }))
+    .filter(g => g.concepto || g.monto);
+}
+function totalInversionForm() {
+  const u = parseFloat($('montoUnidad') ? $('montoUnidad').value : '') || 0;
+  const g = leerGastos().reduce((s, x) => s + (x.monto || 0), 0);
+  return u + g;
+}
+function recalcInv() {
+  const el = $('totalInvPrev');
+  if (el) el.innerHTML = `Total de inversión: <b>${fmtUSD(totalInversionForm())}</b>`;
+  if ($('fTit')) prevParte();     // preview de la parte del inversor en "Editar"
+}
+
 // ── Nueva inversión: una propiedad + varios propietarios (cliente + %) en una sola carga ──
 let _ownerSeq = 0;
 
@@ -1025,9 +1064,10 @@ function abrirNueva() {
       <div><label>Fecha de compra</label><input type="date" id="nFecha"></div>
       <div><label>TC (referencia)</label><input type="number" id="nTC" placeholder="1170"></div>
     </div>
+    ${gastosEditorHTML(null, [])}
     <div class="grid2">
-      <div><label>Pagado — total propiedad (USD)</label><input type="number" id="nPagado" placeholder="80000"></div>
       <div><label>P. de Mercado — total (USD)</label><input type="number" id="nMercado" placeholder="141552"></div>
+      <div></div>
     </div>
     <div class="grid2">
       <div><label>Precio venta — total (USD)</label><input type="number" id="nVenta" placeholder="(si se vendió)"></div>
@@ -1051,6 +1091,7 @@ function abrirNueva() {
   document.body.appendChild(modal);
   agregarOwner();
   toggleDecl('n');
+  recalcInv();
 }
 
 async function guardarNueva() {
@@ -1058,10 +1099,14 @@ async function guardarNueva() {
   clearErr('nErr');
   if (!propiedad) { showErr('nErr', 'Poné la propiedad.'); return; }
   const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
+  const gastos = leerGastos();
+  const montoUnidad = num('montoUnidad');
   const base = {
     propiedad,
     fecha: $('nFecha').value || null,
-    pagado: num('nPagado'),
+    monto_unidad: montoUnidad,
+    gastos: gastos.length ? gastos : null,
+    pagado: totalInversionForm() || null,
     tc: num('nTC'),
     precio_mercado: num('nMercado'),
     precio_venta: num('nVenta'),
@@ -1105,9 +1150,10 @@ function abrirForm(id) {
           <div><label>Titularidad del inversor (%)</label><input type="number" id="fTit" value="${v(inv.titularidad)}" placeholder="100" oninput="prevParte()"></div>
           <div><label>Fecha</label><input type="date" id="fFecha" value="${v(inv.fecha)}"></div>
         </div>
+        ${gastosEditorHTML(inv.monto_unidad != null ? inv.monto_unidad : (inv.gastos ? null : inv.pagado), inv.gastos)}
         <div class="grid2">
-          <div><label>Pagado — total propiedad (USD)</label><input type="number" id="fPagado" value="${v(inv.pagado)}" placeholder="80000" oninput="prevParte()"></div>
           <div><label>TC (referencia)</label><input type="number" id="fTC" value="${v(inv.tc)}" placeholder="1170"></div>
+          <div></div>
         </div>
         <div class="grid2">
           <div><label>P. de Mercado — total (USD)</label><input type="number" id="fMercado" value="${v(inv.precio_mercado)}" placeholder="141552" oninput="prevParte()"></div>
@@ -1132,8 +1178,8 @@ function abrirForm(id) {
       </div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
-  prevParte();
   toggleDecl('f');
+  recalcInv();
   if (id) renderHistValor(id);
 }
 
@@ -1156,12 +1202,12 @@ function prevParte() {
   if (!$('fTit')) return;
   const tit = parseFloat($('fTit').value) || 100;
   const c = tit / 100;
-  const pag = parseFloat($('fPagado').value);
+  const pag = totalInversionForm();
   const merc = parseFloat($('fMercado').value);
   const vent = parseFloat($('fVenta').value);
   const ref = !isNaN(vent) ? vent : merc;
   let txt = '';
-  if (!isNaN(pag)) {
+  if (pag > 0) {
     txt = `Parte del inversor (${tit}%): pagó ${fmtUSD(pag * c)}`;
     if (!isNaN(ref)) {
       const res = (ref - pag) * c;
@@ -1185,7 +1231,9 @@ async function guardar(id) {
     propiedad,
     titularidad: numOrNull('fTit'),
     fecha: $('fFecha').value || null,
-    pagado: numOrNull('fPagado'),
+    monto_unidad: numOrNull('montoUnidad'),
+    gastos: leerGastos().length ? leerGastos() : null,
+    pagado: totalInversionForm() || null,
     tc: numOrNull('fTC'),
     precio_mercado: numOrNull('fMercado'),
     precio_venta: numOrNull('fVenta'),
@@ -1261,6 +1309,12 @@ function verDetalleInversion(id) {
       </div>
       ${inv.tc ? `<div class="prop-foot">TC al comprar: ${Number(inv.tc).toLocaleString('es-AR')}</div>` : ''}
     </div>
+    ${(inv.monto_unidad != null || (inv.gastos && inv.gastos.length)) ? `<div class="card">
+      <div class="card-title">Desglose de la inversión (tu parte)</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Unidad</span><b>${fmtUSD((Number(inv.monto_unidad) || 0) * cuota(inv))}</b></div>
+      ${(inv.gastos || []).map(g => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${g.concepto || 'Gasto'}</span><b>${fmtUSD((Number(g.monto) || 0) * cuota(inv))}</b></div>`).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;font-weight:700"><span>Total invertido</span><b>${fmtUSD(pagadoInv(inv))}</b></div>
+    </div>` : ''}
     <div class="card">
       <div class="card-title">📈 Evolución del valor (tu parte)</div>
       ${chartHTML(pts, { proj: proy })}
