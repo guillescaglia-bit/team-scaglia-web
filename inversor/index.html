@@ -291,6 +291,30 @@ function timelineGlobal(invs) {
   return out;
 }
 
+// Proyección TOTAL a futuro (línea punteada del gráfico global): suma la proyección de cada propiedad.
+// Arranca en el total de hoy y avanza por cada fecha proyectada; una propiedad sin proyección se mantiene en su valor actual.
+function timelineGlobalProyeccion(invs) {
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0); const hoyT = hoy.getTime();
+  const valFuturo = (inv, t) => {
+    if (estadoDe(inv) === 'vendida') return 0; // ya no la tiene
+    const c = cuota(inv);
+    const proj = _valuaciones.filter(x => x.inversion_id === inv.id && x.proyectado)
+      .map(x => { const d = new Date(x.fecha); d.setHours(0, 0, 0, 0); return { t: d.getTime(), v: Number(x.valor) * c }; }).sort((a, b) => a.t - b.t);
+    let v = valorInv(inv) || 0; // valor actual (parte del inversor)
+    for (const p of proj) { if (p.t <= t) v = p.v; else break; }
+    return v;
+  };
+  const futuras = [...new Set(_valuaciones
+    .filter(x => x.proyectado && invs.some(i => i.id === x.inversion_id))
+    .map(x => { const d = new Date(x.fecha); d.setHours(0, 0, 0, 0); return d.getTime(); }))]
+    .filter(t => t > hoyT).sort((a, b) => a - b);
+  if (!futuras.length) return [];
+  const totalHoy = invs.reduce((s, inv) => s + (estadoDe(inv) === 'vendida' ? 0 : (valorInv(inv) || 0)), 0);
+  const out = [{ t: hoy, v: totalHoy }];
+  futuras.forEach(t => out.push({ t: new Date(t), v: invs.reduce((s, inv) => s + valFuturo(inv, t), 0) }));
+  return out;
+}
+
 // ── Gráficos con Chart.js (eje X por fechas reales, tooltips al pasar el mouse) ──
 let _chartSeq = 0, _pendingCharts = [];
 const _charts = {};
@@ -300,7 +324,7 @@ function chartHTML(points, opts) {
   opts = opts || {};
   if (!points || points.length < 2) return '<p class="muted" style="font-size:12px;margin:8px 0">Cargá más de un valor en el historial para ver la evolución.</p>';
   const id = 'chart_' + (++_chartSeq);
-  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.4, proj: (opts.proj || []).slice() });
+  _pendingCharts.push({ id, points: points.slice(), tension: opts.tension != null ? opts.tension : 0.4, proj: (opts.proj || []).slice(), monotone: !!opts.monotone });
   return `<div style="position:relative;height:${opts.height || 220}px;margin-top:8px"><canvas id="${id}"></canvas></div>`;
 }
 
@@ -308,22 +332,23 @@ function chartHTML(points, opts) {
 function flushCharts() {
   if (!window.Chart) { _pendingCharts = []; return; }
   const fmtAxis = v => (Math.abs(v) >= 1000 ? '$' + Math.round(v / 1000) + 'k' : '$' + Math.round(v));
-  _pendingCharts.forEach(({ id, points, tension, proj }) => {
+  _pendingCharts.forEach(({ id, points, tension, proj, monotone }) => {
     const el = document.getElementById(id);
     if (!el) return;
     if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
     const tens = tension != null ? tension : 0.4;
+    const cim = monotone ? 'monotone' : 'default'; // monotone suaviza sin deformar los escalones
     const datasets = [{
       data: points.map(p => ({ x: p.t.getTime(), y: p.v })),
       borderColor: '#15925a', backgroundColor: 'rgba(21,146,90,.10)',
-      borderWidth: 2, fill: true, tension: tens,
+      borderWidth: 2, fill: true, tension: tens, cubicInterpolationMode: cim,
       pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#15925a'
     }];
     if (proj && proj.length >= 2) {
       datasets.push({
         data: proj.map(p => ({ x: p.t.getTime(), y: p.v })),
         borderColor: '#9ca3af', borderDash: [6, 5], backgroundColor: 'rgba(0,0,0,0)',
-        borderWidth: 2, fill: false, tension: tens,
+        borderWidth: 2, fill: false, tension: tens, cubicInterpolationMode: cim,
         pointRadius: proj.map((p, i) => i === 0 ? 0 : 3),      // oculto el punto ancla (se pisa con el real)
         pointHoverRadius: proj.map((p, i) => i === 0 ? 0 : 6),
         pointBackgroundColor: '#9ca3af'
@@ -513,11 +538,12 @@ function renderDashboard(invs) {
 
   // Gráfico global: valor total de toda la cartera del inversor en el tiempo
   const gpts = timelineGlobal(invs);
+  const gproj = timelineGlobalProyeccion(invs);
   const globalChart = gpts.length > 1 ? `
     <div class="card">
       <div class="card-title">📊 Evolución total de tus inversiones</div>
-      ${chartHTML(gpts, { tension: 0 })}
-      <p class="muted" style="font-size:11px;margin:8px 0 0">Los saltos verticales son aportes de capital (cuando sumás una propiedad nueva).</p>
+      ${chartHTML(gpts, { monotone: true, proj: gproj })}
+      <p class="muted" style="font-size:11px;margin:8px 0 0">Los saltos verticales son aportes de capital.${gproj.length ? ' La <span style="color:#9ca3af">línea punteada</span> es la proyección a futuro.' : ''}</p>
     </div>` : '';
 
   const banner = (usuario && usuario.rol === 'admin') ?
