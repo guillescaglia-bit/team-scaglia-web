@@ -1491,6 +1491,7 @@
                                     <tr>
                                         <th>Nombre</th>
                                         <th>Email</th>
+                                        <th>Registrados</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -2240,6 +2241,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                         <tr>
                                             <th>Nombre</th>
                                             <th>Email</th>
+                                            <th>Registrados</th>
                                             <th>Estado</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -3198,10 +3200,13 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
         function renderAgentes() {
             let html = '';
             appState.agentes.forEach(agente => {
+                const regs = (appState.clientes || []).filter(c => clienteTieneAgente(c, agente.id));
+                const validados = regs.filter(c => c.validado).length;
                 html += `
                     <tr>
                         <td>${agente.nombre}</td>
                         <td>${agente.email}</td>
+                        <td><b>${regs.length}</b> <span style="color:#888;font-size:12px">(${validados} val.)</span></td>
                         <td><span class="status-badge ${agente.activo ? 'status-activo' : 'status-inactivo'}">${agente.activo ? 'Activo' : 'Inactivo'}</span></td>
                         <td>
                             <div class="actions">
