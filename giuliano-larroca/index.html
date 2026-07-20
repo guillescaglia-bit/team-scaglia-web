@@ -77,41 +77,41 @@
     <p class="legal">Somos parte del equipo RED SUMA · Martillero responsable Diego Mastrangelo CPI 7615 CSI 6609. En cumplimiento de las leyes vigentes que regulan el corretaje inmobiliario, Ley 25.028, Ley 22.802 de Lealtad Comercial, Ley 24.240 de Defensa al Consumidor, las normas del Código Civil y Comercial de la Nación y Constitucionales, los agentes NO ejercen el corretaje inmobiliario. Todas las operaciones inmobiliarias son objeto de intermediación y conclusión por parte de los martilleros y corredores colegiados, cuyos datos se exhiben debajo del nombre de la inmobiliaria.</p>
   </div>
   <div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(10,15,30,.85);z-index:1000;align-items:center;justify-content:center;padding:24px" onclick="if(event.target===this)cerrarQR()">
-    <div style="background:#fff;color:#253C64;border-radius:18px;padding:26px 24px;max-width:320px;width:100%;text-align:center">
-      <div id="qrNombre" style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:2px"></div>
-      <div style="font-size:12px;color:#667;margin-bottom:18px">Escaneá con la cámara del celu para guardar el contacto</div>
+    <div style="background:#fff;color:#253C64;border-radius:18px;padding:24px 22px;max-width:330px;width:100%;text-align:center">
+      <div id="qrNombre" style="font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;margin-bottom:14px"></div>
+      <a href="contacto.vcf" download style="display:flex;align-items:center;justify-content:center;gap:9px;background:#253C64;color:#fff;text-decoration:none;padding:14px;border-radius:12px;font-size:14px;font-weight:600;font-family:inherit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Agregar a mis contactos
+      </a>
+      <div style="font-size:11.5px;color:#8a93a5;margin:18px 0 10px">o escaneá este código desde otro teléfono</div>
       <div id="qrBox" style="display:flex;justify-content:center"></div>
-      <button onclick="cerrarQR()" style="margin-top:20px;background:#253C64;color:#fff;border:none;padding:11px 24px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.04em">Cerrar</button>
+      <button onclick="cerrarQR()" style="margin-top:18px;background:none;color:#8a93a5;border:none;padding:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Cerrar</button>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
   <script>
-    function _vcardContacto(){
-      const g = s => { const e = document.querySelector(s); return e ? (e.textContent||'').trim() : ''; };
-      const nombre = g('.nombre');
-      const rol = g('.rol') || 'Agente Inmobiliario';
-      const partes = nombre.split(/\s+/);
-      const first = partes.shift() || '';
-      const last = partes.join(' ');
-      const wa = document.querySelector('a[href*="wa.me"]');
-      const tel = wa ? ('+' + (wa.href.split('wa.me/')[1]||'').replace(/[^0-9]/g,'')) : '';
-      const mailEl = document.querySelector('a[href^="mailto:"]');
-      const email = mailEl ? mailEl.href.replace('mailto:','').split('?')[0] : '';
-      const ig = document.querySelector('a[href*="instagram.com"]');
-      const L = ['BEGIN:VCARD','VERSION:3.0','N:'+last+';'+first+';;;','FN:'+nombre,'ORG:Team Scaglia · Red Suma','TITLE:'+rol];
-      if (tel) L.push('TEL;TYPE=CELL:'+tel);
-      if (email) L.push('EMAIL;TYPE=INTERNET:'+email);
-      L.push('URL:'+location.origin+location.pathname);
-      if (ig) L.push('X-SOCIALPROFILE;TYPE=instagram:'+ig.href);
-      L.push('END:VCARD');
-      return L.join(String.fromCharCode(10));
-    }
     function abrirQR(){
-      const box = document.getElementById('qrBox'); box.innerHTML='';
-      new QRCode(box, { text:_vcardContacto(), width:236, height:236, colorDark:'#253C64', colorLight:'#ffffff', correctLevel: QRCode.CorrectLevel.M });
-      const n = document.querySelector('.nombre');
-      document.getElementById('qrNombre').textContent = n ? n.textContent : 'Contacto';
+      const nEl = document.querySelector('.nombre');
+      const nombre = nEl ? nEl.textContent.trim() : 'Contacto';
+      document.getElementById('qrNombre').textContent = nombre;
       document.getElementById('qrModal').style.display='flex';
+      const box = document.getElementById('qrBox'); box.innerHTML='';
+      try {
+        if (window.QRCode) {
+          const NL = String.fromCharCode(13) + String.fromCharCode(10);
+          const wa = document.querySelector('a[href*="wa.me"]');
+          const tel = wa ? ('+' + (wa.href.split('wa.me/')[1]||'').replace(/[^0-9]/g,'')) : '';
+          const mailEl = document.querySelector('a[href^="mailto:"]');
+          const email = mailEl ? mailEl.href.replace('mailto:','').split('?')[0] : '';
+          const rol = (document.querySelector('.rol')||{}).textContent ? document.querySelector('.rol').textContent.trim() : 'Agente Inmobiliario';
+          const partes = nombre.split(/\s+/); const first = partes.shift()||''; const last = partes.join(' ');
+          const L = ['BEGIN:VCARD','VERSION:3.0','N:'+last+';'+first+';;;','FN:'+nombre,'ORG:Team Scaglia · Red Suma','TITLE:'+rol];
+          if (tel) L.push('TEL;TYPE=CELL:'+tel);
+          if (email) L.push('EMAIL;TYPE=INTERNET:'+email);
+          L.push('END:VCARD');
+          new QRCode(box, { text:L.join(NL), width:220, height:220, colorDark:'#253C64', colorLight:'#ffffff', correctLevel: QRCode.CorrectLevel.M });
+        }
+      } catch(e){}
     }
     function cerrarQR(){ document.getElementById('qrModal').style.display='none'; }
   </script>
