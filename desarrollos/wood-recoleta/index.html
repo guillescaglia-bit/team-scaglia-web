@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script>document.documentElement.classList.add('js')</script>
 <style>
   :root{
     --green:#40584A; --green-2:#354a3e; --green-3:#28382e;
@@ -47,7 +46,7 @@
   .top .cta:hover{background:rgba(255,255,255,.26)}
 
   /* Hero */
-  .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:#fff;overflow:hidden}
+  .hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:flex-end;color:#fff;overflow:hidden}
   .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
   .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,56,46,.55) 0%,rgba(40,56,46,.12) 32%,rgba(40,56,46,.30) 62%,rgba(28,40,34,.86) 100%)}
   .hero .inner{position:relative;padding-bottom:clamp(48px,8vw,86px);width:100%}
@@ -135,9 +134,11 @@
   footer a{color:var(--cream);text-decoration:none}
   footer .legal{max-width:720px;margin:22px auto 0;font-size:9.5px;line-height:1.7;color:rgba(255,255,255,.34)}
 
-  .reveal{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
-  .js .reveal{opacity:0;transform:translateY(26px)}
-  .js .reveal.in{opacity:1;transform:none}
+  /* Animación de entrada 100% CSS: siempre termina visible (no depende de JS) */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  }
 
   @media (max-width:860px){
     .split,.specs-wrap{grid-template-columns:1fr}
@@ -347,10 +348,6 @@
   var top = document.getElementById('top');
   function onScroll(){ top.classList.toggle('solid', window.scrollY > window.innerHeight*0.7); }
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
-
-  // Reveal on scroll
-  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {threshold:.16});
-  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 </script>
 </body>
 </html>
