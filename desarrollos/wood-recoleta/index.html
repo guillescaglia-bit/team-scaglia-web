@@ -296,6 +296,80 @@
   </div>
 </section>
 
+<!-- DISPONIBILIDAD (interactivo) -->
+<style>
+  .avail{background:var(--paper)}
+  .avail .head{text-align:center;max-width:640px;margin:0 auto}
+  .avail .head .subt{margin:2px auto 0}
+  .avail .layout{margin-top:48px;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,4vw,52px);align-items:start;max-width:960px;margin-left:auto;margin-right:auto}
+  /* Edificio */
+  .bld{display:flex;flex-direction:column;gap:7px}
+  .bld .roof{height:16px;background:repeating-linear-gradient(90deg,var(--green) 0 10px,var(--green-2) 10px 20px);border-radius:3px 3px 0 0;opacity:.9;margin:0 34px}
+  .floor{display:flex;align-items:stretch;gap:7px}
+  .floor .pn{flex:none;width:34px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:var(--green);font-weight:600}
+  .floor .cells{flex:1;display:flex;gap:7px}
+  .u{flex:1;min-height:60px;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;border:1px solid transparent;transition:transform .18s,background .2s,color .2s;padding:6px 4px}
+  .u .ul{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+  .u .up{font-size:12.5px;font-weight:600;letter-spacing:.01em;line-height:1.1}
+  .u.disp{background:var(--cream);color:var(--ink);border-color:#e2d9c6;cursor:pointer}
+  .u.disp .up{color:var(--green)}
+  .u.disp:hover,.u.disp.sel{background:var(--green);color:#fff;transform:translateY(-2px)}
+  .u.disp:hover .up,.u.disp.sel .up,.u.disp:hover .ul,.u.disp.sel .ul{color:#fff;opacity:.95}
+  .u.vend{background:var(--green-3);color:rgba(237,228,211,.55)}
+  .u.vend .up{font-weight:500}
+  .u.nolib{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+  .u.nolib .up{font-weight:400;font-size:11px}
+  .bld .local{margin:2px 34px 0;background:#fff;border:1px solid var(--line);border-radius:0 0 3px 3px;padding:12px;text-align:center;font-size:12px;color:var(--muted);letter-spacing:.03em}
+  .bld .local b{color:var(--green)}
+  /* Panel detalle */
+  .panel{position:sticky;top:88px}
+  .legend{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+  .legend .li{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#4b4f45}
+  .legend .sw{width:15px;height:15px;border-radius:3px;flex:none}
+  .sw.d{background:var(--cream);border:1px solid #e2d9c6}.sw.v{background:var(--green-3)}.sw.n{border:1px dashed var(--line)}
+  .detail{background:#fff;border:1px solid var(--line);border-radius:4px;padding:26px 24px;box-shadow:0 10px 30px rgba(40,56,46,.08)}
+  .detail .empty{color:var(--muted);font-size:14px;font-weight:300;line-height:1.7}
+  .detail .dp{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--green)}
+  .detail .du{font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:600;margin-top:4px;line-height:1}
+  .detail .dt{font-size:13.5px;color:var(--muted);margin-top:6px;font-weight:300}
+  .detail .price{font-family:var(--serif);font-size:38px;color:var(--green);font-weight:600;margin-top:18px;line-height:1}
+  .detail .dmeta{font-size:12px;color:var(--muted);margin-top:6px}
+  .detail .dwa{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:22px;background:var(--wa);color:#fff;text-decoration:none;padding:13px;border-radius:3px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .summary{margin-top:22px;font-size:12.5px;color:#4b4f45;line-height:1.75;font-weight:300}
+  .summary b{color:var(--green);font-weight:600}
+  @media (max-width:820px){
+    .avail .layout{grid-template-columns:1fr;gap:30px}
+    .panel{position:static}
+    .legend{flex-direction:row;flex-wrap:wrap;gap:16px;justify-content:center}
+  }
+</style>
+<section class="avail">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="eyebrow">Disponibilidad</div>
+      <h2 class="title">El edificio</h2>
+      <div class="subt">/ piso por piso</div>
+    </div>
+    <div class="layout">
+      <div class="bld reveal" id="bld"></div>
+      <div class="panel reveal">
+        <div class="legend">
+          <div class="li"><span class="sw d"></span> Disponible</div>
+          <div class="li"><span class="sw v"></span> Vendida / no disponible</div>
+          <div class="li"><span class="sw n"></span> Aún no liberada</div>
+        </div>
+        <div class="detail" id="detail">
+          <div class="empty">Tocá una unidad <b style="color:var(--green)">disponible</b> del edificio para ver su precio y consultarla.</div>
+        </div>
+        <div class="summary">
+          <b>15 unidades disponibles</b> · 10 vendidas · 6 aún no liberadas.<br>
+          Pisos 1 a 6 con anticipo del 30%; pisos 7 a 9, del 50%. Ambos en 24 cuotas.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FINANCIACIÓN -->
 <section class="fin">
   <div class="wrap reveal">
@@ -345,9 +419,55 @@
   document.querySelectorAll('a[href="#contacto"]').forEach(function(a){/* dejan el scroll interno */});
 
   // Topbar sólida al scrollear
-  var top = document.getElementById('top');
-  function onScroll(){ top.classList.toggle('solid', window.scrollY > window.innerHeight*0.7); }
+  var topEl = document.getElementById('top');
+  function onScroll(){ topEl.classList.toggle('solid', window.scrollY > window.innerHeight*0.7); }
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  // ── Disponibilidad · el edificio piso por piso ──
+  var FLOORS = [
+    {p:'9°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
+    {p:'8°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
+    {p:'7°', us:[{u:'A',price:123336},{u:'B',price:146484},{u:'C',price:182988}]},
+    {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',price:177905}]},
+    {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',price:87686}]},
+    {p:'4°', us:[{u:'A',s:'v'},{u:'B',price:117000},{u:'C',price:89661},{u:'D',price:85107}]},
+    {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',price:86944},{u:'D',price:82528}]},
+    {p:'2°', us:[{u:'A',s:'v'},{u:'B',price:118400},{u:'C',price:84227},{u:'D',s:'v'}]},
+    {p:'1°', us:[{u:'A',price:95928},{u:'B',price:103572},{u:'C',price:185000}]}
+  ];
+  var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
+  var bld = document.getElementById('bld');
+  if (bld){
+    var h = '<div class="roof"></div>';
+    FLOORS.forEach(function(f, fi){
+      h += '<div class="floor"><div class="pn">'+f.p+'</div><div class="cells">';
+      f.us.forEach(function(x, ui){
+        if (x.price != null) h += '<div class="u disp" data-f="'+fi+'" data-u="'+ui+'"><span class="ul">'+x.u+'</span><span class="up">'+fmtU(x.price)+'</span></div>';
+        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="up">Vendida</span></div>';
+        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="up">No liberada</span></div>';
+      });
+      h += '</div></div>';
+    });
+    h += '<div class="local">Local comercial a la calle · <b>Consultar</b></div>';
+    bld.innerHTML = h;
+    var detail = document.getElementById('detail');
+    bld.addEventListener('click', function(e){
+      var cell = e.target.closest ? e.target.closest('.u.disp') : null;
+      if (!cell) return;
+      var prev = bld.querySelector('.u.sel'); if (prev) prev.classList.remove('sel');
+      cell.classList.add('sel');
+      var fi = +cell.getAttribute('data-f'), f = FLOORS[fi], x = f.us[+cell.getAttribute('data-u')];
+      var anticipo = fi <= 2 ? 'Anticipo 50% + 24 cuotas' : 'Anticipo 30% + 24 cuotas';
+      var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de WOOD Recoleta (Larrea 1180), publicada en '+fmtU(x.price)+'. ¿Me pasás la planta y más info?');
+      detail.innerHTML =
+        '<div class="dp">Unidad disponible</div>'+
+        '<div class="du">'+f.p+' · '+x.u+'</div>'+
+        '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>'+
+        '<div class="price">'+fmtU(x.price)+'</div>'+
+        '<div class="dmeta">'+anticipo+'</div>'+
+        '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
+    });
+  }
 </script>
 </body>
 </html>
