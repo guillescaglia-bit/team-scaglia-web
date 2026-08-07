@@ -37,6 +37,14 @@
   p.lead i{font-style:italic;color:var(--green-2)}
   section{padding:clamp(64px,9vw,110px) 0}
 
+  /* CTA recurrente hacia la disponibilidad */
+  .ver-unidades{display:inline-flex;align-items:center;gap:10px;margin-top:30px;font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--green);text-decoration:none;border-bottom:1.5px solid var(--green);padding-bottom:6px;transition:gap .25s,opacity .2s}
+  .ver-unidades .ar{display:inline-block;transition:transform .28s}
+  .ver-unidades:hover{opacity:.72}
+  .ver-unidades:hover .ar{transform:translateX(5px)}
+  .ver-unidades.light{color:var(--cream);border-color:rgba(237,228,211,.55)}
+  .ver-unidades.center{display:flex;width:fit-content;margin-left:auto;margin-right:auto}
+
   /* Topbar */
   .top{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;transition:background .4s,box-shadow .4s;color:#fff}
   .top.solid{background:var(--green);box-shadow:0 2px 20px rgba(0,0,0,.16)}
@@ -181,6 +189,7 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
         Quiero más info
       </a>
+      <a class="btn-ghost" href="#disponibilidad" style="border-color:rgba(237,228,211,.55)">Ver unidades disponibles <span class="ar" style="margin-left:2px">→</span></a>
     </div>
   </div>
   <div class="scroll-cue">Scroll</div>
@@ -208,6 +217,7 @@
       <p class="lead">En <b>WOOD Recoleta</b>, la arquitectura contemporánea da forma a espacios pensados para ser vividos. Cada detalle combina <i>diseño</i>, <i>funcionalidad</i> y <i>calidad constructiva</i>, creando ambientes que acompañan el ritmo de la ciudad sin perder calidez.</p>
       <p class="lead">A lo largo de sus <b>12 pisos</b>, el edificio se integra de manera natural al entorno urbano, mientras el <b>local comercial</b> a la calle suma vida y movimiento al barrio.</p>
       <p class="lead">Vivir WOOD es sentir Recoleta desde adentro, en un lugar donde la ciudad se vuelve <b>hogar</b>.</p>
+      <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
     </div>
   </div>
 </section>
@@ -225,6 +235,7 @@
       <div class="subt">/ Literal</div>
       <p class="lead"><b>Recoleta</b> es sinónimo de <i>elegancia, historia y vida urbana</i>. Uno de los barrios más emblemáticos de Buenos Aires, donde la arquitectura clásica convive con propuestas contemporáneas.</p>
       <p class="lead">A pocos pasos de WOOD: cafés tradicionales, restaurantes de primer nivel, teatros, librerías, universidades, centros de salud y una amplia oferta comercial. Todo conectado por múltiples medios de transporte y con cercanía a líneas de subte.</p>
+      <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
     </div>
   </div>
 </section>
@@ -249,6 +260,7 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
       Larrea 1180 · a metros de Av. Santa Fe y Av. Pueyrredón
     </div>
+    <div><a class="ver-unidades light" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a></div>
   </div>
 </section>
 
@@ -273,6 +285,7 @@
         <div class="v serif">Wilson Tobal</div>
         <p>Servicio de interiorismo disponible para acompañar la puesta en valor de cada ambiente.</p>
       </div>
+      <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
     </div>
     <div class="planobox">
       <img src="img/plano-a.jpg" alt="Plano tipo · Unidad A">
@@ -343,7 +356,7 @@
     .legend{flex-direction:row;flex-wrap:wrap;gap:16px;justify-content:center}
   }
 </style>
-<section class="avail">
+<section class="avail" id="disponibilidad" style="scroll-margin-top:72px">
   <div class="wrap">
     <div class="head reveal">
       <div class="eyebrow">Disponibilidad</div>
