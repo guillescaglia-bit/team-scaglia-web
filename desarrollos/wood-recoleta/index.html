@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOOD Recoleta · Larrea 1180 · Team Scaglia</title>
+<meta name="description" content="WOOD Recoleta — desarrollo en Larrea 1180, Recoleta. Unidades de 25 a 108 m², 12 pisos y local comercial. Entrega 2026. Financiación 30% + 24 cuotas.">
+<meta name="theme-color" content="#40584A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WOOD Recoleta · Larrea 1180">
+<meta property="og:description" content="Arquitectura contemporánea en el corazón de Recoleta. Unidades de 25 a 108 m². Entrega 2026.">
+<meta property="og:url" content="https://www.teamscaglia.com/desarrollos/wood-recoleta">
+<meta property="og:image" content="https://www.teamscaglia.com/desarrollos/wood-recoleta/img/hero.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  :root{
+    --green:#40584A; --green-2:#354a3e; --green-3:#28382e;
+    --cream:#EDE4D3; --paper:#f5f2ea; --card:#ffffff;
+    --ink:#2d322b; --muted:#767a6d; --line:#ded8c9;
+    --wa:#25D366;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Montserrat',-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.65;font-weight:400}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-size:11px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--green)}
+  h2.title{font-family:var(--serif);font-weight:500;font-size:clamp(34px,5vw,52px);line-height:1.02;letter-spacing:.01em;color:var(--green);text-wrap:balance}
+  .subt{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(20px,3vw,27px);color:var(--muted);margin-top:2px}
+  p.lead{font-size:16px;font-weight:300;color:#4b4f45;max-width:56ch;line-height:1.85}
+  p.lead b{font-weight:600;color:var(--ink)}
+  p.lead i{font-style:italic;color:var(--green-2)}
+  section{padding:clamp(64px,9vw,110px) 0}
+
+  /* Topbar */
+  .top{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;transition:background .4s,box-shadow .4s;color:#fff}
+  .top.solid{background:var(--green);box-shadow:0 2px 20px rgba(0,0,0,.16)}
+  .top .brand{font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:.34em;padding-left:.34em}
+  .top .brand small{display:block;font-family:var(--sans);font-size:8px;letter-spacing:.42em;opacity:.7;margin-top:-2px}
+  .top .cta{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);color:#fff;text-decoration:none;padding:9px 18px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;transition:background .25s}
+  .top .cta:hover{background:rgba(255,255,255,.26)}
+
+  /* Hero */
+  .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:#fff;overflow:hidden}
+  .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,56,46,.55) 0%,rgba(40,56,46,.12) 32%,rgba(40,56,46,.30) 62%,rgba(28,40,34,.86) 100%)}
+  .hero .inner{position:relative;padding-bottom:clamp(48px,8vw,86px);width:100%}
+  .hero .wm{font-family:var(--serif);font-weight:500;font-size:clamp(64px,15vw,150px);line-height:.9;letter-spacing:.14em;padding-left:.14em}
+  .hero .rec{font-size:clamp(15px,3.4vw,25px);font-weight:400;letter-spacing:.62em;padding-left:.62em;margin-top:6px}
+  .hero .addr{margin-top:26px;font-size:15px;font-weight:300;letter-spacing:.04em;display:flex;align-items:center;gap:10px;opacity:.94}
+  .hero .row{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:9px;background:rgba(237,228,211,.14);border:1px solid rgba(237,228,211,.4);border-radius:100px;padding:9px 18px;font-size:12px;letter-spacing:.06em;font-weight:400}
+  .btn-wa{display:inline-flex;align-items:center;gap:10px;background:var(--wa);color:#fff;text-decoration:none;padding:14px 26px;border-radius:3px;font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:transform .2s,filter .2s}
+  .btn-wa:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .scroll-cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.4em;text-transform:uppercase;opacity:.6;writing-mode:vertical-rl}
+
+  /* Manifesto */
+  .manifesto{background:var(--cream);text-align:center}
+  .manifesto .w-mono{font-family:var(--serif);font-weight:500;font-size:60px;color:var(--green);line-height:1}
+  .manifesto p{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3.6vw,36px);line-height:1.4;color:var(--green-2);max-width:20ch;margin:24px auto 0;text-wrap:balance}
+  .manifesto .loc{margin-top:28px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+
+  /* Split (imagen + texto) */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,72px);align-items:center}
+  .split.rev{direction:rtl}.split.rev>*{direction:ltr}
+  .split .media{position:relative}
+  .split .media img{width:100%;height:100%;max-height:640px;object-fit:cover;border-radius:2px}
+  .split .media .tagimg{position:absolute;left:-1px;top:26px;background:var(--green);color:#fff;font-size:10px;letter-spacing:.24em;text-transform:uppercase;padding:9px 16px}
+  .split .body .eyebrow{margin-bottom:14px}
+  .split .body .subt{margin-bottom:22px}
+  .split .body p.lead+p.lead{margin-top:18px}
+
+  /* Amenities */
+  .amen{background:var(--green);color:#fff}
+  .amen .eyebrow{color:rgba(237,228,211,.75)}
+  .amen h2.title{color:#fff}
+  .amen .subt{color:rgba(237,228,211,.7)}
+  .amen .lead2{font-size:15.5px;font-weight:300;color:rgba(255,255,255,.82);max-width:60ch;line-height:1.85;margin-top:20px}
+  .amen .grid{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(237,228,211,.16);border:1px solid rgba(237,228,211,.16)}
+  .amen .cell{background:var(--green);padding:26px 20px;text-align:center;transition:background .3s}
+  .amen .cell:hover{background:var(--green-2)}
+  .amen .cell svg{width:30px;height:30px;stroke:var(--cream);stroke-width:1.3;fill:none;margin:0 auto 12px}
+  .amen .cell span{font-size:12.5px;font-weight:400;letter-spacing:.04em;color:rgba(255,255,255,.92)}
+  .amen .pinrow{margin-top:34px;display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cream)}
+
+  /* Specs */
+  .specs-wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,64px);align-items:start}
+  .spec-list{list-style:none;margin-top:26px}
+  .spec-list li{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line);font-size:15px;font-weight:300;color:#41453b}
+  .spec-list li b{font-weight:600;color:var(--ink)}
+  .spec-list li::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;background:var(--green);border-radius:50%}
+  .designer{margin-top:30px;background:var(--cream);border-left:3px solid var(--green);padding:22px 26px}
+  .designer .k{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--green);font-weight:600}
+  .designer .v{font-family:var(--serif);font-size:24px;color:var(--green-2);margin-top:6px}
+  .designer p{font-size:13.5px;font-weight:300;color:var(--muted);margin-top:6px;line-height:1.7}
+  .specs-wrap .planobox{background:var(--green);border-radius:2px;padding:22px;text-align:center}
+  .specs-wrap .planobox img{border-radius:2px}
+  .specs-wrap .planobox .cap{color:var(--cream);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-top:16px}
+
+  /* Tipologías */
+  .tipos{background:var(--cream)}
+  .tipos .cards{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .tipo{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:30px 26px;transition:transform .25s,box-shadow .25s}
+  .tipo:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,56,46,.14)}
+  .tipo .n{font-family:var(--serif);font-size:26px;color:var(--green);font-weight:600}
+  .tipo .m{font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+  .tipo .d{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;font-weight:300;color:#4b4f45;line-height:1.6}
+  .tipos .foot{margin-top:30px;font-size:13px;color:var(--muted);font-weight:300}
+
+  /* Financiación */
+  .fin{background:var(--green-3);color:#fff;text-align:center}
+  .fin .eyebrow{color:rgba(237,228,211,.7)}
+  .fin .nums{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:820px;margin-left:auto;margin-right:auto;background:rgba(237,228,211,.16)}
+  .fin .num{background:var(--green-3);padding:36px 18px}
+  .fin .num .big{font-family:var(--serif);font-size:clamp(40px,7vw,64px);color:var(--cream);line-height:1;font-weight:500}
+  .fin .num .lbl{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72);margin-top:12px}
+
+  /* Contacto */
+  .contact{background:var(--green);color:#fff;text-align:center}
+  .contact h2.title{color:#fff}
+  .contact .subt{color:rgba(237,228,211,.72);margin-top:6px}
+  .contact p{font-size:15.5px;font-weight:300;color:rgba(255,255,255,.85);max-width:48ch;margin:22px auto 0;line-height:1.8}
+  .contact .actions{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn-ghost{display:inline-flex;align-items:center;gap:10px;background:transparent;border:1px solid rgba(237,228,211,.5);color:#fff;text-decoration:none;padding:14px 26px;border-radius:3px;font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:background .25s}
+  .btn-ghost:hover{background:rgba(237,228,211,.12)}
+
+  footer{background:var(--green-3);color:rgba(255,255,255,.6);padding:44px 0 40px;text-align:center;font-size:12px;font-weight:300;line-height:1.9}
+  footer .fbrand{font-family:var(--serif);font-size:26px;letter-spacing:.3em;color:var(--cream);padding-left:.3em}
+  footer a{color:var(--cream);text-decoration:none}
+  footer .legal{max-width:720px;margin:22px auto 0;font-size:9.5px;line-height:1.7;color:rgba(255,255,255,.34)}
+
+  .reveal{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+  .js .reveal{opacity:0;transform:translateY(26px)}
+  .js .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:860px){
+    .split,.specs-wrap{grid-template-columns:1fr}
+    .split.rev{direction:ltr}
+    .split .media img{max-height:460px}
+    .amen .grid{grid-template-columns:repeat(2,1fr)}
+    .tipos .cards{grid-template-columns:1fr}
+    .fin .nums{grid-template-columns:1fr}
+    .top .brand small{display:none}
+    .top{padding:13px 18px}
+    .top .brand{font-size:19px}
+    .top .cta{padding:8px 12px;font-size:10px;letter-spacing:.1em}
+    .specs-wrap .planobox{max-width:420px;margin:0 auto}
+    .hero .inner{padding-left:20px;padding-right:20px}
+  }
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="top" id="top">
+  <div class="brand">WOOD<small>RECOLETA</small></div>
+  <a class="cta" href="#contacto">Consultar</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <img class="bg" src="img/hero.jpg" alt="WOOD Recoleta · fachada del edificio">
+  <div class="veil"></div>
+  <div class="inner wrap">
+    <div class="wm">WOOD</div>
+    <div class="rec">RECOLETA</div>
+    <div class="addr">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      Larrea 1180, Recoleta · Buenos Aires
+    </div>
+    <div class="row">
+      <span class="pill">Entrega 2026 · Anticipo 30% + 24 cuotas</span>
+      <a class="btn-wa" href="#contacto">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
+        Quiero más info
+      </a>
+    </div>
+  </div>
+  <div class="scroll-cue">Scroll</div>
+</header>
+
+<!-- MANIFIESTO -->
+<section class="manifesto">
+  <div class="wrap reveal">
+    <div class="w-mono">W</div>
+    <p>Donde el movimiento urbano se transforma en calma.</p>
+    <div class="loc">Recoleta · Bs. As. · 2026</div>
+  </div>
+</section>
+
+<!-- HABITAR -->
+<section>
+  <div class="wrap split reveal">
+    <div class="media">
+      <img src="img/edificio.jpg" alt="WOOD Recoleta · render del edificio">
+    </div>
+    <div class="body">
+      <div class="eyebrow">El proyecto</div>
+      <h2 class="title">Habitar</h2>
+      <div class="subt">/ Recoleta</div>
+      <p class="lead">En <b>WOOD Recoleta</b>, la arquitectura contemporánea da forma a espacios pensados para ser vividos. Cada detalle combina <i>diseño</i>, <i>funcionalidad</i> y <i>calidad constructiva</i>, creando ambientes que acompañan el ritmo de la ciudad sin perder calidez.</p>
+      <p class="lead">A lo largo de sus <b>12 pisos</b>, el edificio se integra de manera natural al entorno urbano, mientras el <b>local comercial</b> a la calle suma vida y movimiento al barrio.</p>
+      <p class="lead">Vivir WOOD es sentir Recoleta desde adentro, en un lugar donde la ciudad se vuelve <b>hogar</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- UBICACIÓN -->
+<section>
+  <div class="wrap split rev reveal">
+    <div class="media">
+      <img src="img/recoleta.jpg" alt="Barrio de Recoleta">
+      <span class="tagimg">Recoleta</span>
+    </div>
+    <div class="body">
+      <div class="eyebrow">Ubicación estratégica</div>
+      <h2 class="title">Todo a caminando.</h2>
+      <div class="subt">/ Literal</div>
+      <p class="lead"><b>Recoleta</b> es sinónimo de <i>elegancia, historia y vida urbana</i>. Uno de los barrios más emblemáticos de Buenos Aires, donde la arquitectura clásica convive con propuestas contemporáneas.</p>
+      <p class="lead">A pocos pasos de WOOD: cafés tradicionales, restaurantes de primer nivel, teatros, librerías, universidades, centros de salud y una amplia oferta comercial. Todo conectado por múltiples medios de transporte y con cercanía a líneas de subte.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AMENITIES / MAPA -->
+<section class="amen">
+  <div class="wrap reveal">
+    <div class="eyebrow">Mapa · Habitar la ciudad</div>
+    <h2 class="title">A pocos pasos de todo</h2>
+    <div class="subt">/ Referencias</div>
+    <div class="grid">
+      <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1.2 11.2a1 1 0 0 1-1 .8H6.2a1 1 0 0 1-1-.8L4 8z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg><span>Comercios & mercado</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10.5V15c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4.5"/></svg><span>Educación</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><path d="M12 20s-6-4.4-6-9a4 4 0 0 1 6-3.4A4 4 0 0 1 18 11c0 4.6-6 9-6 9z"/><path d="M12 4v3"/></svg><span>Espacios verdes</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><path d="M6.5 8v8M17.5 8v8M4 10v4M20 10v4M6.5 12h11"/></svg><span>Gimnasio</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg><span>Centros de salud</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="14" rx="2"/><path d="M5 13h14M8 21l1.5-4M16 21l-1.5-4"/><circle cx="8.5" cy="16" r=".4" fill="var(--cream)"/><circle cx="15.5" cy="16" r=".4" fill="var(--cream)"/></svg><span>Transporte & subte</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M12 10v6M9 13h6M9 4h6"/></svg><span>Farmacias</span></div>
+      <div class="cell"><svg viewBox="0 0 24 24"><path d="M6 3v7a2 2 0 0 0 4 0V3M8 3v18M18 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4v9"/></svg><span>Gastronomía</span></div>
+    </div>
+    <div class="pinrow">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+      Larrea 1180 · a metros de Av. Santa Fe y Av. Pueyrredón
+    </div>
+  </div>
+</section>
+
+<!-- DISEÑO Y TERMINACIONES -->
+<section>
+  <div class="wrap specs-wrap reveal">
+    <div>
+      <div class="eyebrow">Diseño & terminaciones</div>
+      <h2 class="title">Terminaciones</h2>
+      <div class="subt">/ que se notan</div>
+      <p class="lead" style="margin-top:18px">Arquitectura contemporánea con materiales nobles y detalles pensados para durar. Cada unidad se entrega con terminaciones de primer nivel.</p>
+      <ul class="spec-list">
+        <li><b>Aberturas de PVC</b> con DVH (doble vidriado hermético)</li>
+        <li><b>Cerraduras biométricas</b> en cada unidad</li>
+        <li><b>Porcelanato</b> en baños y balcones</li>
+        <li>Mesadas de <b>Silestone</b></li>
+        <li><b>Calefón individual</b> por unidad</li>
+        <li>Grifería de <b>acero inoxidable</b></li>
+      </ul>
+      <div class="designer">
+        <div class="k">Diseño interior</div>
+        <div class="v serif">Wilson Tobal</div>
+        <p>Servicio de interiorismo disponible para acompañar la puesta en valor de cada ambiente.</p>
+      </div>
+    </div>
+    <div class="planobox">
+      <img src="img/plano-a.jpg" alt="Plano tipo · Unidad A">
+      <div class="cap">Unidad A · Monoambiente · 34,26 m²</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPOLOGÍAS -->
+<section class="tipos">
+  <div class="wrap reveal">
+    <div class="eyebrow">Unidades</div>
+    <h2 class="title">Tipologías</h2>
+    <div class="subt">/ de 25 a 108 m²</div>
+    <div class="cards">
+      <div class="tipo"><div class="n">Monoambientes</div><div class="m">desde 25 m²</div><div class="d">Unidades eficientes y luminosas, ideales para vivir o invertir en el corazón de Recoleta.</div></div>
+      <div class="tipo"><div class="n">2 ambientes</div><div class="m">con balcón</div><div class="d">Espacios flexibles con balcón, pensados para el ritmo de la ciudad sin resignar confort.</div></div>
+      <div class="tipo"><div class="n">3 ambientes</div><div class="m">hasta 108 m²</div><div class="d">Las unidades más amplias del edificio, con generosos ambientes y expansiones.</div></div>
+    </div>
+    <p class="foot">12 pisos + local comercial a la calle · consultá disponibilidad, plantas y precios actualizados.</p>
+  </div>
+</section>
+
+<!-- FINANCIACIÓN -->
+<section class="fin">
+  <div class="wrap reveal">
+    <div class="eyebrow">Plan de pago</div>
+    <h2 class="title" style="color:#fff">Financiación directa</h2>
+    <div class="nums">
+      <div class="num"><div class="big">30%</div><div class="lbl">de anticipo</div></div>
+      <div class="num"><div class="big">24</div><div class="lbl">cuotas</div></div>
+      <div class="num"><div class="big">2026</div><div class="lbl">entrega estimada</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="contact" id="contacto">
+  <div class="wrap reveal">
+    <div class="eyebrow">Contacto</div>
+    <h2 class="title">Sumate a WOOD</h2>
+    <div class="subt">/ Recoleta</div>
+    <p>Escribinos y te enviamos la lista de precios, las plantas disponibles y el brochure completo del desarrollo.</p>
+    <div class="actions">
+      <a class="btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        Consultar por WhatsApp
+      </a>
+      <a class="btn-ghost" href="/desarrollos/brochure-wood.pdf" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+        Descargar brochure
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fbrand serif">WOOD</div>
+  <div style="margin-top:8px">Larrea 1180 · Recoleta · Buenos Aires</div>
+  <div style="margin-top:4px">Comercializa <a href="https://www.teamscaglia.com">Team Scaglia</a> · Desarrolla Red Suma</div>
+  <p class="legal">Imágenes de carácter ilustrativo, no contractual. Las superficies, terminaciones y plazos de entrega son estimados y pueden sufrir modificaciones. Consultar condiciones comerciales vigentes. Somos parte del equipo Red Suma — Martillero responsable Diego Mastrangelo CPI 7615 CSI 6609.</p>
+</footer>
+
+<script>
+  // WhatsApp con mensaje pre-cargado
+  var TEL = '541130977868'; // ← número al que llegan las consultas
+  var MSG = encodeURIComponent('¡Hola! Me interesa el desarrollo WOOD Recoleta (Larrea 1180). Me gustaría recibir precios y disponibilidad.');
+  var waHref = 'https://wa.me/' + TEL + '?text=' + MSG;
+  document.getElementById('waBtn').href = waHref;
+  document.querySelectorAll('a[href="#contacto"]').forEach(function(a){/* dejan el scroll interno */});
+
+  // Topbar sólida al scrollear
+  var top = document.getElementById('top');
+  function onScroll(){ top.classList.toggle('solid', window.scrollY > window.innerHeight*0.7); }
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  // Reveal on scroll
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {threshold:.16});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+</script>
+</body>
+</html>
