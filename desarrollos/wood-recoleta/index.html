@@ -376,6 +376,7 @@
   .detail .dp{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--green)}
   .detail .du{font-family:var(--sans);font-size:27px;color:var(--ink);font-weight:600;letter-spacing:.01em;margin-top:4px;line-height:1}
   .detail .dtipo{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--green);margin-top:8px;letter-spacing:.01em}
+  .detail .dm2{font-family:var(--sans);font-size:12px;font-weight:400;color:var(--muted);margin-top:2px;letter-spacing:.01em}
   .detail .dt{font-size:13.5px;color:var(--muted);margin-top:5px;font-weight:300}
   .detail .dplano{margin-top:16px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--green);cursor:zoom-in}
   .detail .dplano img{display:block;width:100%;height:auto;max-height:380px;object-fit:contain;background:var(--green)}
@@ -498,17 +499,17 @@
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
   var disp = function(x){ return x.fin != null || x.cash != null; };
   var planInfo = function(pnum, u){
-    if (u === 'A') return {img:'plano-a', tipo:'Monoambiente', m2:'34,26 m²'};
+    if (u === 'A') return {img:'plano-a', tipo:'Monoambiente', cub:'30,17', tot:'34,26'};
     if (u === 'B') return pnum <= 5
-      ? {img:'plano-b-1a5', tipo:'Monoambiente', m2:'36,99 m²'}
-      : {img:'plano-b-6a10', tipo:'Monoambiente', m2:'40,69 m²'};
+      ? {img:'plano-b-1a5', tipo:'Monoambiente', cub:'32,90', tot:'36,99'}
+      : {img:'plano-b-6a10', tipo:'Monoambiente', cub:'36,60', tot:'40,69'};
     if (u === 'C'){
-      if (pnum === 1) return {img:'plano-c-1', tipo:'2 Ambientes', m2:'107,68 m² · con terraza propia'};
+      if (pnum === 1) return {img:'plano-c-1', tipo:'2 Ambientes', cub:'54,58', tot:'107,68', terraza:true};
       return pnum <= 5
-        ? {img:'plano-c-2a5', tipo:'Estudio profesional', m2:'27,17 m²'}
-        : {img:'plano-c-6a10', tipo:'2 Ambientes', m2:'50,83 m²'};
+        ? {img:'plano-c-2a5', tipo:'Estudio profesional', cub:'27,17', tot:'27,17'}
+        : {img:'plano-c-6a10', tipo:'2 Ambientes', cub:'45,80', tot:'50,83'};
     }
-    if (u === 'D') return {img:'plano-d', tipo:'Estudio profesional', m2:'25,79 m²'};
+    if (u === 'D') return {img:'plano-d', tipo:'Estudio profesional', cub:'25,79', tot:'25,79'};
     return null;
   };
   var bld = document.getElementById('bld');
@@ -536,7 +537,12 @@
       var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de WOOD Recoleta (Larrea 1180), publicada en '+fmtU(pref)+'. ¿Me pasás la planta y más info?');
       var pi = planInfo(parseInt(f.p, 10), x.u);
       var html = '<div class="dp">Unidad disponible</div><div class="du">'+f.p+' · '+x.u+'</div>';
-      if (pi) html += '<div class="dtipo">'+pi.tipo+' · '+pi.m2+'</div>';
+      if (pi){
+        var m2txt = (pi.cub === pi.tot)
+          ? pi.tot + ' m²'
+          : pi.cub + ' m² cubiertos · ' + pi.tot + ' m² totales' + (pi.terraza ? ' (con terraza)' : '');
+        html += '<div class="dtipo">'+pi.tipo+'</div><div class="dm2">'+m2txt+'</div>';
+      }
       html += '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
       if (pi) html += '<div class="dplano"><img src="img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
       if (x.fin != null){
