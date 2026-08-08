@@ -351,9 +351,10 @@
   .floor .cells{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
   .floor.hdr{align-items:end}
   .floor.hdr .hl{text-align:center;font-family:var(--sans);font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:600;padding-bottom:3px}
-  .u{min-height:56px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid transparent;transition:transform .18s,background .2s,color .2s,box-shadow .2s;padding:4px 2px}
-  .u .ul{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:.03em;line-height:1}
-  .u .us{font-family:var(--sans);font-size:8.5px;font-weight:500;letter-spacing:.03em;line-height:1;white-space:nowrap;opacity:.85}
+  .u{position:relative;min-height:62px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid transparent;transition:transform .18s,background .2s,color .2s,box-shadow .2s;padding:6px 3px}
+  .u .ul{position:absolute;top:5px;left:6px;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.04em;line-height:1;opacity:.5}
+  .u .ut{font-family:var(--sans);font-size:9.5px;font-weight:600;letter-spacing:.01em;line-height:1.15;white-space:nowrap}
+  .u .us{font-family:var(--sans);font-size:8px;font-weight:500;letter-spacing:.03em;line-height:1;white-space:nowrap;opacity:.8;margin-top:1px}
   .u.disp{background:var(--cream);color:var(--green);border-color:#e2d9c6;cursor:pointer}
   .u.disp .us{color:var(--muted);opacity:1}
   .u.disp:hover,.u.disp.sel{background:var(--green);color:#fff;transform:translateY(-2px);box-shadow:0 7px 18px rgba(64,88,74,.28)}
@@ -402,6 +403,15 @@
     .legend{flex-direction:row;flex-wrap:wrap;gap:16px;justify-content:center}
     .panel .detail{display:none}
     .tap-hint{display:block}
+  }
+  @media (max-width:430px){
+    .floor .pn{width:26px;font-size:15px}
+    .bld .roof,.bld .local{margin-left:33px}
+    .u{min-height:58px;padding:6px 2px}
+    .u .ut{font-size:8.4px}
+    .u .us{font-size:7.3px}
+    .u .ul{top:4px;left:4px;font-size:8px}
+    .floor .cells{gap:5px}
   }
   .tap-hint{display:none;text-align:center;margin-top:16px;font-size:12.5px;color:var(--muted);font-weight:300}
   /* Bottom-sheet (mobile) */
@@ -511,6 +521,12 @@
   ];
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
   var disp = function(x){ return x.fin != null || x.cash != null; };
+  var tipoLabel = function(pnum, u){
+    if (u === 'A' || u === 'B') return 'Monoambiente';
+    if (u === 'D') return 'Estudio';
+    if (u === 'C') return (pnum === 1 || pnum >= 6) ? '2 ambientes' : 'Estudio';
+    return '';
+  };
   var planInfo = function(pnum, u){
     if (u === 'A') return {img:'plano-a', tipo:'Monoambiente', cub:'30,17', tot:'34,26'};
     if (u === 'B') return pnum <= 5
@@ -534,9 +550,10 @@
       for (var i = 0; i < 4; i++){
         var x = f.us[i];
         if (!x){ h += '<div class="u empty"></div>'; continue; }
-        if (disp(x)) h += '<div class="u disp" data-f="'+fi+'" data-u="'+i+'"><span class="ul">'+x.u+'</span><span class="us">Disponible</span></div>';
-        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="us">Vendido</span></div>';
-        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="us">No disp.</span></div>';
+        var tl = tipoLabel(parseInt(f.p, 10), x.u);
+        if (disp(x)) h += '<div class="u disp" data-f="'+fi+'" data-u="'+i+'"><span class="ul">'+x.u+'</span><span class="ut">'+tl+'</span><span class="us">Disponible</span></div>';
+        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="ut">'+tl+'</span><span class="us">Vendido</span></div>';
+        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="ut">'+tl+'</span><span class="us">No disp.</span></div>';
       }
       h += '</div></div>';
     });
