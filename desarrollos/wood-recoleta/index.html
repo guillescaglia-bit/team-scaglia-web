@@ -288,8 +288,8 @@
       <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
     </div>
     <div class="planobox">
-      <img src="img/plano-a.jpg" alt="Plano tipo · Unidad A">
-      <div class="cap">Unidad A · Monoambiente · 34,26 m²</div>
+      <img src="img/int-cocina.jpg" alt="Cocina · terminaciones WOOD Recoleta">
+      <div class="cap">Cocina integrada · mesada Silestone y porcelanato</div>
     </div>
   </div>
 </section>
@@ -306,6 +306,37 @@
       <div class="tipo"><div class="n">2 ambientes</div><div class="m">51 m²</div><div class="d">Las unidades más amplias del edificio, con generosos ambientes y balcón. Unidades ideales para vivienda o consultorios.</div></div>
     </div>
     <p class="foot">12 pisos + local comercial a la calle · consultá disponibilidad, plantas y precios actualizados.</p>
+  </div>
+</section>
+
+<!-- GALERÍA INTERIORES -->
+<style>
+  .galery{background:var(--paper)}
+  .galery .head{text-align:center;max-width:640px;margin:0 auto}
+  .galery .head .subt{margin:2px auto 0}
+  .gal-grid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1080px;margin-left:auto;margin-right:auto}
+  .gal-item{position:relative;overflow:hidden;border-radius:5px;cursor:zoom-in;background:var(--green-3);aspect-ratio:4/3}
+  .gal-item.wide{grid-column:span 2}
+  .gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .gal-item:hover img{transform:scale(1.05)}
+  .gal-item .gcap{position:absolute;left:0;right:0;bottom:0;padding:22px 16px 12px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#fff;font-weight:500;background:linear-gradient(to top,rgba(40,56,46,.82),transparent)}
+  @media(max-width:720px){.gal-grid{grid-template-columns:repeat(2,1fr);gap:10px}.gal-item.wide{grid-column:span 2}}
+</style>
+<section class="galery">
+  <div class="wrap reveal">
+    <div class="head">
+      <div class="eyebrow">Interiores</div>
+      <h2 class="title">Espacios pensados para habitar</h2>
+      <div class="subt">/ renders del proyecto</div>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-item wide"><img src="img/int-2amb-living.jpg" alt="2 ambientes · living" loading="lazy"><div class="gcap">2 ambientes · living</div></div>
+      <div class="gal-item"><img src="img/int-mono-living.jpg" alt="Monoambiente · living" loading="lazy"><div class="gcap">Monoambiente · living</div></div>
+      <div class="gal-item"><img src="img/int-2amb-dorm.jpg" alt="2 ambientes · dormitorio" loading="lazy"><div class="gcap">2 ambientes · dormitorio</div></div>
+      <div class="gal-item"><img src="img/int-mono2-living.jpg" alt="Monoambiente · living con vista" loading="lazy"><div class="gcap">Living · con vista</div></div>
+      <div class="gal-item"><img src="img/int-bano.jpg" alt="Baño · porcelanato" loading="lazy"><div class="gcap">Baño · porcelanato</div></div>
+    </div>
+    <a class="ver-unidades" href="#disponibilidad" style="justify-content:center;margin-top:38px">Ver unidades disponibles <span class="ar">→</span></a>
   </div>
 </section>
 
@@ -344,7 +375,15 @@
   .detail .empty{color:var(--muted);font-size:14px;font-weight:300;line-height:1.7}
   .detail .dp{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--green)}
   .detail .du{font-family:var(--sans);font-size:27px;color:var(--ink);font-weight:600;letter-spacing:.01em;margin-top:4px;line-height:1}
-  .detail .dt{font-size:13.5px;color:var(--muted);margin-top:6px;font-weight:300}
+  .detail .dtipo{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--green);margin-top:8px;letter-spacing:.01em}
+  .detail .dt{font-size:13.5px;color:var(--muted);margin-top:5px;font-weight:300}
+  .detail .dplano{margin-top:16px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--green);cursor:zoom-in}
+  .detail .dplano img{display:block;width:100%;height:auto;max-height:380px;object-fit:contain;background:var(--green)}
+  .detail .dplano-cap{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.72);text-align:center;padding:9px;background:var(--green-2)}
+  .plb{position:fixed;inset:0;z-index:200;background:rgba(40,56,46,.94);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+  .plb.on{display:flex}
+  .plb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px}
+  .plb-x{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:38px;line-height:1;cursor:pointer;opacity:.85;font-family:var(--sans)}
   .detail .price{font-family:var(--sans);font-size:30px;color:var(--green);font-weight:600;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin-top:2px;line-height:1}
   .detail .pblock{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
   .detail .pbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:8px}
@@ -458,6 +497,20 @@
   ];
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
   var disp = function(x){ return x.fin != null || x.cash != null; };
+  var planInfo = function(pnum, u){
+    if (u === 'A') return {img:'plano-a', tipo:'Monoambiente', m2:'34,26 m²'};
+    if (u === 'B') return pnum <= 5
+      ? {img:'plano-b-1a5', tipo:'Monoambiente', m2:'36,99 m²'}
+      : {img:'plano-b-6a10', tipo:'Monoambiente', m2:'40,69 m²'};
+    if (u === 'C'){
+      if (pnum === 1) return {img:'plano-c-1', tipo:'2 Ambientes', m2:'107,68 m² · con terraza propia'};
+      return pnum <= 5
+        ? {img:'plano-c-2a5', tipo:'Estudio profesional', m2:'27,17 m²'}
+        : {img:'plano-c-6a10', tipo:'2 Ambientes', m2:'50,83 m²'};
+    }
+    if (u === 'D') return {img:'plano-d', tipo:'Estudio profesional', m2:'25,79 m²'};
+    return null;
+  };
   var bld = document.getElementById('bld');
   if (bld){
     var h = '<div class="roof"></div>';
@@ -481,7 +534,11 @@
       var fi = +cell.getAttribute('data-f'), f = FLOORS[fi], x = f.us[+cell.getAttribute('data-u')];
       var pref = (x.fin != null) ? x.fin : x.cash;
       var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de WOOD Recoleta (Larrea 1180), publicada en '+fmtU(pref)+'. ¿Me pasás la planta y más info?');
-      var html = '<div class="dp">Unidad disponible</div><div class="du">'+f.p+' · '+x.u+'</div><div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
+      var pi = planInfo(parseInt(f.p, 10), x.u);
+      var html = '<div class="dp">Unidad disponible</div><div class="du">'+f.p+' · '+x.u+'</div>';
+      if (pi) html += '<div class="dtipo">'+pi.tipo+' · '+pi.m2+'</div>';
+      html += '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
+      if (pi) html += '<div class="dplano"><img src="img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
       if (x.fin != null){
         var adelanto = Math.round(x.fin * 0.30), cuota = Math.round(x.fin * 0.70 / 24);
         html += '<div class="pblock"><div class="pbl">Precio financiado · 30% + 24 cuotas</div>'+
@@ -496,7 +553,21 @@
       html += '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
       detail.innerHTML = html;
     });
+    detail.addEventListener('click', function(e){
+      var box = e.target.closest('.dplano'); if (!box) return;
+      openLB(box.querySelector('img').src);
+    });
   }
+  // Lightbox global (plantas + galería de interiores)
+  var lb = document.createElement('div'); lb.className = 'plb'; lb.innerHTML = '<img alt="Imagen ampliada"><button class="plb-x" aria-label="Cerrar">×</button>';
+  document.body.appendChild(lb);
+  var lbImg = lb.querySelector('img');
+  function openLB(src){ lbImg.src = src; lb.classList.add('on'); }
+  lb.addEventListener('click', function(){ lb.classList.remove('on'); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') lb.classList.remove('on'); });
+  Array.prototype.forEach.call(document.querySelectorAll('.gal-item'), function(g){
+    g.addEventListener('click', function(){ openLB(g.querySelector('img').src); });
+  });
 </script>
 </body>
 </html>
