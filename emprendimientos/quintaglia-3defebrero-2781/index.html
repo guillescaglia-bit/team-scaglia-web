@@ -54,6 +54,8 @@
   .top{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;transition:background .4s,box-shadow .4s;color:#fff}
   .top.solid{background:var(--green);box-shadow:0 2px 20px rgba(0,0,0,.16)}
   .top .brand{font-family:var(--sans);font-weight:300;font-size:20px;letter-spacing:.32em;padding-left:.32em}
+  .top .brand-word{height:15px;width:auto;display:block;margin-bottom:3px}
+  footer .fbrand-word{height:22px;width:auto;display:inline-block}
   .top .brand small{display:block;font-family:var(--sans);font-size:8px;letter-spacing:.42em;opacity:.7;margin-top:-2px}
   .top .cta{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);color:#fff;text-decoration:none;padding:9px 18px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;transition:background .25s}
   .top .cta:hover{background:rgba(255,255,255,.26)}
@@ -63,7 +65,7 @@
   .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
   .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,18,.55) 0%,rgba(18,18,18,.12) 32%,rgba(18,18,18,.30) 62%,rgba(28,40,34,.86) 100%)}
   .hero .inner{position:relative;padding-bottom:clamp(48px,8vw,86px);width:100%}
-  .hero .wm{font-family:var(--sans);font-weight:300;font-size:clamp(36px,8.4vw,86px);line-height:1;letter-spacing:.18em;padding-left:.18em}
+  .hero .wm{width:clamp(270px,54vw,600px);height:auto;display:block}
   .hero .rec{font-size:clamp(12px,2.7vw,22px);font-weight:400;letter-spacing:.34em;padding-left:.34em;margin-top:8px}
   .hero .addr{margin-top:26px;font-size:15px;font-weight:300;letter-spacing:.04em;display:flex;align-items:center;gap:10px;opacity:.94}
   .hero .row{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
@@ -182,7 +184,7 @@
 <body>
 
 <div class="top" id="top">
-  <div class="brand">QUINTAGLIA<small>3 DE FEBRERO</small></div>
+  <div class="brand"><img class="brand-word" src="img/quintaglia-word.png" alt="QUINTAGLIA"><small>3 DE FEBRERO</small></div>
   <a class="cta" href="#contacto">Consultar</a>
 </div>
 
@@ -191,7 +193,7 @@
   <img class="bg" src="img/hero.jpg" alt="Quintaglia · fachada del edificio">
   <div class="veil"></div>
   <div class="inner wrap">
-    <div class="wm">QUINTAGLIA</div>
+    <img class="wm" src="img/quintaglia-word.png" alt="QUINTAGLIA">
     <div class="rec">3 DE FEBRERO 2781</div>
     <div class="addr">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.4-7-11a7 7 0 0 1 14 0c0 4.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
@@ -224,7 +226,7 @@
     <div class="body">
       <div class="eyebrow">El proyecto</div>
       <h2 class="title">Habitar</h2>
-      <div class="subt">/ Núñez · Belgrano</div>
+      <div class="subt">/ Nunez · Belgrano</div>
       <p class="lead">En <b>Quintaglia</b>, la arquitectura contemporánea da forma a espacios pensados para ser vividos. Cada detalle combina <i>diseño</i>, <i>funcionalidad</i> y <i>calidad constructiva</i>, creando ambientes que acompañan el ritmo de la ciudad sin perder calidez.</p>
       <p class="lead">A lo largo de sus <b>12 pisos</b>, el edificio se integra de manera natural al entorno urbano, con <b>amenities</b> —piscina, solárium, parrilla y laundry— y un <b>local comercial en esquina</b> que suma vida al barrio.</p>
       <p class="lead">Vivir Quintaglia es sentir <b>Núñez y Belgrano</b> desde adentro, en un lugar donde la ciudad se vuelve <b>hogar</b>.</p>
@@ -238,7 +240,7 @@
   <div class="wrap reveal">
     <div class="eyebrow">Ubicación estratégica</div>
     <h2 class="title">A pocos pasos de todo</h2>
-    <div class="subt">/ Núñez y Belgrano</div>
+    <div class="subt">/ Nunez y Belgrano</div>
     <p class="lead2"><b>Núñez y Belgrano</b> combinan lo mejor de dos mundos: <i>el verde y el río</i> junto a una amplia oferta urbana. Una de las zonas más buscadas de Buenos Aires, tranquila y muy bien conectada.</p>
     <p class="lead2">A pocos pasos de Quintaglia: las Barrancas, el corredor comercial de Av. Cabildo, colegios y universidades, centros de salud, gastronomía y transporte —Tren Mitre y subte— para moverte por toda la ciudad.</p>
     <div class="grid">
@@ -264,7 +266,7 @@
 <section class="tipos">
   <div class="wrap reveal">
     <div class="eyebrow">Unidades</div>
-    <h2 class="title">Tipologías</h2>
+    <h2 class="title">Tipologias</h2>
     <div class="subt">/ Estudios, 2, 3 y 4 ambientes</div>
     <div class="cards">
       <div class="tipo" data-tipo="estudio"><div class="n">Estudios</div><div class="m">35 m²</div><div class="desde" data-tipo="estudio"></div><div class="d">Unidades compactas y eficientes con balcón, ideales para invertir o para vivir. Excelente relación metros / ubicación en Núñez.</div><div class="tipo-cta">Ver unidades disponibles <span>→</span></div></div>
@@ -458,7 +460,7 @@
 <section class="fin">
   <div class="wrap reveal">
     <div class="eyebrow">Plan de pago</div>
-    <h2 class="title" style="color:#fff">Financiación directa</h2>
+    <h2 class="title" style="color:#fff">Financiacion directa</h2>
     <div class="nums">
       <div class="num"><div class="big">50%</div><div class="lbl">de anticipo</div></div>
       <div class="num"><div class="big">24</div><div class="lbl">cuotas en USD o CAC</div></div>
@@ -472,7 +474,7 @@
   <div class="wrap reveal">
     <div class="eyebrow">Contacto</div>
     <h2 class="title">Sumate a Quintaglia</h2>
-    <div class="subt">/ Núñez · Belgrano</div>
+    <div class="subt">/ Nunez · Belgrano</div>
     <p>Escribinos y te enviamos la lista de precios, las plantas disponibles y el brochure completo del desarrollo.</p>
     <div class="actions">
       <a class="btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">
@@ -488,7 +490,7 @@
 </section>
 
 <footer>
-  <div class="fbrand serif">QUINTAGLIA</div>
+  <img class="fbrand-word" src="img/quintaglia-word.png" alt="QUINTAGLIA">
   <div style="margin-top:8px">3 de Febrero 2781 · Núñez / Belgrano · Buenos Aires</div>
   <div style="margin-top:4px">Comercializa: <b style="color:var(--cream);font-weight:500">Red SUMA</b> · Desarrolla: <b style="color:var(--cream);font-weight:500">Quintaglia Desarrollos</b></div>
   <p class="legal">Imágenes de carácter ilustrativo, no contractual. Las superficies, terminaciones y plazos de entrega son estimados y pueden sufrir modificaciones. Consultar condiciones comerciales vigentes. Somos parte del equipo Red Suma — Martillero responsable Diego Mastrangelo CPI 7615 CSI 6609.</p>
