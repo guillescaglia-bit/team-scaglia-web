@@ -5,5 +5,11 @@
   "redirects": [
     { "source": "/desarrollos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta", "permanent": false },
     { "source": "/desarrollos/wood-recoleta/:path*", "destination": "/emprendimientos/wood-recoleta/:path*", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/:agent/emprendimientos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta/index.html" },
+    { "source": "/:agent/emprendimientos/wood-recoleta/", "destination": "/emprendimientos/wood-recoleta/index.html" },
+    { "source": "/:agent/emprendimientos/quintaglia-3defebrero-2781", "destination": "/emprendimientos/quintaglia-3defebrero-2781/index.html" },
+    { "source": "/:agent/emprendimientos/quintaglia-3defebrero-2781/", "destination": "/emprendimientos/quintaglia-3defebrero-2781/index.html" }
   ]
 }

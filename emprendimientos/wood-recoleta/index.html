@@ -141,6 +141,9 @@
   .contact h2.title{color:#fff}
   .contact .subt{color:rgba(237,228,211,.72);margin-top:6px}
   .contact p{font-size:15.5px;font-weight:300;color:rgba(255,255,255,.85);max-width:48ch;margin:22px auto 0;line-height:1.8}
+  .contact .agent-line{margin:18px auto 0;font-size:13px;color:rgba(255,255,255,.9);letter-spacing:.02em;display:inline-block;border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:7px 18px}
+  .contact .agent-line b{color:#fff;font-weight:600}
+  .contact .agent-line:empty{display:none}
   .contact .actions{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .btn-ghost{display:inline-flex;align-items:center;gap:10px;background:transparent;border:1px solid rgba(237,228,211,.5);color:#fff;text-decoration:none;padding:14px 26px;border-radius:3px;font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:background .25s}
   .btn-ghost:hover{background:rgba(237,228,211,.12)}
@@ -182,7 +185,7 @@
 
 <!-- HERO -->
 <header class="hero">
-  <img class="bg" src="img/hero.jpg" alt="WOOD Recoleta · fachada del edificio">
+  <img class="bg" src="/emprendimientos/wood-recoleta/img/hero.jpg" alt="WOOD Recoleta · fachada del edificio">
   <div class="veil"></div>
   <div class="inner wrap">
     <div class="wm">WOOD</div>
@@ -213,7 +216,7 @@
 <section>
   <div class="wrap split reveal">
     <div class="media">
-      <img src="img/edificio.jpg" alt="WOOD Recoleta · render del edificio">
+      <img src="/emprendimientos/wood-recoleta/img/edificio.jpg" alt="WOOD Recoleta · render del edificio">
     </div>
     <div class="body">
       <div class="eyebrow">El proyecto</div>
@@ -290,12 +293,12 @@
       <div class="subt">/ renders del proyecto</div>
     </div>
     <div class="gal-grid">
-      <div class="gal-item"><img src="img/int-2amb-living.jpg" alt="2 ambientes · living" loading="lazy"><div class="gcap">2 ambientes · living</div></div>
-      <div class="gal-item"><img src="img/int-mono-living.jpg" alt="Monoambiente · living" loading="lazy"><div class="gcap">Monoambiente · living</div></div>
-      <div class="gal-item"><img src="img/int-cocina.jpg" alt="Cocina integrada" loading="lazy"><div class="gcap">Cocina integrada</div></div>
-      <div class="gal-item"><img src="img/int-2amb-dorm.jpg" alt="2 ambientes · dormitorio" loading="lazy"><div class="gcap">2 ambientes · dormitorio</div></div>
-      <div class="gal-item"><img src="img/int-mono2-living.jpg" alt="Monoambiente · living con vista" loading="lazy"><div class="gcap">Living · con vista</div></div>
-      <div class="gal-item"><img src="img/int-bano.jpg" alt="Baño · porcelanato" loading="lazy"><div class="gcap">Baño · porcelanato</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-2amb-living.jpg" alt="2 ambientes · living" loading="lazy"><div class="gcap">2 ambientes · living</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-mono-living.jpg" alt="Monoambiente · living" loading="lazy"><div class="gcap">Monoambiente · living</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-cocina.jpg" alt="Cocina integrada" loading="lazy"><div class="gcap">Cocina integrada</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-2amb-dorm.jpg" alt="2 ambientes · dormitorio" loading="lazy"><div class="gcap">2 ambientes · dormitorio</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-mono2-living.jpg" alt="Monoambiente · living con vista" loading="lazy"><div class="gcap">Living · con vista</div></div>
+      <div class="gal-item"><img src="/emprendimientos/wood-recoleta/img/int-bano.jpg" alt="Baño · porcelanato" loading="lazy"><div class="gcap">Baño · porcelanato</div></div>
     </div>
     <a class="ver-unidades" href="#disponibilidad" style="justify-content:center;margin-top:38px">Ver unidades disponibles <span class="ar">→</span></a>
   </div>
@@ -464,6 +467,7 @@
     <h2 class="title">Sumate a WOOD</h2>
     <div class="subt">/ Recoleta</div>
     <p>Escribinos y te enviamos la lista de precios, las plantas disponibles y el brochure completo del desarrollo.</p>
+    <div class="agent-line" id="agentLine"></div>
     <div class="actions">
       <a class="btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
@@ -485,11 +489,28 @@
 </footer>
 
 <script>
-  // WhatsApp con mensaje pre-cargado
-  var TEL = '541130977868'; // ← número al que llegan las consultas
+  // WhatsApp con mensaje pre-cargado · el contacto puede ir al agente según la URL
+  var AGENTS = {
+    'carolina-klachko':{t:'541158598204',n:'Carolina Klachko'},
+    'cecilia-paul':{t:'541136836444',n:'Cecilia Paul'},
+    'federico-susemihl':{t:'541157463477',n:'Federico Susemihl'},
+    'giuliano-larroca':{t:'541158433676',n:'Giuliano Larroca'},
+    'guillermo-scaglia':{t:'541130977868',n:'Guillermo Scaglia'},
+    'irene-ruiz-diaz':{t:'541132514010',n:'Irene Ruiz Diaz'},
+    'luciano-perez':{t:'541169876997',n:'Luciano Pérez Mango'},
+    'romina-garfunkel':{t:'541166685050',n:'Romina Garfunkel'},
+    'talia-larroca':{t:'541157380298',n:'Talia Larroca'}
+  };
+  var TEL = '541130977868'; // default: Guillermo
+  var AGENT = null;
+  (function(){
+    var m = location.pathname.match(/^\/([^\/]+)\/emprendimientos\//);
+    if (m && AGENTS[m[1]]){ AGENT = AGENTS[m[1]]; TEL = AGENT.t; }
+  })();
   var MSG = encodeURIComponent('¡Hola! Me interesa el desarrollo WOOD Recoleta (Larrea 1180). Me gustaría recibir precios y disponibilidad.');
   var waHref = 'https://wa.me/' + TEL + '?text=' + MSG;
   document.getElementById('waBtn').href = waHref;
+  if (AGENT){ var _al = document.getElementById('agentLine'); if (_al) _al.innerHTML = 'Te atiende <b>'+AGENT.n+'</b> · Equipo Team Scaglia'; }
   document.querySelectorAll('a[href="#contacto"]').forEach(function(a){/* dejan el scroll interno */});
 
   // Topbar sólida al scrollear
@@ -607,7 +628,7 @@
           '<div class="dfin-row"><span>24 cuotas de</span><b>'+fmtU(cuota)+'</b></div>'+
           '<div class="dfin-note">* Cuota fija en dólares estadounidenses, o en pesos ajustada por el índice CAC.</div></div></div>';
       }
-      if (pi) html += '<div class="dplano"><img src="img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
+      if (pi) html += '<div class="dplano"><img src="/emprendimientos/wood-recoleta/img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
       html += '<button class="dback" type="button" data-back="'+tipoKey(parseInt(f.p,10), x.u)+'">‹ Ver todas de esta tipología</button>';
       html += '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
       return html;
