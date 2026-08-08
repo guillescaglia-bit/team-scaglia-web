@@ -345,7 +345,11 @@
   .detail .dp{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--green)}
   .detail .du{font-family:var(--sans);font-size:27px;color:var(--ink);font-weight:600;letter-spacing:.01em;margin-top:4px;line-height:1}
   .detail .dt{font-size:13.5px;color:var(--muted);margin-top:6px;font-weight:300}
-  .detail .price{font-family:var(--sans);font-size:30px;color:var(--green);font-weight:600;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin-top:18px;line-height:1}
+  .detail .price{font-family:var(--sans);font-size:30px;color:var(--green);font-weight:600;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin-top:2px;line-height:1}
+  .detail .pblock{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+  .detail .pbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:8px}
+  .detail .pblock.cash .pbl{color:var(--muted)}
+  .detail .price-cash{font-family:var(--sans);font-size:26px;color:var(--ink);font-weight:600;letter-spacing:.01em;font-variant-numeric:tabular-nums;line-height:1}
   .detail .dmeta{font-size:12px;color:var(--muted);margin-top:6px}
   .detail .dfin{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
   .detail .dfin-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:5px 0;font-size:13.5px;color:#4b4f45}
@@ -444,22 +448,23 @@
   var FLOORS = [
     {p:'9°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
     {p:'8°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
-    {p:'7°', us:[{u:'A',price:123336},{u:'B',price:146484},{u:'C',price:182988}]},
-    {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',price:177905}]},
-    {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',price:87686}]},
-    {p:'4°', us:[{u:'A',s:'v'},{u:'B',price:117000},{u:'C',price:89661},{u:'D',price:85107}]},
-    {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',price:86944},{u:'D',price:82528}]},
-    {p:'2°', us:[{u:'A',s:'v'},{u:'B',price:118400},{u:'C',price:84227},{u:'D',s:'v'}]},
-    {p:'1°', us:[{u:'A',price:95928},{u:'B',price:103572},{u:'C',price:185000}]}
+    {p:'7°', us:[{u:'A',fin:123336,cash:117169},{u:'B',fin:146484,cash:139160},{u:'C',fin:182988,cash:173839}]},
+    {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:177905,cash:170281}]},
+    {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',fin:87686,cash:83818}]},
+    {p:'4°', us:[{u:'A',s:'v'},{u:'B',fin:null,cash:117000},{u:'C',fin:89661,cash:85586},{u:'D',fin:85107,cash:81239}]},
+    {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:86944,cash:82597},{u:'D',fin:82528,cash:78402}]},
+    {p:'2°', us:[{u:'A',s:'v'},{u:'B',fin:118400,cash:105422},{u:'C',fin:84227,cash:74718},{u:'D',s:'v'}]},
+    {p:'1°', us:[{u:'A',fin:95928,cash:85650},{u:'B',fin:103572,cash:92475},{u:'C',fin:185000,cash:175750}]}
   ];
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
+  var disp = function(x){ return x.fin != null || x.cash != null; };
   var bld = document.getElementById('bld');
   if (bld){
     var h = '<div class="roof"></div>';
     FLOORS.forEach(function(f, fi){
       h += '<div class="floor"><div class="pn">'+f.p+'</div><div class="cells">';
       f.us.forEach(function(x, ui){
-        if (x.price != null) h += '<div class="u disp" data-f="'+fi+'" data-u="'+ui+'"><span class="ul">'+x.u+'</span><span class="up">'+fmtU(x.price)+'</span></div>';
+        if (disp(x)){ var pr = (x.fin != null) ? x.fin : x.cash; h += '<div class="u disp" data-f="'+fi+'" data-u="'+ui+'"><span class="ul">'+x.u+'</span><span class="up">'+fmtU(pr)+'</span></div>'; }
         else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="up">Vendida</span></div>';
         else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="up">No disponible</span></div>';
       });
@@ -474,21 +479,22 @@
       var prev = bld.querySelector('.u.sel'); if (prev) prev.classList.remove('sel');
       cell.classList.add('sel');
       var fi = +cell.getAttribute('data-f'), f = FLOORS[fi], x = f.us[+cell.getAttribute('data-u')];
-      var adelanto = Math.round(x.price * 0.30);
-      var cuota = Math.round(x.price * 0.70 / 24);
-      var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de WOOD Recoleta (Larrea 1180), publicada en '+fmtU(x.price)+'. ¿Me pasás la planta y más info?');
-      detail.innerHTML =
-        '<div class="dp">Unidad disponible</div>'+
-        '<div class="du">'+f.p+' · '+x.u+'</div>'+
-        '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>'+
-        '<div class="price">'+fmtU(x.price)+'</div>'+
-        '<div class="dmeta">Plan directo · 30% de anticipo + 24 cuotas</div>'+
-        '<div class="dfin">'+
-          '<div class="dfin-row"><span>Adelanto (30%)</span><b>'+fmtU(adelanto)+'</b></div>'+
+      var pref = (x.fin != null) ? x.fin : x.cash;
+      var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de WOOD Recoleta (Larrea 1180), publicada en '+fmtU(pref)+'. ¿Me pasás la planta y más info?');
+      var html = '<div class="dp">Unidad disponible</div><div class="du">'+f.p+' · '+x.u+'</div><div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
+      if (x.fin != null){
+        var adelanto = Math.round(x.fin * 0.30), cuota = Math.round(x.fin * 0.70 / 24);
+        html += '<div class="pblock"><div class="pbl">Precio financiado · 30% + 24 cuotas</div>'+
+          '<div class="price">'+fmtU(x.fin)+'</div>'+
+          '<div class="dfin"><div class="dfin-row"><span>Adelanto (30%)</span><b>'+fmtU(adelanto)+'</b></div>'+
           '<div class="dfin-row"><span>24 cuotas de</span><b>'+fmtU(cuota)+'</b></div>'+
-          '<div class="dfin-note">* Cuota fija en dólares estadounidenses, o en pesos ajustada por el índice CAC.</div>'+
-        '</div>'+
-        '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
+          '<div class="dfin-note">* Cuota fija en dólares estadounidenses, o en pesos ajustada por el índice CAC.</div></div></div>';
+      }
+      if (x.cash != null){
+        html += '<div class="pblock cash"><div class="pbl">Precio cash · 100% adelantado</div><div class="price-cash">'+fmtU(x.cash)+'</div></div>';
+      }
+      html += '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
+      detail.innerHTML = html;
     });
   }
 </script>
