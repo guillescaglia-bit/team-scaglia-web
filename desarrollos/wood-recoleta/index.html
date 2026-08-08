@@ -351,10 +351,13 @@
   .floor .cells{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
   .floor.hdr{align-items:end}
   .floor.hdr .hl{text-align:center;font-family:var(--sans);font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:600;padding-bottom:3px}
-  .u{min-height:50px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;transition:transform .18s,background .2s,color .2s,box-shadow .2s}
+  .u{min-height:56px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid transparent;transition:transform .18s,background .2s,color .2s,box-shadow .2s;padding:4px 2px}
   .u .ul{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:.03em;line-height:1}
+  .u .us{font-family:var(--sans);font-size:8.5px;font-weight:500;letter-spacing:.03em;line-height:1;white-space:nowrap;opacity:.85}
   .u.disp{background:var(--cream);color:var(--green);border-color:#e2d9c6;cursor:pointer}
+  .u.disp .us{color:var(--muted);opacity:1}
   .u.disp:hover,.u.disp.sel{background:var(--green);color:#fff;transform:translateY(-2px);box-shadow:0 7px 18px rgba(64,88,74,.28)}
+  .u.disp:hover .us,.u.disp.sel .us{color:rgba(255,255,255,.9)}
   .u.vend{background:var(--green-3);color:rgba(237,228,211,.5)}
   .u.nolib{background:transparent;border:1px dashed var(--line);color:var(--muted)}
   .u.empty{background:transparent;border:none;min-height:0}
@@ -531,9 +534,9 @@
       for (var i = 0; i < 4; i++){
         var x = f.us[i];
         if (!x){ h += '<div class="u empty"></div>'; continue; }
-        if (disp(x)) h += '<div class="u disp" data-f="'+fi+'" data-u="'+i+'"><span class="ul">'+x.u+'</span></div>';
-        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span></div>';
-        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span></div>';
+        if (disp(x)) h += '<div class="u disp" data-f="'+fi+'" data-u="'+i+'"><span class="ul">'+x.u+'</span><span class="us">Disponible</span></div>';
+        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="us">Vendido</span></div>';
+        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="us">No disp.</span></div>';
       }
       h += '</div></div>';
     });
@@ -557,7 +560,9 @@
         html += '<div class="dtipo">'+pi.tipo+'</div><div class="dm2">'+m2txt+'</div>';
       }
       html += '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
-      if (pi) html += '<div class="dplano"><img src="img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
+      if (x.cash != null){
+        html += '<div class="pblock cash"><div class="pbl">Precio cash · 100% adelantado</div><div class="price-cash">'+fmtU(x.cash)+'</div></div>';
+      }
       if (x.fin != null){
         var adelanto = Math.round(x.fin * 0.30), cuota = Math.round(x.fin * 0.70 / 24);
         html += '<div class="pblock"><div class="pbl">Precio financiado · 30% + 24 cuotas</div>'+
@@ -566,9 +571,7 @@
           '<div class="dfin-row"><span>24 cuotas de</span><b>'+fmtU(cuota)+'</b></div>'+
           '<div class="dfin-note">* Cuota fija en dólares estadounidenses, o en pesos ajustada por el índice CAC.</div></div></div>';
       }
-      if (x.cash != null){
-        html += '<div class="pblock cash"><div class="pbl">Precio cash · 100% adelantado</div><div class="price-cash">'+fmtU(x.cash)+'</div></div>';
-      }
+      if (pi) html += '<div class="dplano"><img src="img/'+pi.img+'.jpg" alt="Planta unidad '+x.u+' — '+pi.tipo+'" loading="lazy"><div class="dplano-cap">Planta · Unidad '+x.u+'</div></div>';
       html += '<a class="dwa" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a>';
       detail.innerHTML = html;
       if (window.matchMedia('(max-width:820px)').matches) openSheet(html);
