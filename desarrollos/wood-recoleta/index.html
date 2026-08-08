@@ -184,7 +184,6 @@
       Larrea 1180, Recoleta · Buenos Aires
     </div>
     <div class="row">
-      <span class="pill">Entrega 1<sup>er</sup> sem. 2029 · Anticipo 30% + 24 cuotas</span>
       <a class="btn-wa" href="#contacto">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
         Quiero más info
@@ -192,14 +191,12 @@
       <a class="btn-ghost" href="#disponibilidad" style="border-color:rgba(237,228,211,.55)">Ver unidades disponibles <span class="ar" style="margin-left:2px">→</span></a>
     </div>
   </div>
-  <div class="scroll-cue">Scroll</div>
 </header>
 
 <!-- MANIFIESTO -->
 <section class="manifesto">
   <div class="wrap reveal">
     <div class="w-mono">W</div>
-    <p>Donde el movimiento urbano se transforma en calma.</p>
     <div class="loc">Recoleta · Bs. As.</div>
   </div>
 </section>
@@ -348,22 +345,20 @@
   .avail .layout{margin-top:48px;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,4vw,52px);align-items:start;max-width:960px;margin-left:auto;margin-right:auto}
   /* Edificio */
   .bld{display:flex;flex-direction:column;gap:7px}
-  .bld .roof{height:16px;background:repeating-linear-gradient(90deg,var(--green) 0 10px,var(--green-2) 10px 20px);border-radius:3px 3px 0 0;opacity:.9;margin:0 34px}
+  .bld .roof{height:16px;background:repeating-linear-gradient(90deg,var(--green) 0 10px,var(--green-2) 10px 20px);border-radius:3px 3px 0 0;opacity:.9;margin:0 0 2px 41px}
   .floor{display:flex;align-items:stretch;gap:7px}
   .floor .pn{flex:none;width:34px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:var(--green);font-weight:600}
-  .floor .cells{flex:1;display:flex;gap:7px}
-  .u{flex:1;min-height:60px;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;border:1px solid transparent;transition:transform .18s,background .2s,color .2s;padding:6px 4px}
-  .u .ul{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
-  .u .up{font-size:12.5px;font-weight:600;letter-spacing:.01em;line-height:1.1}
-  .u.disp{background:var(--cream);color:var(--ink);border-color:#e2d9c6;cursor:pointer}
-  .u.disp .up{color:var(--green)}
-  .u.disp:hover,.u.disp.sel{background:var(--green);color:#fff;transform:translateY(-2px)}
-  .u.disp:hover .up,.u.disp.sel .up,.u.disp:hover .ul,.u.disp.sel .ul{color:#fff;opacity:.95}
-  .u.vend{background:var(--green-3);color:rgba(237,228,211,.55)}
-  .u.vend .up{font-weight:500}
+  .floor .cells{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .floor.hdr{align-items:end}
+  .floor.hdr .hl{text-align:center;font-family:var(--sans);font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:600;padding-bottom:3px}
+  .u{min-height:50px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;transition:transform .18s,background .2s,color .2s,box-shadow .2s}
+  .u .ul{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:.03em;line-height:1}
+  .u.disp{background:var(--cream);color:var(--green);border-color:#e2d9c6;cursor:pointer}
+  .u.disp:hover,.u.disp.sel{background:var(--green);color:#fff;transform:translateY(-2px);box-shadow:0 7px 18px rgba(64,88,74,.28)}
+  .u.vend{background:var(--green-3);color:rgba(237,228,211,.5)}
   .u.nolib{background:transparent;border:1px dashed var(--line);color:var(--muted)}
-  .u.nolib .up{font-weight:400;font-size:11px}
-  .bld .local{margin:2px 34px 0;background:#fff;border:1px solid var(--line);border-radius:0 0 3px 3px;padding:12px;text-align:center;font-size:12px;color:var(--muted);letter-spacing:.03em}
+  .u.empty{background:transparent;border:none;min-height:0}
+  .bld .local{margin:4px 0 0 41px;background:#fff;border:1px solid var(--line);border-radius:0 0 3px 3px;padding:12px;text-align:center;font-size:12px;color:var(--muted);letter-spacing:.03em}
   .bld .local b{color:var(--green)}
   /* Panel detalle */
   .panel{position:sticky;top:88px}
@@ -530,13 +525,16 @@
   var bld = document.getElementById('bld');
   if (bld){
     var h = '<div class="roof"></div>';
+    h += '<div class="floor hdr"><div class="pn"></div><div class="cells"><div class="hl">A</div><div class="hl">B</div><div class="hl">C</div><div class="hl">D</div></div></div>';
     FLOORS.forEach(function(f, fi){
       h += '<div class="floor"><div class="pn">'+f.p+'</div><div class="cells">';
-      f.us.forEach(function(x, ui){
-        if (disp(x)){ var pr = (x.fin != null) ? x.fin : x.cash; h += '<div class="u disp" data-f="'+fi+'" data-u="'+ui+'"><span class="ul">'+x.u+'</span><span class="up">'+fmtU(pr)+'</span></div>'; }
-        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span><span class="up">Vendida</span></div>';
-        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span><span class="up">No disponible</span></div>';
-      });
+      for (var i = 0; i < 4; i++){
+        var x = f.us[i];
+        if (!x){ h += '<div class="u empty"></div>'; continue; }
+        if (disp(x)) h += '<div class="u disp" data-f="'+fi+'" data-u="'+i+'"><span class="ul">'+x.u+'</span></div>';
+        else if (x.s === 'v') h += '<div class="u vend"><span class="ul">'+x.u+'</span></div>';
+        else h += '<div class="u nolib"><span class="ul">'+x.u+'</span></div>';
+      }
       h += '</div></div>';
     });
     h += '<div class="local">Local comercial a la calle · <b>Consultar</b></div>';
