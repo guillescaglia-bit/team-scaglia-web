@@ -12,6 +12,5 @@ index.html.backup
 # Documentos generados (no van al deploy)
 manual-de-marca-team-scaglia.pdf
 
-# Brochures pesados de emprendimientos (las imagenes optimizadas estan en /desarrollos)
-Emprendimientos/
+# Temporales de desarrollo
 .tmp-dev/

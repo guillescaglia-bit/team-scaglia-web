@@ -899,6 +899,8 @@
         }
 
         .dev-card:hover { box-shadow: 0 16px 44px rgba(0,0,0,0.10); transform: translateY(-3px); }
+        a.dev-card { text-decoration: none; color: inherit; }
+        a.dev-card:hover .dev-cta.filled { background: var(--primary-dark, #1a2847); }
 
         .dev-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
 
@@ -1293,7 +1295,7 @@
                     </div>
                 </div>
             </div>
-            <div class="dev-card">
+            <a class="dev-card" href="/emprendimientos/wood-recoleta/">
                 <img class="dev-img" src="/desarrollos/wood.jpg" alt="Render del edificio Wood Recoleta" loading="lazy">
                 <div class="dev-body">
                     <div class="dev-tag">Desarrollo residencial</div>
@@ -1305,11 +1307,10 @@
                         <li class="dev-spec"><span class="k">Entrega</span><span class="v">Segundo semestre 2028</span></li>
                     </ul>
                     <div class="dev-actions">
-                        <a class="dev-cta filled" href="/desarrollos/brochure-wood.pdf" target="_blank" rel="noopener">Ver brochure</a>
-                        <button class="dev-cta" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Solicitar información</button>
+                        <span class="dev-cta filled">Ver desarrollo <span aria-hidden="true">→</span></span>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 

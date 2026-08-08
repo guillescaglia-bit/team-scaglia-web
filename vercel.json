@@ -1,5 +1,9 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "redirects": [
+    { "source": "/desarrollos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta", "permanent": false },
+    { "source": "/desarrollos/wood-recoleta/:path*", "destination": "/emprendimientos/wood-recoleta/:path*", "permanent": false }
+  ]
 }
