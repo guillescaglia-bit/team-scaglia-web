@@ -117,6 +117,8 @@
   .tipo:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(40,56,46,.14)}
   .tipo .n{font-family:var(--serif);font-size:26px;color:var(--green);font-weight:600}
   .tipo .m{font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+  .tipo .desde{margin-top:14px;font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .tipo .desde b{display:block;margin-top:3px;font-family:var(--sans);font-size:21px;font-weight:700;letter-spacing:.01em;color:var(--green);text-transform:none}
   .tipo .d{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;font-weight:300;color:#4b4f45;line-height:1.6}
   .tipos .foot{margin-top:30px;font-size:13px;color:var(--muted);font-weight:300}
 
@@ -298,9 +300,9 @@
     <h2 class="title">Tipologías</h2>
     <div class="subt">/ de 25 a 51 m²</div>
     <div class="cards">
-      <div class="tipo"><div class="n">Estudios</div><div class="m">25 a 27 m²</div><div class="d">Unidades compactas y eficientes, ideales para invertir, destinadas a renta temporaria o estudios profesionales en el corazón de Recoleta.</div></div>
-      <div class="tipo"><div class="n">1 ambiente</div><div class="m">34 a 41 m²</div><div class="d">Monoambientes con balcón, pensados para el ritmo de la ciudad. Ideal para vivienda o renta temporaria. Unidades al frente.</div></div>
-      <div class="tipo"><div class="n">2 ambientes</div><div class="m">51 m²</div><div class="d">Las unidades más amplias del edificio, con generosos ambientes y balcón. Unidades ideales para vivienda o consultorios.</div></div>
+      <div class="tipo"><div class="n">Estudios</div><div class="m">25 a 27 m²</div><div class="desde" data-tipo="estudio"></div><div class="d">Unidades compactas y eficientes, ideales para invertir, destinadas a renta temporaria o estudios profesionales en el corazón de Recoleta.</div></div>
+      <div class="tipo"><div class="n">1 ambiente</div><div class="m">34 a 41 m²</div><div class="desde" data-tipo="mono"></div><div class="d">Monoambientes con balcón, pensados para el ritmo de la ciudad. Ideal para vivienda o renta temporaria. Unidades al frente.</div></div>
+      <div class="tipo"><div class="n">2 ambientes</div><div class="m">51 m²</div><div class="desde" data-tipo="dosamb"></div><div class="d">Las unidades más amplias del edificio, con generosos ambientes y balcón. Unidades ideales para vivienda o consultorios.</div></div>
     </div>
     <p class="foot">12 pisos + local comercial a la calle · consultá disponibilidad, plantas y precios actualizados.</p>
   </div>
@@ -527,6 +529,12 @@
     if (u === 'C') return (pnum === 1 || pnum >= 6) ? '2 ambientes' : 'Estudio';
     return '';
   };
+  var tipoKey = function(pnum, u){
+    if (u === 'A' || u === 'B') return 'mono';
+    if (u === 'D') return 'estudio';
+    if (u === 'C') return (pnum === 1 || pnum >= 6) ? 'dosamb' : 'estudio';
+    return '';
+  };
   var planInfo = function(pnum, u){
     if (u === 'A') return {img:'plano-a', tipo:'Monoambiente', cub:'30,17', tot:'34,26'};
     if (u === 'B') return pnum <= 5
@@ -541,6 +549,23 @@
     if (u === 'D') return {img:'plano-d', tipo:'Estudio profesional', cub:'25,79', tot:'25,79'};
     return null;
   };
+  // "Desde U$S ..." (cash más barato disponible) en cada card de Tipologías
+  (function(){
+    var min = {estudio:Infinity, mono:Infinity, dosamb:Infinity};
+    FLOORS.forEach(function(f){
+      var pn = parseInt(f.p, 10);
+      f.us.forEach(function(x){
+        if (x.cash == null) return;
+        var k = tipoKey(pn, x.u);
+        if (k && x.cash < min[k]) min[k] = x.cash;
+      });
+    });
+    document.querySelectorAll('.tipo .desde').forEach(function(el){
+      var v = min[el.getAttribute('data-tipo')];
+      if (v != null && isFinite(v)) el.innerHTML = 'Desde <b>'+fmtU(v)+'</b>';
+      else el.style.display = 'none';
+    });
+  })();
   var bld = document.getElementById('bld');
   if (bld){
     var h = '<div class="roof"></div>';
