@@ -504,7 +504,7 @@
     {p:'7°', us:[{u:'A',fin:123336,cash:117169},{u:'B',fin:146484,cash:139160},{u:'C',fin:182988,cash:173839}]},
     {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:177905,cash:170281}]},
     {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',fin:87686,cash:83818}]},
-    {p:'4°', us:[{u:'A',s:'v'},{u:'B',fin:null,cash:117000},{u:'C',fin:89661,cash:85586},{u:'D',fin:85107,cash:81239}]},
+    {p:'4°', us:[{u:'A',s:'v'},{u:'B',cash:117000},{u:'C',fin:89661,cash:85586},{u:'D',fin:85107,cash:81239}]},
     {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:86944,cash:82597},{u:'D',fin:82528,cash:78402}]},
     {p:'2°', us:[{u:'A',s:'v'},{u:'B',fin:118400,cash:105422},{u:'C',fin:84227,cash:74718},{u:'D',s:'v'}]},
     {p:'1°', us:[{u:'A',fin:95928,cash:85650},{u:'B',fin:103572,cash:92475},{u:'C',fin:185000,cash:175750}]}
@@ -561,7 +561,8 @@
       }
       html += '<div class="dt">WOOD Recoleta · Larrea 1180, Recoleta</div>';
       if (x.cash != null){
-        html += '<div class="pblock cash"><div class="pbl">Precio cash · 100% adelantado</div><div class="price-cash">'+fmtU(x.cash)+'</div></div>';
+        html += '<div class="pblock cash"><div class="pbl">Precio cash · 100% adelantado</div><div class="price-cash">'+fmtU(x.cash)+'</div>'+
+          (x.fin == null ? '<div class="dfin-note">Esta unidad se comercializa únicamente en modalidad cash (100% al contado).</div>' : '')+'</div>';
       }
       if (x.fin != null){
         var adelanto = Math.round(x.fin * 0.30), cuota = Math.round(x.fin * 0.70 / 24);
