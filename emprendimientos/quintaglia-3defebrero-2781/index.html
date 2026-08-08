@@ -12,18 +12,22 @@
 <meta property="og:url" content="https://www.teamscaglia.com/emprendimientos/quintaglia-3defebrero-2781">
 <meta property="og:image" content="https://www.teamscaglia.com/emprendimientos/quintaglia-3defebrero-2781/img/hero.jpg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Tipografías institucionales Quintaglia (self-hosted) */
+  @font-face{font-family:'Harume Roman';src:url('fonts/harume-roman.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+  @font-face{font-family:'Neue Montreal';src:url('fonts/neuemontreal-light.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Neue Montreal';src:url('fonts/neuemontreal-regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Neue Montreal';src:url('fonts/neuemontreal-medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Neue Montreal';src:url('fonts/neuemontreal-bold.woff2') format('woff2');font-weight:600 700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Neue Montreal';src:url('fonts/neuemontreal-italic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:swap}
   :root{
     --green:#1e1e1e; --green-2:#171717; --green-3:#111111;
     --cream:#EAE6DE; --paper:#F3F0E9; --card:#ffffff;
     --ink:#232120; --muted:#8b857a; --line:#ddd6cb; --mink:#D0C7BE;
     --res:#b07d2a;
     --wa:#25D366;
-    --serif:'Cormorant Garamond',Georgia,serif;
-    --sans:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+    --serif:'Harume Roman','Cormorant Garamond',Georgia,serif;
+    --sans:'Neue Montreal',-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -71,6 +75,7 @@
   /* Manifesto */
   .manifesto{background:var(--cream);text-align:center}
   .manifesto .w-mono{font-family:var(--serif);font-weight:500;font-size:60px;color:var(--green);line-height:1}
+  .manifesto .qlogo{height:78px;width:auto;margin:0 auto;display:block}
   .manifesto p{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3.6vw,36px);line-height:1.4;color:var(--green-2);max-width:20ch;margin:24px auto 0;text-wrap:balance}
   .manifesto .loc{margin-top:28px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
 
@@ -205,7 +210,7 @@
 <!-- MANIFIESTO -->
 <section class="manifesto">
   <div class="wrap reveal">
-    <div class="w-mono">Q</div>
+    <img class="qlogo" src="img/q-logo.png" alt="Quintaglia">
     <div class="loc">Núñez / Belgrano · Bs. As.</div>
   </div>
 </section>
