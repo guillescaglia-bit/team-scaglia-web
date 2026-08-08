@@ -227,30 +227,14 @@
   </div>
 </section>
 
-<!-- UBICACIÓN -->
-<section>
-  <div class="wrap split rev reveal">
-    <div class="media">
-      <img src="img/recoleta.jpg" alt="Barrio de Recoleta">
-      <span class="tagimg">Recoleta</span>
-    </div>
-    <div class="body">
-      <div class="eyebrow">Ubicación estratégica</div>
-      <h2 class="title">Todo a caminando.</h2>
-      <div class="subt">/ Literal</div>
-      <p class="lead"><b>Recoleta</b> es sinónimo de <i>elegancia, historia y vida urbana</i>. Uno de los barrios más emblemáticos de Buenos Aires, donde la arquitectura clásica convive con propuestas contemporáneas.</p>
-      <p class="lead">A pocos pasos de WOOD: cafés tradicionales, restaurantes de primer nivel, teatros, librerías, universidades, centros de salud y una amplia oferta comercial. Todo conectado por múltiples medios de transporte y con cercanía a líneas de subte.</p>
-      <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
-    </div>
-  </div>
-</section>
-
 <!-- AMENITIES / MAPA -->
 <section class="amen">
   <div class="wrap reveal">
-    <div class="eyebrow">Mapa · Habitar la ciudad</div>
+    <div class="eyebrow">Ubicación estratégica</div>
     <h2 class="title">A pocos pasos de todo</h2>
-    <div class="subt">/ Referencias</div>
+    <div class="subt">/ Todo a caminando. Literal.</div>
+    <p class="lead2"><b>Recoleta</b> es sinónimo de <i>elegancia, historia y vida urbana</i>. Uno de los barrios más emblemáticos de Buenos Aires, donde la arquitectura clásica convive con propuestas contemporáneas.</p>
+    <p class="lead2">A pocos pasos de WOOD: cafés tradicionales, restaurantes de primer nivel, teatros, librerías, universidades, centros de salud y una amplia oferta comercial. Todo conectado por múltiples medios de transporte y con cercanía a líneas de subte.</p>
     <div class="grid">
       <div class="cell" data-am="comercios"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1.2 11.2a1 1 0 0 1-1 .8H6.2a1 1 0 0 1-1-.8L4 8z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg><span>Comercios & mercado</span><em class="cell-more">Ver cercanos</em></div>
       <div class="cell" data-am="educacion"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10.5V15c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-4.5"/></svg><span>Educación</span><em class="cell-more">Ver cercanos</em></div>
@@ -269,35 +253,6 @@
   </div>
 </section>
 
-<!-- DISEÑO Y TERMINACIONES -->
-<section>
-  <div class="wrap specs-wrap reveal">
-    <div>
-      <div class="eyebrow">Diseño & terminaciones</div>
-      <h2 class="title">Terminaciones</h2>
-      <div class="subt">/ que se notan</div>
-      <p class="lead" style="margin-top:18px">Arquitectura contemporánea con materiales nobles y detalles pensados para durar. Cada unidad se entrega con terminaciones de primer nivel.</p>
-      <ul class="spec-list">
-        <li><b>Aberturas de PVC</b> con DVH (doble vidriado hermético)</li>
-        <li><b>Cerraduras biométricas</b> en cada unidad</li>
-        <li><b>Porcelanato</b> en baños y balcones</li>
-        <li>Mesadas de <b>Silestone</b></li>
-        <li><b>Calefón individual</b> por unidad</li>
-        <li>Grifería de <b>acero inoxidable</b></li>
-      </ul>
-      <div class="designer">
-        <div class="k">Diseño interior</div>
-        <div class="v serif">Wilson Tobal</div>
-        <p>Servicio de interiorismo disponible para acompañar la puesta en valor de cada ambiente.</p>
-      </div>
-      <a class="ver-unidades" href="#disponibilidad">Ver unidades disponibles <span class="ar">→</span></a>
-    </div>
-    <div class="planobox">
-      <img src="img/int-cocina.jpg" alt="Cocina · terminaciones WOOD Recoleta">
-      <div class="cap">Cocina integrada · mesada Silestone y porcelanato</div>
-    </div>
-  </div>
-</section>
 
 <!-- TIPOLOGÍAS -->
 <section class="tipos">
@@ -335,8 +290,9 @@
       <div class="subt">/ renders del proyecto</div>
     </div>
     <div class="gal-grid">
-      <div class="gal-item wide"><img src="img/int-2amb-living.jpg" alt="2 ambientes · living" loading="lazy"><div class="gcap">2 ambientes · living</div></div>
+      <div class="gal-item"><img src="img/int-2amb-living.jpg" alt="2 ambientes · living" loading="lazy"><div class="gcap">2 ambientes · living</div></div>
       <div class="gal-item"><img src="img/int-mono-living.jpg" alt="Monoambiente · living" loading="lazy"><div class="gcap">Monoambiente · living</div></div>
+      <div class="gal-item"><img src="img/int-cocina.jpg" alt="Cocina integrada" loading="lazy"><div class="gcap">Cocina integrada</div></div>
       <div class="gal-item"><img src="img/int-2amb-dorm.jpg" alt="2 ambientes · dormitorio" loading="lazy"><div class="gcap">2 ambientes · dormitorio</div></div>
       <div class="gal-item"><img src="img/int-mono2-living.jpg" alt="Monoambiente · living con vista" loading="lazy"><div class="gcap">Living · con vista</div></div>
       <div class="gal-item"><img src="img/int-bano.jpg" alt="Baño · porcelanato" loading="lazy"><div class="gcap">Baño · porcelanato</div></div>
@@ -835,11 +791,21 @@
       {n:'Cafés de especialidad de Barrio Norte', d:'a pasos'}
     ]}
   };
+  function amMeters(d){
+    if (/a pasos/i.test(d)) return 0;
+    if (/pocas cuadras/i.test(d)) return 250;
+    var km = d.match(/([\d.,]+)\s*km/i);
+    if (km) return parseFloat(km[1].replace(',', '.')) * 1000;
+    var m = d.match(/([\d.,]+)\s*m/i);
+    if (m) return parseFloat(m[1].replace(',', '.'));
+    return 99999;
+  }
   function buildAmenHtml(key){
     var c = AMEN[key];
+    var places = c.places.slice().sort(function(a, b){ return amMeters(a.d) - amMeters(b.d); });
     var html = '<div class="dp">A pocos pasos</div><div class="du">'+c.title+'</div>'+
       '<div class="dt">Distancias aproximadas a pie</div><div class="amlist">';
-    c.places.forEach(function(p){
+    places.forEach(function(p){
       html += '<div class="amrow"><span class="am-n">'+p.n+'</span><span class="am-d">'+p.d+'</span></div>';
     });
     html += '</div>';
