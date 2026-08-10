@@ -1778,20 +1778,34 @@
         document.getElementById('menuToggle').addEventListener('click', () => {
             document.getElementById('navLinks').classList.toggle('active');
         });
-        // Scroll suave a las secciones sin dejar el # en la URL
+        // Navegación con URLs limpias: /nosotros en vez de /#nosotros
+        function goToSection(id, smooth) {
+            const el = (id && id !== 'inicio') ? document.getElementById(id) : document.body;
+            if (!el) return false;
+            el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
+            const nav = document.getElementById('navLinks');
+            if (nav) nav.classList.remove('active');
+            return true;
+        }
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const id = a.getAttribute('href').slice(1);
-                const target = id ? document.getElementById(id) : document.body;
-                if (target) {
+                if (goToSection(id, true)) {
                     e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth' });
-                    const nav = document.getElementById('navLinks');
-                    if (nav) nav.classList.remove('active');
-                    history.replaceState(null, '', location.pathname + location.search);
+                    const url = (id && id !== 'inicio') ? '/' + id : '/';
+                    history.pushState(null, '', url);
                 }
             });
         });
+        // Link limpio compartido (/nosotros, /contacto, ...) o botón atrás → baja a la sección
+        function syncFromPath() {
+            const slug = location.pathname.replace(/^\/+|\/+$/g, '');
+            const el = slug ? document.getElementById(slug) : null;
+            if (el) el.scrollIntoView({ behavior: 'auto' });
+            else window.scrollTo(0, 0);
+        }
+        window.addEventListener('popstate', syncFromPath);
+        window.addEventListener('load', () => setTimeout(syncFromPath, 80));
 
         // ─── THEME TOGGLE ───
         const themeToggle = document.getElementById('themeToggle');

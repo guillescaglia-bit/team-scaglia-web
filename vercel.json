@@ -10,6 +10,14 @@
     { "source": "/:agent/emprendimientos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta/index.html" },
     { "source": "/:agent/emprendimientos/wood-recoleta/", "destination": "/emprendimientos/wood-recoleta/index.html" },
     { "source": "/:agent/emprendimientos/quintaglia-3defebrero-2781", "destination": "/emprendimientos/quintaglia-3defebrero-2781/index.html" },
-    { "source": "/:agent/emprendimientos/quintaglia-3defebrero-2781/", "destination": "/emprendimientos/quintaglia-3defebrero-2781/index.html" }
+    { "source": "/:agent/emprendimientos/quintaglia-3defebrero-2781/", "destination": "/emprendimientos/quintaglia-3defebrero-2781/index.html" },
+    { "source": "/inicio", "destination": "/index.html" },
+    { "source": "/emprendimientos", "destination": "/index.html" },
+    { "source": "/equipo", "destination": "/index.html" },
+    { "source": "/inversiones", "destination": "/index.html" },
+    { "source": "/nosotros", "destination": "/index.html" },
+    { "source": "/propiedades", "destination": "/index.html" },
+    { "source": "/testimonios", "destination": "/index.html" },
+    { "source": "/contacto", "destination": "/index.html" }
   ]
 }
