@@ -1036,39 +1036,58 @@ function recalcInv() {
 
 // ── Forma de pago: anticipo + N cuotas mensuales; indicás cuántas ya pagaste ──
 function addMonths(iso, n) { if (!iso) return null; const d = new Date(iso + 'T00:00:00'); d.setMonth(d.getMonth() + n); return d.toISOString().slice(0, 10); }
+function planMonedaSel(id, cur) {
+  const c = cur || 'USD';
+  return `<select id="${id}" onchange="recalcPlan();planToggleUsd()" style="width:100%;margin:0">
+    <option value="USD"${c === 'USD' ? ' selected' : ''}>USD</option>
+    <option value="ARS"${c === 'ARS' ? ' selected' : ''}>$ pesos</option>
+    <option value="CAC"${c === 'CAC' ? ' selected' : ''}>$ CAC</option></select>`;
+}
 function planPagoEditorHTML(plan) {
   const on = plan && plan.modo === 'cuotas';
   const a = (on && plan.anticipo) ? plan.anticipo : {};
   const q = (on && plan.cuotas) ? plan.cuotas : {};
-  const aArs = a.moneda === 'ARS', qArs = q.moneda === 'ARS';
+  const aArs = a.moneda && a.moneda !== 'USD', qArs = q.moneda && q.moneda !== 'USD';
   const nv = x => (x == null || x === '') ? '' : x;
+  const L = t => `<div style="font-size:11px;color:var(--muted);margin-bottom:3px">${t}</div>`;
+  const F = 'flex:1;min-width:0';
   return `
     <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="planOn" ${on ? 'checked' : ''} onchange="togglePlanOn()"> Se paga en cuotas / financiado</label>
     <div id="planBox" style="${on ? '' : 'display:none'};margin-top:10px">
-      <div style="font-size:12px;font-weight:700;margin:2px 0 6px">Anticipo <span class="muted" style="font-weight:400">(si hay)</span></div>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
-        <input type="number" id="aMonto" placeholder="monto" value="${nv(a.monto)}" oninput="recalcPlan()" style="width:110px;margin:0">
-        <select id="aMoneda" onchange="recalcPlan();planToggleUsd()" style="width:72px;margin:0"><option value="USD"${aArs ? '' : ' selected'}>USD</option><option value="ARS"${aArs ? ' selected' : ''}>$</option></select>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin:0"><input type="checkbox" id="aPag" ${a.pagado ? 'checked' : ''} onchange="recalcPlan()"> pagado</label>
-        <input type="number" id="aUsd" placeholder="USD" title="Equivalente en USD del anticipo (si es en pesos)" value="${nv(a.usd)}" oninput="recalcPlan()" style="width:96px;margin:0;${aArs ? '' : 'display:none'}">
+
+      <div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px">Anticipo <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+        <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+          <div style="${F}">${L('Monto')}<input type="number" id="aMonto" placeholder="ej. 99000" value="${nv(a.monto)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="width:110px">${L('Moneda')}${planMonedaSel('aMoneda', a.moneda)}</div>
+          <div id="aUsdWrap" style="width:120px;${aArs ? '' : 'display:none'}">${L('Equivale a USD')}<input type="number" id="aUsd" placeholder="en USD" value="${nv(a.usd)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin:0;padding-bottom:8px;white-space:nowrap"><input type="checkbox" id="aPag" ${a.pagado ? 'checked' : ''} onchange="recalcPlan()"> Ya pagado</label>
+        </div>
       </div>
-      <div style="font-size:12px;font-weight:700;margin:2px 0 6px">Cuotas mensuales consecutivas</div>
-      <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;background:var(--page);padding:10px;border-radius:8px">
-        <div><div style="font-size:11px;margin-bottom:2px">Cantidad</div><input type="number" id="cCant" placeholder="24" value="${nv(q.cantidad)}" oninput="recalcPlan()" style="width:70px;margin:0"></div>
-        <div><div style="font-size:11px;margin-bottom:2px">Valor c/u</div><input type="number" id="cValor" placeholder="4125" value="${nv(q.valor)}" oninput="recalcPlan()" style="width:96px;margin:0"></div>
-        <div><div style="font-size:11px;margin-bottom:2px">Moneda</div><select id="cMoneda" onchange="recalcPlan();planToggleUsd()" style="width:72px;margin:0"><option value="USD"${qArs ? '' : ' selected'}>USD</option><option value="ARS"${qArs ? ' selected' : ''}>$</option></select></div>
-        <div><div style="font-size:11px;margin-bottom:2px">1ª cuota</div><input type="date" id="cDesde" value="${nv(q.desde)}" oninput="recalcPlan()" style="width:140px;margin:0"></div>
-        <div><div style="font-size:11px;margin-bottom:2px">Ya pagué</div><input type="number" id="cPagadas" placeholder="0" value="${nv(q.pagadas)}" oninput="recalcPlan()" style="width:80px;margin:0"></div>
-        <div id="cUsdWrap" style="${qArs ? '' : 'display:none'}"><div style="font-size:11px;margin-bottom:2px">USD por cuota</div><input type="number" id="cUsd" placeholder="equiv." value="${nv(q.usd_cuota)}" oninput="recalcPlan()" title="Equivalente en USD de cada cuota (para cuotas en pesos)" style="width:96px;margin:0"></div>
+
+      <div style="border:1px solid var(--bd);border-radius:10px;padding:12px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px">Cuotas mensuales consecutivas</div>
+        <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+          <div style="width:90px">${L('Cantidad')}<input type="number" id="cCant" placeholder="24" value="${nv(q.cantidad)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="${F}">${L('Valor c/u')}<input type="number" id="cValor" placeholder="4125" value="${nv(q.valor)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="width:110px">${L('Moneda')}${planMonedaSel('cMoneda', q.moneda)}</div>
+          <div id="cUsdWrap" style="width:120px;${qArs ? '' : 'display:none'}">${L('USD por cuota')}<input type="number" id="cUsd" placeholder="en USD" value="${nv(q.usd_cuota)}" oninput="recalcPlan()" title="Equivalente en USD de cada cuota (para cuotas en pesos)" style="width:100%;margin:0"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-top:10px">
+          <div style="${F}">${L('1ª cuota (mes/año)')}<input type="date" id="cDesde" value="${nv(q.desde)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="width:120px">${L('Ya pagué (cuántas)')}<input type="number" id="cPagadas" placeholder="0" value="${nv(q.pagadas)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+        </div>
       </div>
-      <div id="planPrev" style="font-size:12.5px;font-weight:600;margin-top:10px;color:var(--navy)"></div>
+
+      <div id="planPrev" style="font-size:12.5px;font-weight:600;margin-top:12px;color:var(--green)"></div>
+      <div id="planCron"></div>
     </div>`;
 }
 function togglePlanOn() { const b = $('planBox'); if (b) b.style.display = $('planOn').checked ? '' : 'none'; recalcPlan(); }
 function planToggleUsd() {
-  if ($('aUsd')) $('aUsd').style.display = ($('aMoneda') && $('aMoneda').value === 'ARS') ? '' : 'none';
-  if ($('cUsdWrap')) $('cUsdWrap').style.display = ($('cMoneda') && $('cMoneda').value === 'ARS') ? '' : 'none';
+  if ($('aUsdWrap')) $('aUsdWrap').style.display = ($('aMoneda') && $('aMoneda').value !== 'USD') ? '' : 'none';
+  if ($('cUsdWrap')) $('cUsdWrap').style.display = ($('cMoneda') && $('cMoneda').value !== 'USD') ? '' : 'none';
 }
 function leerPlanPago() {
   if (!$('planOn') || !$('planOn').checked) return null;
@@ -1084,15 +1103,17 @@ function pagadoDelPlan(plan) {
   if (!plan || plan.modo !== 'cuotas') return null;
   let s = 0;
   const a = plan.anticipo;
-  if (a && a.pagado) s += a.moneda === 'ARS' ? (Number(a.usd) || 0) : (Number(a.monto) || 0);
+  if (a && a.pagado) s += (a.moneda && a.moneda !== 'USD') ? (Number(a.usd) || 0) : (Number(a.monto) || 0);
   const q = plan.cuotas;
-  if (q) { const val = q.moneda === 'ARS' ? (Number(q.usd_cuota) || 0) : (Number(q.valor) || 0); s += (Number(q.pagadas) || 0) * val; }
+  if (q) { const val = (q.moneda && q.moneda !== 'USD') ? (Number(q.usd_cuota) || 0) : (Number(q.valor) || 0); s += (Number(q.pagadas) || 0) * val; }
   return s;
 }
 function recalcPlan() {
   const el = $('planPrev'); if (!el) return;
+  const cron = $('planCron');
   const plan = leerPlanPago();
-  if (!plan) { el.innerHTML = ''; return; }
+  if (!plan) { el.innerHTML = ''; if (cron) cron.innerHTML = ''; return; }
+  if (cron) cron.innerHTML = planCronogramaHTML(plan);
   const pag = pagadoDelPlan(plan) || 0;
   const q = plan.cuotas;
   let extra = '';
@@ -1109,7 +1130,7 @@ function planCronogramaHTML(plan) {
   const q = plan && plan.cuotas; if (!q || !q.desde) return '';
   const cant = Number(q.cantidad) || 0, pagadas = Number(q.pagadas) || 0;
   if (!cant) return '';
-  const val = q.moneda === 'ARS' ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') : fmtUSD(Number(q.valor) || 0);
+  const val = (q.moneda && q.moneda !== 'USD') ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') + (q.moneda === 'CAC' ? ' CAC' : '') : fmtUSD(Number(q.valor) || 0);
   let items = '';
   for (let i = 0; i < cant; i++) {
     const pag = i < pagadas;
@@ -1130,15 +1151,15 @@ function planCardDetalle(inv) {
   const rows = [];
   const a = plan.anticipo;
   if (a && a.monto != null) {
-    const mon = a.moneda === 'ARS' ? '$ ' + (Number(a.monto) || 0).toLocaleString('es-AR') : fmtUSD(Number(a.monto) || 0);
+    const mon = (a.moneda && a.moneda !== 'USD') ? '$ ' + (Number(a.monto) || 0).toLocaleString('es-AR') + (a.moneda === 'CAC' ? ' CAC' : '') : fmtUSD(Number(a.monto) || 0);
     const est = a.pagado ? '<span class="green" style="font-weight:600">✓ pagado</span>' : '<span class="muted">pendiente</span>';
     rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Anticipo</span><span>${mon} · ${est}</span></div>`);
   }
   const q = plan.cuotas;
   if (q) {
-    const val = q.moneda === 'ARS' ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') : fmtUSD(Number(q.valor) || 0);
+    const val = (q.moneda && q.moneda !== 'USD') ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') + (q.moneda === 'CAC' ? ' CAC' : '') : fmtUSD(Number(q.valor) || 0);
     const pagadas = Number(q.pagadas) || 0, cant = Number(q.cantidad) || 0, restan = Math.max(0, cant - pagadas);
-    rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Cuotas ${q.moneda === 'ARS' ? '(en $)' : ''}</span><span>${cant} × ${val}</span></div>`);
+    rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Cuotas ${(q.moneda && q.moneda !== 'USD') ? '(en $)' : ''}</span><span>${cant} × ${val}</span></div>`);
     rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Pagadas</span><span><b class="green">${pagadas}</b> · restan ${restan}</span></div>`);
     if (q.desde && restan > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Próxima cuota</span><span>${fmtFecha(addMonths(q.desde, pagadas))}</span></div>`);
   }
