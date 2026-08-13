@@ -877,6 +877,10 @@ function abrirPropiedad(prop) {
     <div style="background:var(--page);border-radius:8px;padding:10px 12px;margin:2px 0 14px">
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">Parte de cada propietario</div>${duenos}
     </div>
+    ${planPagoEditorHTML(ref.plan_pago)}
+    <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
+    <label>Notas <span class="muted" style="font-weight:400">(opcional)</span></label>
+    <textarea id="pNotas" rows="3" placeholder="Notas de la propiedad…" style="width:100%">${val(ref.notas)}</textarea>
     <div id="histProp"></div>
     <div id="proyProp"></div>
     <p class="err" id="pErr"></p>
@@ -889,6 +893,7 @@ function abrirPropiedad(prop) {
   renderHistProp(prop);
   renderProyProp(prop);
   toggleDecl('p');
+  recalcPlan();
 }
 
 // Lista de valores por fecha a nivel PROPIEDAD (real o proyectado), se aplica a todos los dueños
@@ -979,6 +984,10 @@ function prevProp(prop) {
 async function guardarPropiedad(prop) {
   const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
   const datos = { precio_mercado: num('pMercado'), precio_venta: num('pVenta'), fecha_venta: $('pVentaFecha').value || null, condicion: $('pCondicion').value || 'A', pct_declarado: ($('pCondicion').value === 'A' && $('pDeclarado').value.trim() !== '') ? Number($('pDeclarado').value) : null };
+  datos.notas = ($('pNotas') && $('pNotas').value.trim()) ? $('pNotas').value.trim() : null;
+  const plan = leerPlanPago();
+  datos.plan_pago = plan;
+  if (plan) datos.pagado = pagadoDelPlan(plan) || 0;   // en cuotas → el pagado sale del plan
   const { error } = await supa.from('inversiones').update(datos).eq('propiedad', prop);
   if (error) { showErr('pErr', 'No se pudo guardar: ' + (error.message || '')); console.error(error); return; }
   const m = document.getElementById('modalProp'); if (m) m.remove();
@@ -1023,6 +1032,113 @@ function recalcInv() {
   const el = $('totalInvPrev');
   if (el) el.innerHTML = `Total de inversión: <b>${fmtUSD(totalInversionForm())}</b>`;
   if ($('fTit')) prevParte();     // preview de la parte del inversor en "Editar"
+}
+
+// ── Forma de pago: anticipo + cuotas (USD o $), tildables a medida que se pagan ──
+let _cuotaSeq = 0;
+function cuotaRowHTML(it) {
+  it = it || {};
+  const i = ++_cuotaSeq;
+  const moneda = it.moneda || 'USD';
+  const ars = moneda === 'ARS';
+  const esc = s => ('' + (s == null ? '' : s)).replace(/"/g, '&quot;');
+  return `<div class="cuota-row" id="cr_${i}" data-tipo="${it.tipo || 'cuota'}" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;border-bottom:1px solid var(--bd);padding-bottom:6px">
+    <input class="cLabel" value="${esc(it.label || 'Cuota')}" style="width:88px;margin:0;font-size:12px">
+    <input class="cFecha" type="date" value="${it.fecha || ''}" style="width:138px;margin:0">
+    <input class="cMonto" type="number" placeholder="monto" value="${it.monto == null ? '' : it.monto}" oninput="recalcPlan()" style="width:92px;margin:0">
+    <select class="cMoneda" onchange="cuotaMonedaCh(this)" style="width:72px;margin:0"><option value="USD"${ars ? '' : ' selected'}>USD</option><option value="ARS"${ars ? ' selected' : ''}>$</option></select>
+    <label style="display:flex;align-items:center;gap:4px;font-size:12px;margin:0;white-space:nowrap"><input type="checkbox" class="cPag" ${it.pagada ? 'checked' : ''} onchange="recalcPlan()"> pagada</label>
+    <input class="cUsd" type="number" placeholder="USD pago" title="Equivalente en USD de este pago (para cuotas en pesos)" value="${it.usd == null ? '' : it.usd}" oninput="recalcPlan()" style="width:92px;margin:0;${ars ? '' : 'display:none'}">
+    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.cuota-row').remove();recalcPlan()">×</button>
+  </div>`;
+}
+function cuotaMonedaCh(sel) { const u = sel.closest('.cuota-row').querySelector('.cUsd'); u.style.display = sel.value === 'ARS' ? '' : 'none'; recalcPlan(); }
+function planPagoEditorHTML(plan) {
+  _cuotaSeq = 0;
+  const activo = plan && plan.modo === 'cuotas';
+  const rows = (activo && Array.isArray(plan.items) ? plan.items : []).map(cuotaRowHTML).join('');
+  return `
+    <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="planOn" ${activo ? 'checked' : ''} onchange="togglePlanOn()"> Se paga en cuotas / financiado</label>
+    <div id="planBox" style="${activo ? '' : 'display:none'};margin-top:10px">
+      <p class="muted" style="font-size:11px;margin:0 0 8px">Definí el anticipo y las cuotas. Marcá cada pago como <b>pagada</b> cuando lo hagas. Si la cuota es en <b>$</b>, al tildarla poné el equivalente en <b>USD</b>. El "Pagado" del inversor se calcula con lo tildado.</p>
+      <div style="display:flex;gap:6px;align-items:end;flex-wrap:wrap;background:var(--page);padding:8px 10px;border-radius:8px;margin-bottom:10px">
+        <div><div style="font-size:11px;margin-bottom:2px">Cantidad</div><input type="number" id="genN" placeholder="24" style="width:66px;margin:0"></div>
+        <div><div style="font-size:11px;margin-bottom:2px">Valor c/u</div><input type="number" id="genMonto" placeholder="2917" style="width:92px;margin:0"></div>
+        <div><div style="font-size:11px;margin-bottom:2px">Moneda</div><select id="genMoneda" style="width:72px;margin:0"><option value="USD">USD</option><option value="ARS">$</option></select></div>
+        <div><div style="font-size:11px;margin-bottom:2px">1ª cuota</div><input type="date" id="genFecha" style="width:138px;margin:0"></div>
+        <button type="button" class="btn btn-sec btn-sm" onclick="generarCuotas()">Generar</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-sec btn-sm" onclick="agregarCuota({tipo:'anticipo',label:'Anticipo'})">+ Anticipo</button>
+        <button type="button" class="btn btn-sec btn-sm" onclick="agregarCuota({})">+ Cuota</button>
+      </div>
+      <div id="cuotas">${rows}</div>
+      <div id="planPrev" style="font-size:12.5px;font-weight:600;margin-top:10px;color:var(--navy)"></div>
+    </div>`;
+}
+function togglePlanOn() { const b = $('planBox'); if (b) b.style.display = $('planOn').checked ? '' : 'none'; recalcPlan(); }
+function agregarCuota(it) { const c = $('cuotas'); if (c) { c.insertAdjacentHTML('beforeend', cuotaRowHTML(it)); recalcPlan(); } }
+function generarCuotas() {
+  const n = parseInt($('genN').value) || 0;
+  if (!n) { alert('Poné la cantidad de cuotas.'); return; }
+  const monto = $('genMonto').value, moneda = $('genMoneda').value, f = $('genFecha').value;
+  for (let k = 0; k < n; k++) {
+    let fecha = f;
+    if (f) { const d = new Date(f + 'T00:00:00'); d.setMonth(d.getMonth() + k); fecha = d.toISOString().slice(0, 10); }
+    agregarCuota({ tipo: 'cuota', label: 'Cuota ' + (k + 1), monto: monto === '' ? null : Number(monto), moneda, fecha });
+  }
+}
+function leerPlanPago() {
+  if (!$('planOn') || !$('planOn').checked) return null;
+  const items = [...document.querySelectorAll('#cuotas .cuota-row')].map(r => ({
+    tipo: r.dataset.tipo || 'cuota',
+    label: r.querySelector('.cLabel').value.trim() || 'Cuota',
+    fecha: r.querySelector('.cFecha').value || null,
+    monto: r.querySelector('.cMonto').value === '' ? null : Number(r.querySelector('.cMonto').value),
+    moneda: r.querySelector('.cMoneda').value,
+    pagada: r.querySelector('.cPag').checked,
+    usd: r.querySelector('.cUsd').value === '' ? null : Number(r.querySelector('.cUsd').value)
+  }));
+  return items.length ? { modo: 'cuotas', items } : null;
+}
+function itemUSD(it) { return it.moneda === 'ARS' ? (Number(it.usd) || 0) : (Number(it.monto) || 0); }
+function pagadoDelPlan(plan) {
+  if (!plan || plan.modo !== 'cuotas' || !Array.isArray(plan.items)) return null;
+  return plan.items.reduce((s, it) => s + (it.pagada ? itemUSD(it) : 0), 0);
+}
+function recalcPlan() {
+  const el = $('planPrev'); if (!el) return;
+  const plan = leerPlanPago();
+  if (!plan) { el.innerHTML = ''; return; }
+  const pag = pagadoDelPlan(plan) || 0;
+  const nPag = plan.items.filter(i => i.pagada).length, nTot = plan.items.length;
+  el.innerHTML = `Pagado a hoy: <b>${fmtUSD(pag)}</b> · <b>${nPag}/${nTot}</b> pagas · restan <b>${nTot - nPag}</b>`;
+}
+// Card de forma de pago para el detalle del inversor (montos = total de la propiedad)
+function planCardDetalle(inv) {
+  const plan = inv.plan_pago;
+  if (!plan || plan.modo !== 'cuotas' || !Array.isArray(plan.items) || !plan.items.length) return '';
+  const c = cuota(inv);
+  const items = plan.items;
+  const pagUSD = items.reduce((s, it) => s + (it.pagada ? itemUSD(it) : 0), 0);
+  const nPag = items.filter(i => i.pagada).length;
+  const rows = items.map(it => {
+    const mon = it.moneda === 'ARS' ? '$ ' + (Number(it.monto) || 0).toLocaleString('es-AR') : fmtUSD(Number(it.monto) || 0);
+    const usdTxt = (it.pagada && it.moneda === 'ARS' && it.usd != null) ? ` <span class="muted">(≈ ${fmtUSD(Number(it.usd))})</span>` : '';
+    const estado = it.pagada ? '<span class="green" style="font-weight:600">✓ pagada</span>' : '<span class="muted">pendiente</span>';
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${it.label || 'Cuota'}${it.fecha ? ' · ' + fmtFecha(it.fecha) : ''}</span><span>${mon}${usdTxt} · ${estado}</span></div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title">Forma de pago · ${nPag}/${items.length} pagas</div>
+    ${rows}
+    <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;font-weight:700"><span>Pagado a hoy (tu parte)</span><b>${fmtUSD(pagUSD * c)}</b></div>
+  </div>`;
+}
+function notasCardHTML(inv) {
+  if (!inv.notas) return '';
+  const safe = ('' + inv.notas).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+  return `<div class="card"><div class="card-title">Notas</div><div style="font-size:13.5px;line-height:1.6;color:var(--tx)">${safe}</div></div>`;
 }
 
 // ── Nueva inversión: una propiedad + varios propietarios (cliente + %) en una sola carga ──
@@ -1091,6 +1207,10 @@ function abrirNueva() {
       <div><label>TC (referencia)</label><input type="number" id="nTC" placeholder="1170"></div>
     </div>
     ${gastosEditorHTML(null, [])}
+    ${planPagoEditorHTML(null)}
+    <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
+    <label>Notas <span class="muted" style="font-weight:400">(opcional)</span></label>
+    <textarea id="nNotas" rows="3" placeholder="Ej: financiada 100% en pesos ajustada por CAC, boleto firmado, etc." style="width:100%"></textarea>
     <div class="grid2">
       <div><label>P. de Mercado — total (USD)</label><input type="number" id="nMercado" placeholder="141552"></div>
       <div></div>
@@ -1118,6 +1238,7 @@ function abrirNueva() {
   agregarOwner();
   toggleDecl('n');
   recalcInv();
+  recalcPlan();
 }
 
 async function guardarNueva() {
@@ -1127,12 +1248,15 @@ async function guardarNueva() {
   const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
   const gastos = leerGastos();
   const montoUnidad = num('montoUnidad');
+  const plan = leerPlanPago();
   const base = {
     propiedad,
     fecha: $('nFecha').value || null,
     monto_unidad: montoUnidad,
     gastos: gastos.length ? gastos : null,
-    pagado: totalInversionForm() || null,
+    plan_pago: plan,
+    pagado: plan ? (pagadoDelPlan(plan) || 0) : (totalInversionForm() || null),
+    notas: $('nNotas') && $('nNotas').value.trim() ? $('nNotas').value.trim() : null,
     tc: num('nTC'),
     precio_mercado: num('nMercado'),
     precio_venta: num('nVenta'),
@@ -1341,6 +1465,8 @@ function verDetalleInversion(id) {
       ${(inv.gastos || []).map(g => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${g.concepto || 'Gasto'}</span><b>${fmtUSD((Number(g.monto) || 0) * cuota(inv))}</b></div>`).join('')}
       <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;font-weight:700"><span>Total invertido</span><b>${fmtUSD(pagadoInv(inv))}</b></div>
     </div>` : ''}
+    ${planCardDetalle(inv)}
+    ${notasCardHTML(inv)}
     <div class="card">
       <div class="card-title">📈 Evolución del valor (tu parte)</div>
       ${chartHTML(pts, { proj: proy })}
