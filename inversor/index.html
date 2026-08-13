@@ -53,7 +53,11 @@
   .login-box .sub{font-size:13px;color:var(--muted);margin-bottom:24px}
   label{display:block;text-align:left;font-size:12px;font-weight:600;color:var(--tx);margin-bottom:6px}
   input{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:14px}
-  input:focus{outline:none;border-color:var(--navy)}
+  select,textarea{width:100%;padding:12px 14px;border:2px solid var(--bd);border-radius:8px;font-family:inherit;font-size:14px;background:var(--card);color:var(--tx);margin-bottom:14px}
+  select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.6'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;cursor:pointer}
+  textarea{resize:vertical;line-height:1.5}
+  input[type=checkbox]{width:auto;margin:0;cursor:pointer}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy)}
   .btn{width:100%;padding:12px;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s}
   .btn:hover{opacity:.9}
   .btn-primary{background:var(--navy);color:#fff}
@@ -1056,8 +1060,8 @@ function planPagoEditorHTML(plan) {
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="planOn" ${on ? 'checked' : ''} onchange="togglePlanOn()"> Se paga en cuotas / financiado</label>
     <div id="planBox" style="${on ? '' : 'display:none'};margin-top:10px">
 
-      <div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px">Anticipo <span style="font-weight:400;text-transform:none">(opcional)</span></div>
+      <div style="background:var(--page);border-radius:10px;padding:14px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:10px">Anticipo <span style="font-weight:400;text-transform:none">(opcional)</span></div>
         <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
           <div style="${F}">${L('Monto')}<input type="number" id="aMonto" placeholder="ej. 99000" value="${nv(a.monto)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
           <div style="width:110px">${L('Moneda')}${planMonedaSel('aMoneda', a.moneda)}</div>
@@ -1066,8 +1070,8 @@ function planPagoEditorHTML(plan) {
         </div>
       </div>
 
-      <div style="border:1px solid var(--bd);border-radius:10px;padding:12px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px">Cuotas mensuales consecutivas</div>
+      <div style="background:var(--page);border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:10px">Cuotas mensuales consecutivas</div>
         <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
           <div style="width:90px">${L('Cantidad')}<input type="number" id="cCant" placeholder="24" value="${nv(q.cantidad)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
           <div style="${F}">${L('Valor c/u')}<input type="number" id="cValor" placeholder="4125" value="${nv(q.valor)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
@@ -1134,8 +1138,8 @@ function planCronogramaHTML(plan) {
   let items = '';
   for (let i = 0; i < cant; i++) {
     const pag = i < pagadas;
-    const bg = pag ? 'background:rgba(46,160,90,.14);border-color:rgba(46,160,90,.35)' : 'background:var(--bg2,transparent)';
-    const mk = pag ? '<span class="green" style="font-weight:700">✓</span>' : '<span class="muted" style="font-size:11px">•</span>';
+    const bg = pag ? 'background:rgba(21,146,90,.12);border-color:rgba(21,146,90,.45)' : 'background:var(--card)';
+    const mk = pag ? '<span class="green" style="font-weight:700">✓</span>' : '<span class="muted" style="font-size:11px">pend.</span>';
     items += `<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;border:1px solid var(--bd);${bg};border-radius:7px;padding:5px 8px;font-size:12px">
       <span style="white-space:nowrap"><b style="opacity:.6">${i + 1}</b> ${mesAnio(addMonths(q.desde, i))}</span>${mk}</div>`;
   }
