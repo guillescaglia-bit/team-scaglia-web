@@ -1103,6 +1103,26 @@ function recalcPlan() {
   }
   el.innerHTML = `Pagado a hoy: <b>${fmtUSD(pag)}</b>${extra}`;
 }
+const MESES_AB = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function mesAnio(iso) { if (!iso) return '—'; const p = iso.split('-'); return p.length === 3 ? `${MESES_AB[(+p[1]) - 1]} ${p[0]}` : iso; }
+function planCronogramaHTML(plan) {
+  const q = plan && plan.cuotas; if (!q || !q.desde) return '';
+  const cant = Number(q.cantidad) || 0, pagadas = Number(q.pagadas) || 0;
+  if (!cant) return '';
+  const val = q.moneda === 'ARS' ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') : fmtUSD(Number(q.valor) || 0);
+  let items = '';
+  for (let i = 0; i < cant; i++) {
+    const pag = i < pagadas;
+    const bg = pag ? 'background:rgba(46,160,90,.14);border-color:rgba(46,160,90,.35)' : 'background:var(--bg2,transparent)';
+    const mk = pag ? '<span class="green" style="font-weight:700">✓</span>' : '<span class="muted" style="font-size:11px">•</span>';
+    items += `<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;border:1px solid var(--bd);${bg};border-radius:7px;padding:5px 8px;font-size:12px">
+      <span style="white-space:nowrap"><b style="opacity:.6">${i + 1}</b> ${mesAnio(addMonths(q.desde, i))}</span>${mk}</div>`;
+  }
+  return `<div style="margin-top:10px">
+    <div class="muted" style="font-size:12px;margin-bottom:6px">Cronograma · <b class="green">${pagadas} pagadas</b> · ${Math.max(0, cant - pagadas)} pendientes · c/u ${val}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:6px">${items}</div>
+  </div>`;
+}
 function planCardDetalle(inv) {
   const plan = inv.plan_pago;
   if (!plan || plan.modo !== 'cuotas' || (!plan.anticipo && !plan.cuotas)) return '';
@@ -1125,6 +1145,7 @@ function planCardDetalle(inv) {
   const pagUSD = pagadoDelPlan(plan) || 0;
   return `<div class="card"><div class="card-title">Forma de pago</div>${rows.join('')}
     <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;font-weight:700"><span>Pagado a hoy (tu parte)</span><b>${fmtUSD(pagUSD * c)}</b></div>
+    ${planCronogramaHTML(plan)}
   </div>`;
 }
 function notasCardHTML(inv) {
