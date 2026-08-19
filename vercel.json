@@ -6,6 +6,10 @@
     { "source": "/desarrollos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta", "permanent": false },
     { "source": "/desarrollos/wood-recoleta/:path*", "destination": "/emprendimientos/wood-recoleta/:path*", "permanent": false }
   ],
+  "headers": [
+    { "source": "/desarrollos/brochure-wood.pdf", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/desarrollos/brochure-quintaglia.pdf", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] }
+  ],
   "rewrites": [
     { "source": "/:agent/emprendimientos/wood-recoleta", "destination": "/emprendimientos/wood-recoleta/index.html" },
     { "source": "/:agent/emprendimientos/wood-recoleta/", "destination": "/emprendimientos/wood-recoleta/index.html" },
