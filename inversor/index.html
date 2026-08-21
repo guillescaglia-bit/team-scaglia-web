@@ -929,8 +929,10 @@ function abrirPropiedad(prop) {
     </div>
     ${planPagoEditorHTML(ref.plan_pago)}
     <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
-    <label>Notas <span class="muted" style="font-weight:400">(opcional)</span></label>
-    <textarea id="pNotas" rows="3" placeholder="Notas de la propiedad…" style="width:100%">${val(ref.notas)}</textarea>
+    <label>Descripción <span class="muted" style="font-weight:400">(qué compró — la ve el inversor)</span></label>
+    <textarea id="pDescr" rows="3" placeholder="Ej: Depto 2 amb, piso 5, 45 m² + cochera." style="width:100%">${val(ref.descripcion)}</textarea>
+    <label style="margin-top:6px">Notas <span class="muted" style="font-weight:400">(uso interno, opcional)</span></label>
+    <textarea id="pNotas" rows="3" placeholder="Notas internas de la propiedad…" style="width:100%">${val(ref.notas)}</textarea>
     <div id="histProp"></div>
     <div id="proyProp"></div>
     <p class="err" id="pErr"></p>
@@ -1035,6 +1037,7 @@ async function guardarPropiedad(prop) {
   const num = (id) => { const x = $(id).value.trim(); return x === '' ? null : Number(x); };
   const datos = { precio_mercado: num('pMercado'), precio_venta: num('pVenta'), fecha_venta: $('pVentaFecha').value || null, condicion: $('pCondicion').value || 'A', pct_declarado: ($('pCondicion').value === 'A' && $('pDeclarado').value.trim() !== '') ? Number($('pDeclarado').value) : null };
   datos.notas = ($('pNotas') && $('pNotas').value.trim()) ? $('pNotas').value.trim() : null;
+  datos.descripcion = ($('pDescr') && $('pDescr').value.trim()) ? $('pDescr').value.trim() : null;
   const plan = leerPlanPago();
   datos.plan_pago = plan;
   if (plan) datos.pagado = pagadoDelPlan(plan) || 0;   // en cuotas → el pagado sale del plan
@@ -1199,27 +1202,47 @@ function planItemEdit(i, k, v) {
   _planItems[i][k] = (k === 'pag') ? v : (k === 'cac' ? v : (String(v).trim() === '' ? null : Number(v)));
   planUpdateTotals();
 }
+// Formato de miles en vivo (formato AR: . miles, , decimales)
+function milesDisplay(n) { return (n == null || n === '') ? '' : Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 }); }
+function parseMiles(str) { if (str == null) return null; const s = String(str).replace(/\./g, '').replace(',', '.').trim(); return s === '' ? null : Number(s); }
+function formatMilesInput(el) {
+  const neg = el.value.trim().startsWith('-');
+  let v = el.value.replace(/[^\d,]/g, '');
+  const hasComma = v.indexOf(',') >= 0;
+  let parts = v.split(','), intp = parts[0].replace(/^0+(?=\d)/, ''), dec = (parts[1] || '').slice(0, 2);
+  const grouped = intp ? intp.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+  let out = hasComma ? ((grouped || '0') + ',' + dec) : grouped;
+  if (neg && out) out = '-' + out;
+  el.value = out;
+}
+function planGridNum(el, i, k) {
+  formatMilesInput(el);
+  if (!_planItems[i]) return;
+  const n = parseMiles(el.value);
+  _planItems[i][k] = (n == null || isNaN(n)) ? null : n;
+  planUpdateTotals();
+}
 function planRenderItems() {
   const cont = $('cItems'); if (!cont) return;
   if (!_planItems.length) { cont.innerHTML = ''; return; }
   const desde = $('cDesde') ? $('cDesde').value : '';
-  const cell = 'padding:4px 5px;border-bottom:1px solid var(--bd)';
-  const inp = 'width:100%;margin:0;padding:6px 8px;font-size:12.5px';
+  const cell = 'padding:4px 4px;border-bottom:1px solid var(--bd)';
+  const inp = 'width:100%;margin:0;padding:6px 7px;font-size:12.5px';
   const rows = _planItems.map((it, i) => {
     const mes = desde ? mesAnio(addMonths(desde, i)) : '—';
     const bg = it.pag ? 'background:rgba(21,146,90,.07)' : '';
     return `<tr data-ci="${i}" style="${bg}">
-      <td style="${cell};text-align:center;font-weight:600;opacity:.6">${i + 1}</td>
-      <td style="${cell};white-space:nowrap;font-size:12px">${mes}</td>
-      <td style="${cell}"><input type="number" value="${it.usd == null ? '' : it.usd}" oninput="planItemEdit(${i},'usd',this.value)" placeholder="USD" style="${inp}"></td>
-      <td style="${cell}"><input type="number" value="${it.ars == null ? '' : it.ars}" oninput="planItemEdit(${i},'ars',this.value)" placeholder="pesos" style="${inp}"></td>
-      <td style="${cell}"><input type="number" value="${it.cac == null ? '' : it.cac}" oninput="planItemEdit(${i},'cac',this.value)" placeholder="a completar" style="${inp}"></td>
-      <td style="${cell};text-align:center"><input type="checkbox" ${it.pag ? 'checked' : ''} onchange="planRowPag(${i},this.checked)"></td>
+      <td style="${cell};text-align:center;font-weight:600;opacity:.6;width:22px">${i + 1}</td>
+      <td style="${cell};text-align:center;width:34px"><input type="checkbox" ${it.pag ? 'checked' : ''} onchange="planRowPag(${i},this.checked)" style="width:18px;height:18px"></td>
+      <td style="${cell};white-space:nowrap;font-size:12px;width:60px">${mes}</td>
+      <td style="${cell};width:82px"><input type="text" inputmode="decimal" value="${milesDisplay(it.usd)}" oninput="planGridNum(this,${i},'usd')" style="${inp}"></td>
+      <td style="${cell}"><input type="text" inputmode="decimal" value="${milesDisplay(it.ars)}" oninput="planGridNum(this,${i},'ars')" style="${inp}"></td>
+      <td style="${cell};width:78px"><input type="text" inputmode="decimal" value="${milesDisplay(it.cac)}" oninput="planGridNum(this,${i},'cac')" placeholder="CAC" style="${inp}"></td>
     </tr>`;
   }).join('');
-  const th = 'padding:6px 5px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);text-align:left;border-bottom:1px solid var(--bd)';
-  cont.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:520px">
-    <thead><tr><th style="${th};text-align:center">#</th><th style="${th}">Mes</th><th style="${th}">USD</th><th style="${th}">Pesos</th><th style="${th}">CAC</th><th style="${th};text-align:center">Pagada</th></tr></thead>
+  const th = 'padding:6px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);text-align:left;border-bottom:1px solid var(--bd)';
+  cont.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:420px">
+    <thead><tr><th style="${th};text-align:center">#</th><th style="${th};text-align:center">✓</th><th style="${th}">Mes</th><th style="${th}">USD</th><th style="${th}">Pesos</th><th style="${th}">CAC</th></tr></thead>
     <tbody>${rows}</tbody></table>`;
 }
 function planRowPag(i, val) {
@@ -1383,6 +1406,11 @@ function notasCardHTML(inv) {
   const safe = ('' + inv.notas).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
   return `<div class="card"><div class="card-title">Notas</div><div style="font-size:13.5px;line-height:1.6">${safe}</div></div>`;
 }
+function descripcionCardHTML(inv) {
+  if (!inv.descripcion) return '';
+  const safe = ('' + inv.descripcion).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+  return `<div class="card"><div class="card-title">Qué compró</div><div style="font-size:13.5px;line-height:1.6">${safe}</div></div>`;
+}
 
 // ── Nueva inversión: una propiedad + varios propietarios (cliente + %) en una sola carga ──
 let _ownerSeq = 0;
@@ -1479,8 +1507,10 @@ function abrirNueva() {
     ${gastosEditorHTML(null, [])}
     ${planPagoEditorHTML(null)}
     <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
-    <label>Notas <span class="muted" style="font-weight:400">(opcional)</span></label>
-    <textarea id="nNotas" rows="3" placeholder="Ej: financiada 100% en pesos ajustada por CAC, boleto firmado, etc." style="width:100%"></textarea>
+    <label>Descripción <span class="muted" style="font-weight:400">(qué compró — la ve el inversor)</span></label>
+    <textarea id="nDescr" rows="3" placeholder="Ej: Depto 2 amb, piso 5, 45 m² + cochera. / 20% del Fideicomiso Torre Larrea." style="width:100%"></textarea>
+    <label style="margin-top:6px">Notas <span class="muted" style="font-weight:400">(uso interno, opcional)</span></label>
+    <textarea id="nNotas" rows="3" placeholder="Notas internas: financiación, boleto firmado, etc." style="width:100%"></textarea>
     <div class="grid2">
       <div><label>P. de Mercado — total (USD)</label><input type="number" id="nMercado" placeholder="141552"></div>
       <div></div>
@@ -1529,6 +1559,7 @@ async function guardarNueva() {
     plan_pago: plan,
     pagado: plan ? (pagadoDelPlan(plan) || 0) : (totalInversionForm() || null),
     notas: $('nNotas') && $('nNotas').value.trim() ? $('nNotas').value.trim() : null,
+    descripcion: $('nDescr') && $('nDescr').value.trim() ? $('nDescr').value.trim() : null,
     tc: num('nTC'),
     precio_mercado: num('nMercado'),
     precio_venta: num('nVenta'),
@@ -1594,8 +1625,10 @@ function abrirForm(id) {
         <div id="fPreview" style="font-size:12.5px;font-weight:600;margin:0 0 14px;color:var(--navy)"></div>
         ${planPagoEditorHTML(inv.plan_pago)}
         <hr style="border:none;border-top:1px solid var(--bd);margin:14px 0 10px">
-        <label>Notas <span class="muted" style="font-weight:400">(opcional)</span></label>
-        <textarea id="fNotas" rows="3" placeholder="Notas de la propiedad…" style="width:100%">${v(inv.notas)}</textarea>
+        <label>Descripción <span class="muted" style="font-weight:400">(qué compró — la ve el inversor)</span></label>
+        <textarea id="fDescr" rows="3" placeholder="Ej: Depto 2 amb, piso 5, 45 m² + cochera. / 20% del Fideicomiso Torre Larrea." style="width:100%">${v(inv.descripcion)}</textarea>
+        <label style="margin-top:6px">Notas <span class="muted" style="font-weight:400">(uso interno, opcional)</span></label>
+        <textarea id="fNotas" rows="3" placeholder="Notas internas: financiación, boleto firmado, etc." style="width:100%">${v(inv.notas)}</textarea>
         <div id="histValor"></div>
         <p class="err" id="fErr"></p>
         <div style="display:flex;gap:10px">
@@ -1666,6 +1699,7 @@ async function guardar(id) {
     plan_pago: leerPlanPago(),
     pagado: leerPlanPago() ? (pagadoDelPlan(leerPlanPago()) || 0) : (totalInversionForm() || null),
     notas: ($('fNotas') && $('fNotas').value.trim()) ? $('fNotas').value.trim() : null,
+    descripcion: ($('fDescr') && $('fDescr').value.trim()) ? $('fDescr').value.trim() : null,
     tc: numOrNull('fTC'),
     precio_mercado: numOrNull('fMercado'),
     precio_venta: numOrNull('fVenta'),
@@ -1741,6 +1775,7 @@ function verDetalleInversion(id) {
       </div>
       ${inv.tc ? `<div class="prop-foot">TC al comprar: ${Number(inv.tc).toLocaleString('es-AR')}</div>` : ''}
     </div>
+    ${descripcionCardHTML(inv)}
     ${(inv.monto_unidad != null || (inv.gastos && inv.gastos.length)) ? `<div class="card">
       <div class="card-title">Desglose de la inversión (tu parte)</div>
       <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Unidad</span><b>${fmtUSD((Number(inv.monto_unidad) || 0) * cuota(inv))}</b></div>
