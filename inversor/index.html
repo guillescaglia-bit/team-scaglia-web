@@ -69,7 +69,7 @@
   .linkline button{background:none;border:none;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline;font-size:12px}
 
   /* KPIs */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0}
   .kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
   .kpi-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
   .kpi-val{font-size:19px;font-weight:700;margin-top:6px}
@@ -565,6 +565,25 @@ function renderDashboard(invs) {
   const invVend = vendidas.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
   const importeCobrado = vendidas.reduce((a, i) => a + (valorInv(i) || 0), 0); // lo que cobraste por las ventas (tu parte)
 
+  // KPIs nuevos: saldo pendiente, próxima cuota, composición de cartera
+  const planInvs = invs.filter(i => i.plan_pago && i.plan_pago.modo === 'cuotas');
+  const planPagado = planInvs.reduce((a, i) => a + (pagadoInv(i) || 0), 0);
+  const planTotal = planInvs.reduce((a, i) => a + ((totalPlanDelPlan(i.plan_pago) || 0) * cuota(i)), 0);
+  const saldoPendiente = Math.max(0, planTotal - planPagado);
+  const avancePlan = planTotal > 0 ? Math.round(planPagado / planTotal * 100) : null;
+  const proximas = invs.map(proximaCuotaInv).filter(Boolean).sort((a, b) => new Date(a.date) - new Date(b.date));
+  let proxHTML = '';
+  if (proximas.length) {
+    const ym = proximas[0].date.slice(0, 7);
+    const mismos = proximas.filter(p => p.date.slice(0, 7) === ym);
+    const montoProx = mismos.reduce((a, p) => a + p.monto, 0);
+    proxHTML = `<div class="kpi"><div class="kpi-label">Próxima cuota</div><div class="kpi-val">${mesAnio(proximas[0].date)}</div><div class="kpi-sub muted">${fmtUSD(montoProx)}${mismos.length > 1 ? ' · ' + mismos.length + ' unidades' : ''}</div></div>`;
+  }
+  const tipos = {};
+  invs.forEach(i => { const t = i.tipo || 'departamento'; tipos[t] = (tipos[t] || 0) + 1; });
+  const compLabel = Object.entries(tipos).map(([t, n]) => `${n} ${(TNAME[t] || [t, t])[n > 1 ? 1 : 0]}`).join(' · ');
+  const compHTML = `<div class="kpi"><div class="kpi-label">Composición de cartera</div><div class="kpi-val">${invs.length} <span style="font-size:13px;font-weight:600;color:var(--muted)">${invs.length === 1 ? 'propiedad' : 'propiedades'}</span></div><div class="kpi-sub muted">${compLabel}</div></div>`;
+
   // Cada card: resumen + info + su gráfico de evolución adentro
   const cards = invs.map(inv => {
     const est = estadoDe(inv);
@@ -611,10 +630,13 @@ function renderDashboard(invs) {
   $('dashInversor').innerHTML = `
     ${banner}
     <div class="kpis">
-      <div class="kpi">${invVend ? `<div class="kpi-label">Neto invertido</div><div class="kpi-val">${fmtUSD(invCartera)}</div><div class="kpi-sub muted">Total invertido: ${fmtUSD(totalInvertido)}</div>` : `<div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div><div class="kpi-sub muted">Volumen invertido</div>`}</div>
+      <div class="kpi">${invVend ? `<div class="kpi-label">Neto invertido</div><div class="kpi-val">${fmtUSD(invCartera)}</div><div class="kpi-sub muted">Total invertido: ${fmtUSD(totalInvertido)}</div>` : `<div class="kpi-label">Total invertido</div><div class="kpi-val">${fmtUSD(totalInvertido)}</div><div class="kpi-sub muted">Ya pagado</div>`}</div>
       <div class="kpi"><div class="kpi-label">Valor de mercado hoy</div><div class="kpi-val">${fmtUSD(valorHoy)}</div><div class="kpi-sub muted">En cartera</div></div>
       <div class="kpi"><div class="kpi-label">Ganancia proyectada</div><div class="kpi-val green">+${fmtUSD(ganProy)}</div><div class="kpi-sub green">${invCartera ? fmtPct(ganProy / invCartera * 100) : '—'}</div></div>
-      <div class="kpi"><div class="kpi-label">Importe cobrado</div><div class="kpi-val">${fmtUSD(importeCobrado)}</div><div class="kpi-sub green">${invVend ? '+' + fmtUSD(ganReal) + ' · ' + fmtPct(ganReal / invVend * 100) + ' · ventas' : 'sin ventas aún'}</div></div>
+      ${planTotal > 0 ? `<div class="kpi"><div class="kpi-label">Saldo pendiente de pago</div><div class="kpi-val">${fmtUSD(saldoPendiente)}</div><div class="kpi-sub muted">Falta pagar${avancePlan != null ? ' · ' + avancePlan + '% pagado' : ''}</div></div>` : ''}
+      ${proxHTML}
+      ${invVend ? `<div class="kpi"><div class="kpi-label">Importe cobrado</div><div class="kpi-val">${fmtUSD(importeCobrado)}</div><div class="kpi-sub green">+${fmtUSD(ganReal)} · ${fmtPct(ganReal / invVend * 100)} · ventas</div></div>` : ''}
+      ${compHTML}
     </div>
     <div class="props">${cards}</div>
     ${globalChart}`;
@@ -1299,6 +1321,47 @@ function pesosPagadoDelPlan(plan) {
   if (!q || !q.mixta || !Array.isArray(q.items)) return 0;
   return q.items.reduce((s, it) => s + (it.pag ? (Number(it.ars) || 0) : 0), 0);
 }
+// Valor TOTAL del plan (anticipo + todas las cuotas, pagadas y pendientes), en USD
+function totalPlanDelPlan(plan) {
+  if (!plan || plan.modo !== 'cuotas') return null;
+  let s = 0;
+  const a = plan.anticipo;
+  if (a && a.monto != null) s += (a.moneda && a.moneda !== 'USD') ? (Number(a.usd) || 0) : (Number(a.monto) || 0);
+  const q = plan.cuotas;
+  if (q) {
+    if (q.mixta && Array.isArray(q.items) && q.items.length) {
+      const tc = Number(q.tc) || 0;
+      q.items.forEach(it => s += (Number(it.usd) || 0) + (tc ? (Number(it.ars) || 0) / tc : 0));
+    } else {
+      s += (Number(q.cantidad) || 0) * valorUsdCuota(q);
+    }
+  }
+  return s;
+}
+// Saldo pendiente de pago (parte del inversor) de una inversión con plan
+function pendienteInv(inv) {
+  if (!inv.plan_pago || inv.plan_pago.modo !== 'cuotas') return 0;
+  const tot = totalPlanDelPlan(inv.plan_pago) || 0, pag = pagadoDelPlan(inv.plan_pago) || 0;
+  return Math.max(0, tot - pag) * cuota(inv);
+}
+// Próxima cuota a pagar de una inversión: {date, monto (parte del inversor)} o null si está al día
+function proximaCuotaInv(inv) {
+  const plan = inv.plan_pago, q = plan && plan.cuotas;
+  if (!q || !q.desde) return null;
+  const cant = Number(q.cantidad) || 0;
+  if (q.mixta && Array.isArray(q.items) && q.items.length) {
+    const tc = Number(q.tc) || 0;
+    for (let i = 0; i < q.items.length; i++) {
+      const it = q.items[i];
+      if (!it.pag) return { date: addMonths(q.desde, i), monto: ((Number(it.usd) || 0) + (tc ? (Number(it.ars) || 0) / tc : 0)) * cuota(inv) };
+    }
+    return null;
+  }
+  const pagadas = Number(q.pagadas) || 0;
+  if (pagadas >= cant) return null;
+  return { date: addMonths(q.desde, pagadas), monto: valorUsdCuota(q) * cuota(inv) };
+}
+const TNAME = { departamento: ['depto', 'deptos'], sociedad: ['sociedad', 'sociedades'], fideicomiso: ['fideicomiso', 'fideicomisos'] };
 function recalcPlan() {
   if (!$('planPrev')) return;
   // Modo mixto: asegurar que la grilla esté dibujada (sin robar foco al editar celdas)
