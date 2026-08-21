@@ -220,7 +220,13 @@ const estadoDe = (inv) => (inv.precio_venta != null && inv.precio_venta !== '') 
 // La titularidad (%) define la PARTE que le corresponde al inversor.
 const cuota = (inv) => ((inv.titularidad == null || inv.titularidad === '') ? 100 : Number(inv.titularidad)) / 100;
 const refTotal = (inv) => { const v = estadoDe(inv) === 'vendida' ? inv.precio_venta : inv.precio_mercado; return (v == null || v === '') ? null : Number(v); };
-const pagadoInv = (inv) => (inv.pagado == null || inv.pagado === '') ? null : Number(inv.pagado) * cuota(inv);
+// Total pagado de la PROPIEDAD: si hay plan de cuotas, se recalcula del plan (así nunca queda
+// desfasado del guardado); si no, usa el monto guardado. Luego se aplica la titularidad %.
+const pagadoTotal = (inv) => {
+  if (inv.plan_pago && inv.plan_pago.modo === 'cuotas') return pagadoDelPlan(inv.plan_pago);
+  return (inv.pagado == null || inv.pagado === '') ? null : Number(inv.pagado);
+};
+const pagadoInv = (inv) => { const p = pagadoTotal(inv); return p == null ? null : p * cuota(inv); };
 const valorInv = (inv) => { const v = refTotal(inv); return v == null ? null : v * cuota(inv); };
 function resultadoDe(inv) { const p = pagadoInv(inv), v = valorInv(inv); return (p == null || v == null) ? null : v - p; }
 function pctDe(inv) { const r = resultadoDe(inv), p = pagadoInv(inv); return (r == null || !p) ? null : (r / p) * 100; }
@@ -249,7 +255,7 @@ async function cargarValuaciones() {
 function timelinePropiedad(inv) {
   const c = cuota(inv);
   const pts = [];
-  if (inv.fecha && inv.pagado != null && inv.pagado !== '') pts.push({ t: new Date(inv.fecha), v: Number(inv.pagado) * c });
+  if (inv.fecha && pagadoTotal(inv) != null) pts.push({ t: new Date(inv.fecha), v: pagadoTotal(inv) * c });
   _valuaciones.filter(x => x.inversion_id === inv.id && !x.proyectado).forEach(x => pts.push({ t: new Date(x.fecha), v: Number(x.valor) * c }));
   const ref = refTotal(inv);
   if (ref != null) {
@@ -644,7 +650,7 @@ const SORT_EXTRACT = {
   propiedad: i => (i.propiedad || '').toLowerCase(),
   pct: i => (i.titularidad == null || i.titularidad === '') ? 100 : Number(i.titularidad),
   fecha: i => i.fecha || '',
-  pagado: i => (i.pagado == null || i.pagado === '') ? -Infinity : Number(i.pagado),
+  pagado: i => { const p = pagadoTotal(i); return p == null ? -Infinity : p; },
   mercado: i => (i.precio_mercado == null || i.precio_mercado === '') ? -Infinity : Number(i.precio_mercado),
   venta: i => (i.precio_venta == null || i.precio_venta === '') ? -Infinity : Number(i.precio_venta),
   ganancia: i => { const p = pctDe(i); return p == null ? -Infinity : p; },
@@ -695,7 +701,7 @@ function filasAdmin(list) {
       <td>${tipoTag(inv)}${inv.propiedad}</td>
       <td>${inv.titularidad != null ? inv.titularidad + '%' : '100%'}</td>
       <td>${fmtFecha(inv.fecha)}</td>
-      <td>${fmtUSD(inv.pagado)}</td>
+      <td>${fmtUSD(pagadoTotal(inv))}</td>
       <td>${fmtUSD(inv.precio_mercado)}</td>
       <td>${fmtUSD(inv.precio_venta)}</td>
       <td class="${(resultadoDe(inv) || 0) >= 0 ? 'green' : ''}">${resultadoDe(inv) == null ? '—' : fmtPct(pctDe(inv))}</td>
@@ -890,7 +896,7 @@ function tarjetasPropiedad(groups) {
     return `<div class="card">
       <div class="prop-head"><div class="prop-name">${prop}</div><span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span></div>
       <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;margin-bottom:12px">
-        <div><div class="muted">Pagado total</div><b>${fmtUSD(ref.pagado)}</b></div>
+        <div><div class="muted">Pagado total</div><b>${fmtUSD(pagadoTotal(ref))}</b></div>
         <div><div class="muted">${est === 'vendida' ? 'Venta total' : 'Mercado total'}</div><b>${fmtUSD(totalActual)}</b></div>
         <div><div class="muted">Titularidad cargada</div><b${sumaTit !== 100 ? ' style="color:var(--danger)"' : ''}>${sumaTit}%</b></div>
         <div><div class="muted">Condición</div>${condTag(ref.condicion)}${(ref.condicion !== 'B' && ref.pct_declarado != null && ref.pct_declarado !== '') ? ` <span class="muted" style="font-size:11px">${ref.pct_declarado}% decl.</span>` : ''}</div>
