@@ -567,7 +567,7 @@ function renderDashboard(invs) {
     return `
       <div class="card prop">
         <div class="prop-head">
-          <div class="prop-name">${inv.propiedad}</div>
+          <div class="prop-name">${tipoTag(inv)}${inv.propiedad}</div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
             <span class="tag ${est === 'vendida' ? 'tag-sold' : 'tag-hold'}">${est === 'vendida' ? 'Vendida' : 'En cartera'}</span>
             ${condTag(inv.condicion)}
@@ -692,7 +692,7 @@ function filasAdmin(list) {
   return list.map(inv => `
     <tr>
       <td>${inv.inversor_nombre}</td>
-      <td>${inv.propiedad}</td>
+      <td>${tipoTag(inv)}${inv.propiedad}</td>
       <td>${inv.titularidad != null ? inv.titularidad + '%' : '100%'}</td>
       <td>${fmtFecha(inv.fecha)}</td>
       <td>${fmtUSD(inv.pagado)}</td>
@@ -1275,6 +1275,32 @@ function prevNueva() {
   }
 }
 
+// ── Tipo de inversión: departamento (default) | sociedad | fideicomiso ──
+const TIPO_MAP = {
+  departamento: { label: 'Propiedad / Unidad', ph: '3 de Febrero 2781 5C', tag: '', opt: '🏢 Departamento / Unidad' },
+  sociedad: { label: 'Nombre de la sociedad', ph: 'Ej: Constructora del Sur S.A.', tag: 'Sociedad', opt: '🤝 % en Sociedad' },
+  fideicomiso: { label: 'Nombre del fideicomiso', ph: 'Ej: Fideicomiso Torre Larrea', tag: 'Fideicomiso', opt: '📄 % en Fideicomiso' }
+};
+function tipoSelectHTML(px, cur) {
+  const t = cur || 'departamento';
+  const o = (v) => `<option value="${v}"${t === v ? ' selected' : ''}>${TIPO_MAP[v].opt}</option>`;
+  return `<label>Tipo de inversión</label>
+    <select id="${px}Tipo" onchange="syncTipoLabel('${px}')">${o('departamento')}${o('sociedad')}${o('fideicomiso')}</select>`;
+}
+function syncTipoLabel(px) {
+  const t = ($(px + 'Tipo') && $(px + 'Tipo').value) || 'departamento';
+  const m = TIPO_MAP[t] || TIPO_MAP.departamento;
+  const lab = $(px + 'PropLabel'), inp = $(px + 'Prop');
+  if (lab) lab.textContent = m.label;
+  if (inp && !inp.value) inp.placeholder = m.ph;
+}
+function tipoTag(inv) {
+  const t = inv.tipo || 'departamento';
+  const m = TIPO_MAP[t];
+  if (!m || !m.tag) return '';
+  return `<span class="tag" style="background:rgba(37,60,100,.12);color:var(--navy);margin-right:6px">${m.tag}</span>`;
+}
+
 function abrirNueva() {
   _ownerSeq = 0;
   const opts = clientesActivos().map(c => `<option value="${(c.nombre || '').replace(/"/g, '&quot;')}">`).join('');
@@ -1284,7 +1310,8 @@ function abrirNueva() {
   modal.innerHTML = `<div class="modal-content">
     <h3>Nueva inversión</h3>
     <datalist id="dlClientes">${opts}</datalist>
-    <label>Propiedad</label>
+    ${tipoSelectHTML('n', null)}
+    <label id="nPropLabel">Propiedad</label>
     <input type="text" id="nProp" placeholder="3 de Febrero 2781 6E">
     <div class="grid2">
       <div><label>Fecha de compra</label><input type="date" id="nFecha"></div>
@@ -1321,6 +1348,7 @@ function abrirNueva() {
   document.body.appendChild(modal);
   agregarOwner();
   toggleDecl('n');
+  syncTipoLabel('n');
   recalcInv();
   recalcPlan();
 }
@@ -1335,6 +1363,7 @@ async function guardarNueva() {
   const plan = leerPlanPago();
   const base = {
     propiedad,
+    tipo: ($('nTipo') && $('nTipo').value) || 'departamento',
     fecha: $('nFecha').value || null,
     monto_unidad: montoUnidad,
     gastos: gastos.length ? gastos : null,
@@ -1378,7 +1407,8 @@ function abrirForm(id) {
         <input type="text" id="fNombre" value="${v(inv.inversor_nombre)}" placeholder="Juan García">
         <label>Email del inversor <span class="muted" style="font-weight:400">(con el que ingresa)</span></label>
         <input type="email" id="fEmail" value="${v(inv.inversor_email)}" placeholder="juan@email.com">
-        <label>Propiedad</label>
+        ${tipoSelectHTML('f', inv.tipo)}
+        <label id="fPropLabel">Propiedad</label>
         <input type="text" id="fProp" value="${v(inv.propiedad)}" placeholder="3 de Febrero 2781 5C">
         <div class="grid2">
           <div><label>Titularidad del inversor (%)</label><input type="number" id="fTit" value="${v(inv.titularidad)}" placeholder="100" oninput="prevParte()"></div>
@@ -1417,6 +1447,7 @@ function abrirForm(id) {
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
   toggleDecl('f');
+  syncTipoLabel('f');
   recalcInv();
   recalcPlan();
   if (id) renderHistValor(id);
@@ -1468,6 +1499,7 @@ async function guardar(id) {
     inversor_nombre: nombre,
     inversor_email: email,
     propiedad,
+    tipo: ($('fTipo') && $('fTipo').value) || 'departamento',
     titularidad: numOrNull('fTit'),
     fecha: $('fFecha').value || null,
     monto_unidad: numOrNull('montoUnidad'),
