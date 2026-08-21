@@ -1103,6 +1103,7 @@ function planPagoEditorHTML(plan) {
   const on = plan && plan.modo === 'cuotas';
   const a = (on && plan.anticipo) ? plan.anticipo : {};
   const q = (on && plan.cuotas) ? plan.cuotas : {};
+  planSeedItems(q);
   const aArs = a.moneda && a.moneda !== 'USD', qArs = q.moneda && q.moneda !== 'USD';
   const nv = x => (x == null || x === '') ? '' : x;
   const L = t => `<div style="font-size:11px;color:var(--muted);margin-bottom:3px">${t}</div>`;
@@ -1126,21 +1127,26 @@ function planPagoEditorHTML(plan) {
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:10px">Cuotas mensuales consecutivas</div>
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin:0 0 12px;cursor:pointer"><input type="checkbox" id="cMixta" ${q.mixta ? 'checked' : ''} onchange="planToggleMixta();recalcPlan()"> Cuota mixta <span class="muted" style="font-weight:400">(parte USD fija + parte en pesos CAC)</span></label>
         <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
-          <div style="width:90px">${L('Cantidad')}<input type="number" id="cCant" placeholder="30" value="${nv(q.cantidad)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="width:90px">${L('Cantidad')}<input type="number" id="cCant" placeholder="30" value="${nv(q.cantidad)}" oninput="planCantChanged()" style="width:100%;margin:0"></div>
           <div id="cSimpleWrap" style="display:${q.mixta ? 'none' : 'flex'};gap:10px;align-items:end;flex-wrap:wrap;flex:1;min-width:0">
             <div style="${F}">${L('Valor c/u')}<input type="number" id="cValor" placeholder="4125" value="${nv(q.valor)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
             <div style="width:110px">${L('Moneda')}${planMonedaSel('cMoneda', q.moneda)}</div>
             <div id="cUsdWrap" style="width:120px;${qArs ? '' : 'display:none'}">${L('USD por cuota')}<input type="number" id="cUsd" placeholder="en USD" value="${nv(q.usd_cuota)}" oninput="recalcPlan()" title="Equivalente en USD de cada cuota (para cuotas en pesos)" style="width:100%;margin:0"></div>
           </div>
         </div>
-        <div id="cMixtaWrap" style="display:${q.mixta ? 'flex' : 'none'};gap:10px;align-items:end;flex-wrap:wrap;margin-top:10px">
-          <div style="${F}">${L('Parte USD fija (c/u)')}<input type="number" id="cUsdFijo" placeholder="650" value="${nv(q.usd_fijo)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
-          <div style="${F}">${L('Parte en pesos — 1ª cuota')}<input type="number" id="cArs" placeholder="1058561" value="${nv(q.ars_cuota)}" oninput="recalcPlan()" title="Monto en pesos de la primera cuota (va ajustando por CAC)" style="width:100%;margin:0"></div>
-          <div style="width:150px">${L('Equiv. USD de esa parte')}<input type="number" id="cArsUsd" placeholder="650" value="${nv(q.ars_usd)}" oninput="recalcPlan()" title="Cuánto vale en dólares la parte en pesos (al momento de pagarla)" style="width:100%;margin:0"></div>
+        <div id="cMixtaWrap" style="display:${q.mixta ? 'block' : 'none'};margin-top:10px">
+          <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+            <div style="${F}">${L('USD por cuota (defecto)')}<input type="number" id="cUsdFijo" placeholder="650" value="${nv(q.usd_fijo)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+            <div style="${F}">${L('Pesos por cuota (defecto)')}<input type="number" id="cArs" placeholder="1058561" value="${nv(q.ars_cuota)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+            <div style="width:130px">${L('TC $→USD (opcional)')}<input type="number" id="cTc" placeholder="a completar" value="${nv(q.tc)}" oninput="recalcPlan()" title="Tipo de cambio para valuar en dólares la parte en pesos" style="width:100%;margin:0"></div>
+            <button type="button" class="btn btn-sec btn-sm" onclick="planGenerarItems()" style="white-space:nowrap;margin:0">↻ Generar cuotas</button>
+          </div>
+          <p class="muted" style="font-size:11px;margin:8px 0 0">Poné la cantidad y la 1ª cuota, apretá <b>Generar cuotas</b> y editá cada fila (USD, pesos y CAC) a mano. Tildá cada cuota cuando se paga.</p>
+          <div id="cItems" style="margin-top:10px;overflow-x:auto"></div>
         </div>
         <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-top:10px">
-          <div style="${F}">${L('1ª cuota (mes/año)')}<input type="date" id="cDesde" value="${nv(q.desde)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
-          <div style="width:120px">${L('Ya pagué (cuántas)')}<input type="number" id="cPagadas" placeholder="0" value="${nv(q.pagadas)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
+          <div style="${F}">${L('1ª cuota (mes/año)')}<input type="date" id="cDesde" value="${nv(q.desde)}" oninput="onDesdeInput()" style="width:100%;margin:0"></div>
+          <div id="cPagadasWrap" style="width:120px;${q.mixta ? 'display:none' : ''}">${L('Ya pagué (cuántas)')}<input type="number" id="cPagadas" placeholder="0" value="${nv(q.pagadas)}" oninput="recalcPlan()" style="width:100%;margin:0"></div>
         </div>
       </div>
 
@@ -1156,7 +1162,72 @@ function planToggleUsd() {
 function planToggleMixta() {
   const on = $('cMixta') && $('cMixta').checked;
   if ($('cSimpleWrap')) $('cSimpleWrap').style.display = on ? 'none' : 'flex';
-  if ($('cMixtaWrap')) $('cMixtaWrap').style.display = on ? 'flex' : 'none';
+  if ($('cMixtaWrap')) $('cMixtaWrap').style.display = on ? 'block' : 'none';
+  if ($('cPagadasWrap')) $('cPagadasWrap').style.display = on ? 'none' : '';
+  if (on) { if (!_planItems.length) planGenerarItems(); else planRenderItems(); }
+}
+
+// ── Grilla editable de cuotas mixtas (una fila por cuota, todo editable) ──
+let _planItems = [];   // [{usd, ars, cac, pag}]
+function planSeedItems(q) {
+  _planItems = (q && q.mixta && Array.isArray(q.items))
+    ? q.items.map(x => ({ usd: x.usd, ars: x.ars, cac: (x.cac == null ? '' : x.cac), pag: !!x.pag }))
+    : [];
+}
+function planNz(id) { const el = $(id); const v = el ? el.value.trim() : ''; return v === '' ? null : Number(v); }
+function planCantChanged() { if ($('cMixta') && $('cMixta').checked) planGenerarItems(); else recalcPlan(); }
+function onDesdeInput() { if ($('cMixta') && $('cMixta').checked) planRenderItems(); recalcPlan(); }
+function planGenerarItems() {
+  const cant = Number($('cCant') && $('cCant').value) || 0;
+  const defUsd = planNz('cUsdFijo'), defArs = planNz('cArs');
+  const out = [];
+  for (let i = 0; i < cant; i++) {
+    const p = _planItems[i] || {};
+    out.push({
+      usd: (p.usd != null && p.usd !== '') ? p.usd : defUsd,
+      ars: (p.ars != null && p.ars !== '') ? p.ars : defArs,
+      cac: (p.cac != null) ? p.cac : '',
+      pag: !!p.pag
+    });
+  }
+  _planItems = out;
+  planRenderItems();
+  planUpdateTotals();
+}
+function planItemEdit(i, k, v) {
+  if (!_planItems[i]) return;
+  _planItems[i][k] = (k === 'pag') ? v : (k === 'cac' ? v : (String(v).trim() === '' ? null : Number(v)));
+  planUpdateTotals();
+}
+function planRenderItems() {
+  const cont = $('cItems'); if (!cont) return;
+  if (!_planItems.length) { cont.innerHTML = ''; return; }
+  const desde = $('cDesde') ? $('cDesde').value : '';
+  const cell = 'padding:4px 5px;border-bottom:1px solid var(--bd)';
+  const inp = 'width:100%;margin:0;padding:6px 8px;font-size:12.5px';
+  const rows = _planItems.map((it, i) => {
+    const mes = desde ? mesAnio(addMonths(desde, i)) : '—';
+    const bg = it.pag ? 'background:rgba(21,146,90,.07)' : '';
+    return `<tr data-ci="${i}" style="${bg}">
+      <td style="${cell};text-align:center;font-weight:600;opacity:.6">${i + 1}</td>
+      <td style="${cell};white-space:nowrap;font-size:12px">${mes}</td>
+      <td style="${cell}"><input type="number" value="${it.usd == null ? '' : it.usd}" oninput="planItemEdit(${i},'usd',this.value)" placeholder="USD" style="${inp}"></td>
+      <td style="${cell}"><input type="number" value="${it.ars == null ? '' : it.ars}" oninput="planItemEdit(${i},'ars',this.value)" placeholder="pesos" style="${inp}"></td>
+      <td style="${cell}"><input type="number" value="${it.cac == null ? '' : it.cac}" oninput="planItemEdit(${i},'cac',this.value)" placeholder="a completar" style="${inp}"></td>
+      <td style="${cell};text-align:center"><input type="checkbox" ${it.pag ? 'checked' : ''} onchange="planRowPag(${i},this.checked)"></td>
+    </tr>`;
+  }).join('');
+  const th = 'padding:6px 5px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);text-align:left;border-bottom:1px solid var(--bd)';
+  cont.innerHTML = `<table style="width:100%;border-collapse:collapse;min-width:520px">
+    <thead><tr><th style="${th};text-align:center">#</th><th style="${th}">Mes</th><th style="${th}">USD</th><th style="${th}">Pesos</th><th style="${th}">CAC</th><th style="${th};text-align:center">Pagada</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+function planRowPag(i, val) {
+  if (!_planItems[i]) return;
+  _planItems[i].pag = val;
+  const tr = document.querySelector(`#cItems tr[data-ci="${i}"]`);
+  if (tr) tr.style.background = val ? 'rgba(21,146,90,.07)' : '';
+  planUpdateTotals();
 }
 function leerPlanPago() {
   if (!$('planOn') || !$('planOn').checked) return null;
@@ -1168,7 +1239,8 @@ function leerPlanPago() {
   if (cant != null) {
     const desde = $('cDesde').value || null, pagadas = (nz('cPagadas') || 0);
     if ($('cMixta') && $('cMixta').checked) {
-      cuotas = { cantidad: cant, mixta: true, usd_fijo: nz('cUsdFijo'), ars_cuota: nz('cArs'), ars_usd: nz('cArsUsd'), desde, pagadas };
+      const items = _planItems.slice(0, cant).map(x => ({ usd: x.usd, ars: x.ars, cac: (x.cac === '' ? null : x.cac), pag: !!x.pag }));
+      cuotas = { cantidad: cant, mixta: true, usd_fijo: nz('cUsdFijo'), ars_cuota: nz('cArs'), tc: nz('cTc'), desde, pagadas: items.filter(x => x.pag).length, items };
     } else {
       cuotas = { cantidad: cant, valor: nz('cValor'), moneda: $('cMoneda').value, desde, pagadas, usd_cuota: nz('cUsd') };
     }
@@ -1182,24 +1254,54 @@ function pagadoDelPlan(plan) {
   const a = plan.anticipo;
   if (a && a.pagado) s += (a.moneda && a.moneda !== 'USD') ? (Number(a.usd) || 0) : (Number(a.monto) || 0);
   const q = plan.cuotas;
-  if (q) s += (Number(q.pagadas) || 0) * valorUsdCuota(q);
+  if (q) {
+    if (q.mixta && Array.isArray(q.items) && q.items.length) {
+      const tc = Number(q.tc) || 0;
+      q.items.forEach(it => { if (it.pag) s += (Number(it.usd) || 0) + (tc ? (Number(it.ars) || 0) / tc : 0); });
+    } else {
+      s += (Number(q.pagadas) || 0) * valorUsdCuota(q);
+    }
+  }
   return s;
 }
+// Total en pesos efectivamente pagado (parte en pesos de las cuotas tildadas)
+function pesosPagadoDelPlan(plan) {
+  const q = plan && plan.cuotas;
+  if (!q || !q.mixta || !Array.isArray(q.items)) return 0;
+  return q.items.reduce((s, it) => s + (it.pag ? (Number(it.ars) || 0) : 0), 0);
+}
 function recalcPlan() {
+  if (!$('planPrev')) return;
+  // Modo mixto: asegurar que la grilla esté dibujada (sin robar foco al editar celdas)
+  if ($('cMixta') && $('cMixta').checked) {
+    const cont = $('cItems');
+    if (cont && cont.querySelectorAll('tr[data-ci]').length !== _planItems.length) planRenderItems();
+  } else {
+    const cron = $('planCron');
+    const plan = leerPlanPago();
+    if (cron) cron.innerHTML = (plan && plan.cuotas && !plan.cuotas.mixta) ? planCronogramaHTML(plan) : '';
+  }
+  planUpdateTotals();
+}
+function planUpdateTotals() {
   const el = $('planPrev'); if (!el) return;
-  const cron = $('planCron');
   const plan = leerPlanPago();
-  if (!plan) { el.innerHTML = ''; if (cron) cron.innerHTML = ''; return; }
-  if (cron) cron.innerHTML = planCronogramaHTML(plan);
+  if (!plan) { el.innerHTML = ''; const cr = $('planCron'); if (cr) cr.innerHTML = ''; return; }
   const pag = pagadoDelPlan(plan) || 0;
   const q = plan.cuotas;
-  let extra = '';
+  let extra = '', pesos = '';
   if (q) {
     const pagadas = Number(q.pagadas) || 0, cant = Number(q.cantidad) || 0, restan = Math.max(0, cant - pagadas);
     extra = ` · pagaste <b>${pagadas}/${cant}</b> · restan <b>${restan}</b>`;
-    if (q.desde && restan > 0) extra += ` · próxima: <b>${fmtFecha(addMonths(q.desde, pagadas))}</b>`;
+    if (q.mixta) {
+      const pp = pesosPagadoDelPlan(plan);
+      if (pp > 0) pesos = ` &nbsp;·&nbsp; en pesos <b>$ ${pp.toLocaleString('es-AR')}</b>`;
+      if (!q.tc) pesos += ` <span class="muted" style="font-weight:400">(cargá el TC para sumar los pesos al total USD)</span>`;
+    } else if (q.desde && restan > 0) {
+      extra += ` · próxima: <b>${fmtFecha(addMonths(q.desde, pagadas))}</b>`;
+    }
   }
-  el.innerHTML = `Pagado a hoy: <b>${fmtUSD(pag)}</b>${extra}`;
+  el.innerHTML = `Pagado a hoy: <b>${fmtUSD(pag)}</b>${extra}${pesos}`;
 }
 const MESES_AB = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 function mesAnio(iso) { if (!iso) return '—'; const p = iso.split('-'); return p.length === 3 ? `${MESES_AB[(+p[1]) - 1]} ${p[0]}` : iso; }
@@ -1235,20 +1337,46 @@ function planCardDetalle(inv) {
     rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Anticipo</span><span>${mon} · ${est}</span></div>`);
   }
   const q = plan.cuotas;
+  const R = (k, v) => rows.push(`<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${k}</span><span style="text-align:right">${v}</span></div>`);
   if (q) {
-    const val = q.mixta
-      ? `US$ ${(Number(q.usd_fijo) || 0).toLocaleString('es-AR')} + $ ${(Number(q.ars_cuota) || 0).toLocaleString('es-AR')} CAC ≈ ${fmtUSD(valorUsdCuota(q))}`
-      : ((q.moneda && q.moneda !== 'USD') ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') + (q.moneda === 'CAC' ? ' CAC' : '') : fmtUSD(Number(q.valor) || 0));
     const pagadas = Number(q.pagadas) || 0, cant = Number(q.cantidad) || 0, restan = Math.max(0, cant - pagadas);
-    rows.push(`<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Cuotas ${q.mixta ? '(mixtas)' : ((q.moneda && q.moneda !== 'USD') ? '(en $)' : '')}</span><span style="text-align:right">${cant} × ${val}</span></div>`);
-    rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Pagadas</span><span><b class="green">${pagadas}</b> · restan ${restan}</span></div>`);
-    if (q.desde && restan > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bd)"><span>Próxima cuota</span><span>${fmtFecha(addMonths(q.desde, pagadas))}</span></div>`);
+    if (q.mixta) {
+      R('Cuotas (mixtas)', `${cant} cuotas · US$ + $ CAC`);
+      R('Pagadas', `<b class="green">${pagadas}</b> · restan ${restan}`);
+      const pp = pesosPagadoDelPlan(plan);
+      if (pp > 0) R('Pagado en pesos', `$ ${pp.toLocaleString('es-AR')}`);
+      if (!q.tc) R('Nota', `<span class="muted">TC $→USD sin cargar</span>`);
+    } else {
+      const val = (q.moneda && q.moneda !== 'USD') ? '$ ' + (Number(q.valor) || 0).toLocaleString('es-AR') + (q.moneda === 'CAC' ? ' CAC' : '') : fmtUSD(Number(q.valor) || 0);
+      R('Cuotas ' + ((q.moneda && q.moneda !== 'USD') ? '(en $)' : ''), `${cant} × ${val}`);
+      R('Pagadas', `<b class="green">${pagadas}</b> · restan ${restan}`);
+      if (q.desde && restan > 0) R('Próxima cuota', fmtFecha(addMonths(q.desde, pagadas)));
+    }
   }
   const pagUSD = pagadoDelPlan(plan) || 0;
+  const detalleCuotas = (q && q.mixta && Array.isArray(q.items) && q.items.length) ? planTablaDetalleHTML(plan) : planCronogramaHTML(plan);
   return `<div class="card"><div class="card-title">Forma de pago</div>${rows.join('')}
     <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;font-weight:700"><span>Pagado a hoy (tu parte)</span><b>${fmtUSD(pagUSD * c)}</b></div>
-    ${planCronogramaHTML(plan)}
+    ${detalleCuotas}
   </div>`;
+}
+function planTablaDetalleHTML(plan) {
+  const q = plan && plan.cuotas;
+  if (!q || !q.mixta || !Array.isArray(q.items) || !q.items.length) return '';
+  const desde = q.desde;
+  const cell = 'padding:5px 6px;border-bottom:1px solid var(--bd);font-size:12px;white-space:nowrap';
+  const rows = q.items.map((it, i) => {
+    const mes = desde ? mesAnio(addMonths(desde, i)) : '—';
+    const usd = it.usd != null ? 'US$ ' + Number(it.usd).toLocaleString('es-AR') : '—';
+    const ars = it.ars != null ? '$ ' + Number(it.ars).toLocaleString('es-AR') : '—';
+    const cac = (it.cac != null && it.cac !== '') ? Number(it.cac).toLocaleString('es-AR') : '—';
+    const est = it.pag ? '<span class="green" style="font-weight:700">✓</span>' : '<span class="muted">pend.</span>';
+    return `<tr style="${it.pag ? 'background:rgba(21,146,90,.06)' : ''}"><td style="${cell};text-align:center;opacity:.6">${i + 1}</td><td style="${cell}">${mes}</td><td style="${cell};text-align:right">${usd}</td><td style="${cell};text-align:right">${ars}</td><td style="${cell};text-align:right">${cac}</td><td style="${cell};text-align:center">${est}</td></tr>`;
+  }).join('');
+  const th = 'padding:6px;font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);border-bottom:1px solid var(--bd)';
+  return `<div style="margin-top:12px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:480px">
+    <thead><tr><th style="${th};text-align:center">#</th><th style="${th};text-align:left">Mes</th><th style="${th};text-align:right">USD</th><th style="${th};text-align:right">Pesos</th><th style="${th};text-align:right">CAC</th><th style="${th};text-align:center">Pag.</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
 }
 function notasCardHTML(inv) {
   if (!inv.notas) return '';
