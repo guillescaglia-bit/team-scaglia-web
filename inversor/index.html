@@ -160,6 +160,18 @@
       <p class="err" id="errPass"></p>
       <button class="btn btn-primary" onclick="loginPass()">Ingresar</button>
       <button class="btn btn-sec" style="margin-top:6px" onclick="volverEmail()">Cambiar email</button>
+      <p class="linkline">¿Olvidaste tu contraseña? <button onclick="olvidePass()">Restablecerla</button></p>
+      <p id="msgReset" style="font-size:12px;color:var(--green);text-align:left;margin-top:8px;display:none"></p>
+    </div>
+
+    <div id="pasoRecovery" class="oculto">
+      <p class="sub">Elegí una contraseña nueva para <b>info@teamscaglia.com</b>.</p>
+      <label>Nueva contraseña</label>
+      <input type="password" id="inPass1" placeholder="mínimo 6 caracteres">
+      <label>Repetir contraseña</label>
+      <input type="password" id="inPass2" placeholder="repetí la contraseña" onkeydown="if(event.key==='Enter')guardarNuevaPass()">
+      <p class="err" id="errRec"></p>
+      <button class="btn btn-primary" onclick="guardarNuevaPass()">Guardar contraseña</button>
     </div>
   </div>
 </div>
@@ -188,6 +200,7 @@
 const SUPABASE_URL = 'https://fgipdqcxsbmrjvozalqn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnaXBkcWN4c2Jtcmp2b3phbHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMzM2NzIsImV4cCI6MjA5NzkwOTY3Mn0.YjDJBcuzwp0_f3U976eGBtyVia1Uw01cjJbaSV3VlE0';
 const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _isRecovery = /type=recovery/.test(location.hash);
 const ADMIN_EMAIL = 'info@teamscaglia.com';
 const esAdmin = (e) => (e || '').trim().toLowerCase() === ADMIN_EMAIL;
 
@@ -440,6 +453,39 @@ async function loginPass() {
   const { error } = await supa.auth.signInWithPassword({ email, password });
   if (error) { showErr('errPass', 'Contraseña incorrecta.'); return; }
   usuario = { email, rol: 'admin' };
+  entrar();
+}
+
+async function olvidePass() {
+  const msg = $('msgReset');
+  const { error } = await supa.auth.resetPasswordForEmail(ADMIN_EMAIL, { redirectTo: location.origin + '/inversor/' });
+  if (msg) {
+    msg.style.display = 'block';
+    msg.style.color = error ? 'var(--danger)' : 'var(--green)';
+    msg.textContent = error
+      ? 'No se pudo enviar el email. Probá de nuevo en un minuto.'
+      : 'Te enviamos un email a info@teamscaglia.com con el link para restablecer la contraseña. Revisá también spam.';
+  }
+}
+
+function mostrarRecovery() {
+  $('vistaApp').classList.add('oculto');
+  const lw = document.querySelector('.login-wrap'); if (lw) lw.classList.remove('oculto');
+  ['pasoEmail', 'pasoCodigo', 'pasoPass'].forEach(id => { const el = $(id); if (el) el.classList.add('oculto'); });
+  $('pasoRecovery').classList.remove('oculto');
+  $('inPass1').focus();
+}
+
+async function guardarNuevaPass() {
+  clearErr('errRec');
+  const p1 = $('inPass1').value, p2 = $('inPass2').value;
+  if (p1.length < 6) { showErr('errRec', 'La contraseña debe tener al menos 6 caracteres.'); return; }
+  if (p1 !== p2) { showErr('errRec', 'Las contraseñas no coinciden.'); return; }
+  const { error } = await supa.auth.updateUser({ password: p1 });
+  if (error) { showErr('errRec', 'No se pudo guardar. Volvé a abrir el link del email (puede haber vencido).'); return; }
+  alert('¡Contraseña actualizada! Ya podés entrar con la nueva.');
+  history.replaceState(null, '', location.pathname);
+  usuario = { email: ADMIN_EMAIL, rol: 'admin' };
   entrar();
 }
 
@@ -1527,7 +1573,10 @@ function volverDashboard() {
 }
 
 // ── Restaurar sesión al recargar ──
+supa.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') mostrarRecovery(); });
+
 (async function init() {
+  if (_isRecovery) { mostrarRecovery(); return; }
   const { data: { session } } = await supa.auth.getSession();
   if (session && session.user) {
     usuario = { email: session.user.email, rol: esAdmin(session.user.email) ? 'admin' : 'inversor' };
