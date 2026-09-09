@@ -450,6 +450,15 @@
   .rlegend{display:flex;gap:16px;margin-top:14px;font-size:10.5px;color:var(--muted);flex-wrap:wrap;justify-content:center}
   .rlegend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
   .lg-g{background:rgba(90,150,105,.85)}.lg-s{background:#a24a3a}.lg-n{background:#c9c8bc}
+  .wfloors{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .wchip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px;padding:8px 11px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font-family:var(--sans);transition:transform .15s,border-color .2s,background .2s}
+  .wchip .cn{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);line-height:1}
+  .wchip .cs{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .wchip.g{border-color:#cbd6ce}.wchip.g .cn{color:var(--green)}.wchip.g .cs{color:var(--green)}
+  .wchip.g:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 8px 18px -10px rgba(64,88,74,.5)}
+  .wchip.active{background:var(--green);border-color:var(--green)}
+  .wchip.active .cn{color:var(--cream)}.wchip.active .cs{color:rgba(237,228,211,.82)}
+  .wchip.s,.wchip.n{opacity:.45;cursor:default}
   .dpanel{min-height:420px}
   .dpanel .step{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:14px}
   .dpanel .step b{color:var(--green)}
@@ -494,8 +503,14 @@
   .dcta{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:16px;background:var(--wa);color:#fff;text-decoration:none;border:none;border-radius:11px;padding:14px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
   @media (max-width:820px){
     #disponibilidad{overflow-x:hidden}
-    .dstage{grid-template-columns:1fr;gap:22px;margin-top:32px}
+    .dstage{grid-template-columns:1fr;gap:18px;margin-top:32px}
     .rlegend{gap:10px;font-size:10px}
+    .render .fzone{pointer-events:none}
+    .render-hint{display:none}
+    .wfloors{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+    .wfloors::-webkit-scrollbar{display:none}
+    .wchip{min-width:56px;padding:10px 12px}
+    .wchip .cn{font-size:20px}
     .render{width:100%;max-width:440px}
     .render img{height:auto;width:100%}
     .render-cap{font-size:11px}
@@ -526,8 +541,9 @@
         <div class="rlegend"><span><i class="lg-g"></i>Con disponibles</span><span><i class="lg-s"></i>Vendido</span><span><i class="lg-n"></i>Próximamente</span></div>
       </div>
       <div class="dpanel">
-        <div class="step" id="wStep">Paso 1 · <b>elegí un piso</b> en la fachada</div>
-        <div id="wBody"><div class="dph"><b>Tocá un piso</b>Pasá por la fachada y elegí el piso; después el departamento.</div></div>
+        <div class="step" id="wStep">Paso 1 · <b>elegí un piso</b></div>
+        <div class="wfloors" id="wFloors"></div>
+        <div id="wBody"><div class="dph"><b>Elegí un piso</b>Tocá un piso arriba (o en la fachada) para ver los departamentos y precios.</div></div>
       </div>
     </div>
   </div>
@@ -833,20 +849,31 @@
     var FY = [{t:20.5,b:27.0},{t:28.5,b:35.0},{t:36.5,b:43.0},{t:44.5,b:50.5},{t:51.5,b:58.5},{t:60.0,b:66.5},{t:67.5,b:74.5},{t:75.0,b:81.5},{t:82.0,b:89.0}];
     var BX = {l:26.5, w:30.0};
     function floorStat(f){ if (f.us.some(disp)) return 'g'; if (f.us.some(function(x){return x.s==='v';})) return 's'; return 'n'; }
+    var ZN = [], chipsHost = document.getElementById('wFloors');
     FLOORS.forEach(function(f, fi){
       var st = floorStat(f), y = FY[fi], nd = f.us.filter(disp).length;
       var z = document.createElement('div'); z.className = 'fzone '+st;
       z.style.left = BX.l+'%'; z.style.width = BX.w+'%'; z.style.top = y.t+'%'; z.style.height = (y.b-y.t)+'%';
       var meta = st==='g' ? (nd+' disp') : (st==='s' ? 'Vendido' : 'Próx.');
       z.innerHTML = '<span class="fl">'+f.p+'<small>'+meta+'</small></span>';
-      if (st==='g') z.addEventListener('click', function(){ wSelFloor(fi, z); });
+      if (st==='g') z.addEventListener('click', function(){ wSelFloor(fi); });
       else z.style.cursor = 'default';
-      wRender.appendChild(z);
+      wRender.appendChild(z); ZN[fi] = z;
+      // botón de piso (control principal en mobile)
+      if (chipsHost){
+        var b = document.createElement('button'); b.type='button'; b.className='wchip '+st;
+        b.innerHTML = '<span class="cn">'+f.p+'</span><span class="cs">'+(st==='g' ? nd+' disp' : (st==='s' ? 'vend.' : 'próx.'))+'</span>';
+        if (st==='g') b.addEventListener('click', function(){ wSelFloor(fi); });
+        else b.disabled = true;
+        chipsHost.appendChild(b);
+      }
     });
     function wCountUp(node, target){ var dur=680, t0=null; function s(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-p,3); node.textContent=fmtU(target*e); if(p<1) requestAnimationFrame(s); else node.textContent=fmtU(target);} requestAnimationFrame(s); }
-    function wSelFloor(fi, z){
+    function wSelFloor(fi){
+      var z = ZN[fi];
       wRender.querySelectorAll('.fzone').forEach(function(e){ e.classList.remove('on'); });
-      z.classList.add('on'); wRender.classList.add('dim');
+      if (z) z.classList.add('on'); wRender.classList.add('dim');
+      if (chipsHost){ var cs = chipsHost.querySelectorAll('.wchip'); for (var k=0;k<cs.length;k++) cs[k].classList.toggle('active', k===fi); var ac=cs[fi]; if (ac && ac.scrollIntoView) ac.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }
       var f = FLOORS[fi], pn = parseInt(f.p, 10);
       document.getElementById('wStep').innerHTML = 'Paso 2 · piso <b>'+f.p+'</b> · elegí el departamento';
       var body = document.getElementById('wBody');
