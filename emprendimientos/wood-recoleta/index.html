@@ -474,6 +474,14 @@
   .unit.disp.sel .ul{color:var(--cream)}.unit.disp.sel .ut{color:rgba(237,228,211,.7)}.unit.disp.sel .ust{color:var(--cream)}
   .unit.sold,.unit.no{cursor:default;background:#f3f0e8}
   .unit.sold .ul,.unit.no .ul{color:#c9c6ba}.unit.sold .ust{color:#b06b5e}.unit.no .ust{color:var(--muted)}
+  .ulist{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+  .urow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:var(--sans);transition:transform .15s,box-shadow .2s,border-color .2s}
+  .urow:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 12px 24px -14px rgba(64,88,74,.45)}
+  .urow .ur-pu{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);display:block;line-height:1}
+  .urow .ur-m2{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:5px;display:block}
+  .urow .ur-r{display:flex;align-items:center;gap:10px}
+  .urow .ur-pr{font-family:var(--sans);font-size:19px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+  .urow .ur-ar{color:var(--green);opacity:.5;font-size:18px}
   .dph{color:var(--muted);font-size:13px;padding:60px 20px;text-align:center;border:1px dashed var(--line);border-radius:14px;background:var(--card)}
   .dph b{display:block;font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:6px}
   .verplanta{display:inline-flex;align-items:center;gap:7px;margin:2px 0;background:none;border:none;color:var(--green);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px 0;border-bottom:1.5px solid var(--line);transition:border-color .3s,opacity .2s}
@@ -912,7 +920,23 @@
       setTimeout(function(){ var cv=document.getElementById('wCv'); if(cv) wCountUp(cv, +cv.getAttribute('data-v')); }, 220);
       if (window.matchMedia('(max-width:820px)').matches) setTimeout(function(){ document.getElementById('wPc').scrollIntoView({behavior:'smooth', block:'center'}); }, 120);
     }
-    document.querySelectorAll('.tipo[data-tipo]').forEach(function(c){ c.style.cursor='pointer'; c.addEventListener('click', function(){ var s=document.getElementById('disponibilidad'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); }); });
+    // Ver todas las unidades de una tipología (con precio), al tocar una card de Tipologías
+    var TIPO_T = { estudio:'Estudios', mono:'1 ambiente', dosamb:'2 ambientes' };
+    function wSelTipo(key){
+      wRender.querySelectorAll('.fzone').forEach(function(e){ e.classList.remove('on'); }); wRender.classList.remove('dim');
+      for (var k=0;k<CH.length;k++){ if (CH[k]) CH[k].classList.remove('active'); }
+      var list = [];
+      FLOORS.forEach(function(f, fi){ var pn=parseInt(f.p,10); f.us.forEach(function(x, ui){ if(!disp(x)) return; if(tipoKey(pn, x.u)!==key) return; list.push({fi:fi, ui:ui, p:f.p, u:x.u, price:(x.cash!=null?x.cash:x.fin), pi:planInfo(pn, x.u)}); }); });
+      list.sort(function(a,b){ return a.price - b.price; });
+      document.getElementById('wStep').innerHTML = 'Tipología · <b>'+(TIPO_T[key]||'')+'</b> · '+list.length+' '+(list.length===1?'disponible':'disponibles');
+      var h = '<div class="ulist">';
+      list.forEach(function(it){ var m2 = it.pi ? (it.pi.tot+' m²') : ''; h += '<button class="urow" type="button" data-fi="'+it.fi+'" data-ui="'+it.ui+'"><span class="ur-l"><span class="ur-pu">'+it.p+' · '+it.u+'</span><span class="ur-m2">'+(it.pi?it.pi.tipo:'')+' · '+m2+'</span></span><span class="ur-r"><span class="ur-pr">'+fmtU(it.price)+'</span><span class="ur-ar">→</span></span></button>'; });
+      h += '</div>';
+      var body = document.getElementById('wBody'); body.innerHTML = h;
+      body.querySelectorAll('.urow').forEach(function(r){ r.addEventListener('click', function(){ var fi=+r.getAttribute('data-fi'), ui=+r.getAttribute('data-ui'); wSelFloor(fi); setTimeout(function(){ var c=document.querySelector('#wBody .unit.disp[data-i="'+ui+'"]'); if(c) c.click(); }, 40); }); });
+      var s=document.getElementById('disponibilidad'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    document.querySelectorAll('.tipo[data-tipo]').forEach(function(c){ c.style.cursor='pointer'; c.addEventListener('click', function(){ wSelTipo(c.getAttribute('data-tipo')); }); });
   })();
 
   // ── "A pocos pasos de todo": lugares cercanos por categoría ──
