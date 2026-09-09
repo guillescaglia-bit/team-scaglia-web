@@ -428,13 +428,19 @@
   .usheet .detail{background:none;border:none;box-shadow:none;padding:0}
   /* ── Selector render (fachada + planta + precio) ── */
   .dstage{margin-top:44px;display:grid;grid-template-columns:360px 1fr;gap:clamp(24px,4vw,44px);align-items:start;max-width:1000px;margin-left:auto;margin-right:auto}
+  .dstage>*{min-width:0}
+  .pgrid{max-width:100%}.pc{max-width:100%}
   .render{position:relative;width:fit-content;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 30px 70px -40px rgba(40,56,46,.7);background:#1a1f1c;line-height:0}
   .render img{height:470px;width:auto;display:block}
   .render.dim img{filter:brightness(.72) saturate(.9);transition:filter .5s}
   .fzone{position:absolute;cursor:pointer;border-radius:3px;transition:background .3s,box-shadow .3s;background:rgba(0,0,0,0)}
   .fzone .fl{position:absolute;left:7px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:7px;background:rgba(40,56,46,.94);color:var(--cream);padding:6px 12px;border-radius:100px;font-family:var(--sans);font-size:14px;font-weight:700;line-height:1;white-space:nowrap;opacity:0;transition:opacity .22s;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none}
   .fzone .fl small{font-family:var(--sans);font-size:8.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.82}
+  .fzone.g{box-shadow:inset 0 0 0 1.5px rgba(214,236,220,.5)}
   .fzone.g:hover{background:rgba(90,150,105,.42);box-shadow:inset 0 0 0 2px rgba(180,220,190,.9)}
+  .render-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:7px;background:rgba(40,56,46,.92);color:var(--cream);padding:8px 15px;border-radius:100px;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.05em;box-shadow:0 6px 18px rgba(0,0,0,.35);white-space:nowrap;z-index:3;animation:hintbob 1.9s ease-in-out infinite}
+  @keyframes hintbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+  .render.dim .render-hint{opacity:0;pointer-events:none;transition:opacity .3s}
   .fzone.s:hover{background:rgba(162,74,58,.4);box-shadow:inset 0 0 0 2px rgba(220,150,140,.8)}
   .fzone.n:hover{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
   .fzone:hover .fl{opacity:1}
@@ -486,7 +492,22 @@
   .fin .rows{margin-top:9px;border-top:1px solid rgba(237,228,211,.2);padding-top:8px}
   .fin .row{display:flex;justify-content:space-between;font-size:11px;color:rgba(237,228,211,.82);padding:2px 0}.fin .row b{color:var(--cream)}
   .dcta{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:16px;background:var(--wa);color:#fff;text-decoration:none;border:none;border-radius:11px;padding:14px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-  @media (max-width:820px){.dstage{grid-template-columns:1fr;gap:28px}.render{max-width:340px}}
+  @media (max-width:820px){
+    #disponibilidad{overflow-x:hidden}
+    .dstage{grid-template-columns:1fr;gap:22px;margin-top:32px}
+    .rlegend{gap:10px;font-size:10px}
+    .render{width:100%;max-width:440px}
+    .render img{height:auto;width:100%}
+    .render-cap{font-size:11px}
+    .pgrid{flex-direction:column;gap:14px}
+    .plano{flex:0 0 auto;width:160px}
+    .pinfo{min-width:0;width:100%}
+    .pc{padding:18px}
+    .pc-u{font-size:26px}
+    .pb-v{font-size:28px}
+    .fin .pb-v{font-size:23px}
+    .dph{padding:34px 18px}
+  }
 </style>
 <section class="avail" id="disponibilidad" style="scroll-margin-top:72px">
   <div class="wrap">
@@ -499,6 +520,7 @@
       <div>
         <div class="render" id="wRender">
           <img src="/emprendimientos/wood-recoleta/img/hero.jpg" alt="WOOD Recoleta · fachada en Larrea 1180">
+          <div class="render-hint" id="wHint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V4a2 2 0 0 1 4 0v9"/><path d="M17 9a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7h-2a7 7 0 0 1-6-3.5L3 16"/></svg> Tocá un piso disponible</div>
           <div class="render-cap">WOOD · Larrea 1180, Recoleta</div>
         </div>
         <div class="rlegend"><span><i class="lg-g"></i>Con disponibles</span><span><i class="lg-s"></i>Vendido</span><span><i class="lg-n"></i>Próximamente</span></div>
@@ -836,6 +858,7 @@
       var vp = document.getElementById('wVerPlanta'); if (vp) vp.addEventListener('click', function(){ openLB(planImg); });
       body.querySelectorAll('.unit.disp').forEach(function(u, idx){ setTimeout(function(){ u.classList.add('in'); }, 60+idx*70); u.addEventListener('click', function(){ wSelUnit(fi, +u.getAttribute('data-i'), u); }); });
       body.querySelectorAll('.unit:not(.disp)').forEach(function(u, idx){ setTimeout(function(){ u.classList.add('in'); }, 60+idx*70); });
+      if (window.matchMedia('(max-width:820px)').matches) setTimeout(function(){ document.getElementById('wStep').scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
     }
     function wSelUnit(fi, ui, node){
       document.getElementById('wBody').querySelectorAll('.unit').forEach(function(e){ e.classList.remove('sel'); }); node.classList.add('sel');
@@ -852,6 +875,7 @@
       var pl = document.getElementById('wPlano'); if (pl) pl.addEventListener('click', function(){ openLB(planoSrc); });
       var pc = document.querySelector('#wPc .pc'); requestAnimationFrame(function(){ pc.classList.add('in'); });
       setTimeout(function(){ var cv=document.getElementById('wCv'); if(cv) wCountUp(cv, +cv.getAttribute('data-v')); }, 220);
+      if (window.matchMedia('(max-width:820px)').matches) setTimeout(function(){ document.getElementById('wPc').scrollIntoView({behavior:'smooth', block:'center'}); }, 120);
     }
     document.querySelectorAll('.tipo[data-tipo]').forEach(function(c){ c.style.cursor='pointer'; c.addEventListener('click', function(){ var s=document.getElementById('disponibilidad'); if(s) s.scrollIntoView({behavior:'smooth', block:'start'}); }); });
   })();
