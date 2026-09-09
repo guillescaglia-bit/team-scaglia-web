@@ -438,6 +438,106 @@
   .usheet-grip{width:44px;height:5px;border-radius:3px;background:var(--line)}
   .usheet-x{position:absolute;top:8px;right:0;width:36px;height:36px;border:none;background:rgba(18,18,18,.1);border-radius:50%;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
   .usheet .detail{background:none;border:none;box-shadow:none;padding:0}
+  /* ── Selector render (fachada + piso + precio) ── */
+  .dstage{margin-top:44px;display:grid;grid-template-columns:360px 1fr;gap:clamp(24px,4vw,44px);align-items:start;max-width:1040px;margin-left:auto;margin-right:auto}
+  .dstage>*{min-width:0}.pgrid{max-width:100%}.pc{max-width:100%}
+  .render{position:relative;width:fit-content;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 30px 70px -40px rgba(20,20,20,.6);background:#1a1a1a;line-height:0}
+  .render img{height:520px;width:auto;display:block}
+  .render.dim img{filter:brightness(.72) saturate(.92);transition:filter .5s}
+  .fzone{position:absolute;cursor:pointer;border-radius:3px;transition:background .3s,box-shadow .3s;background:rgba(0,0,0,0)}
+  .fzone.g{box-shadow:inset 0 0 0 1.5px rgba(234,230,222,.5)}
+  .fzone .fl{position:absolute;left:7px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:7px;background:rgba(20,20,20,.92);color:var(--cream);padding:6px 12px;border-radius:100px;font-family:var(--sans);font-size:13px;font-weight:600;line-height:1;white-space:nowrap;opacity:0;transition:opacity .22s;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none}
+  .fzone .fl small{font-size:8px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+  .fzone.g:hover{background:rgba(120,120,120,.28);box-shadow:inset 0 0 0 2px rgba(234,230,222,.95)}
+  .fzone.s:hover{background:rgba(140,60,50,.32);box-shadow:inset 0 0 0 2px rgba(210,150,140,.8)}
+  .fzone.n:hover{background:rgba(255,255,255,.14)}
+  .fzone:hover .fl{opacity:1}
+  .fzone.on.g{background:rgba(120,120,120,.34);box-shadow:inset 0 0 0 2px rgba(255,255,255,1)}
+  .fzone.on .fl{opacity:1}
+  .render-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:7px;background:rgba(20,20,20,.92);color:var(--cream);padding:8px 15px;border-radius:100px;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.05em;box-shadow:0 6px 18px rgba(0,0,0,.4);white-space:nowrap;z-index:3;animation:hintbob 1.9s ease-in-out infinite}
+  @keyframes hintbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+  .render.dim .render-hint{opacity:0;pointer-events:none;transition:opacity .3s}
+  .render-cap{position:absolute;bottom:10px;left:12px;font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.8);text-shadow:0 1px 3px rgba(0,0,0,.7)}
+  .rlegend{display:flex;gap:16px;margin-top:14px;font-size:10.5px;color:var(--muted);flex-wrap:wrap;justify-content:center}
+  .rlegend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .lg-g{background:var(--green)}.lg-s{background:#8c3c32}.lg-n{background:#cfc9bd}.lg-r{background:var(--res)}
+  .wfloors{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .wchip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px;padding:8px 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font-family:var(--sans);transition:transform .15s,border-color .2s,background .2s}
+  .wchip .cn{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink);line-height:1}
+  .wchip .cs{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .wchip.g{border-color:#cdc7ba}.wchip.g .cn{color:var(--green)}.wchip.g .cs{color:var(--green)}
+  .wchip.g:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 8px 18px -10px rgba(20,20,20,.4)}
+  .wchip.active{background:var(--green);border-color:var(--green)}
+  .wchip.active .cn{color:var(--cream)}.wchip.active .cs{color:rgba(234,230,222,.82)}
+  .wchip.s,.wchip.n{opacity:.45;cursor:default}
+  .dpanel{min-height:440px}
+  .dpanel .step{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:14px}
+  .dpanel .step b{color:var(--green)}
+  .units{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 6px 11px;text-align:center;cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity .45s,transform .45s,box-shadow .3s,border-color .3s,background .3s}
+  .unit.in{opacity:1;transform:none}
+  .unit .ul{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1}
+  .unit .ut{font-size:7.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:4px;min-height:9px}
+  .unit .ust{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:6px}
+  .unit.disp .ust{color:var(--green)}
+  .unit.disp:hover{transform:translateY(-3px);box-shadow:0 14px 26px -14px rgba(20,20,20,.4);border-color:var(--green)}
+  .unit.disp.sel{background:var(--green);border-color:var(--green)}
+  .unit.disp.sel .ul{color:var(--cream)}.unit.disp.sel .ut{color:rgba(234,230,222,.7)}.unit.disp.sel .ust{color:var(--cream)}
+  .unit.sold,.unit.no,.unit.res{cursor:default;background:#f0ece3}
+  .unit.sold .ul,.unit.no .ul,.unit.res .ul{color:#c9c3b6}
+  .unit.sold .ust{color:#8c3c32}.unit.no .ust{color:var(--muted)}.unit.res .ust{color:var(--res)}
+  .dph{color:var(--muted);font-size:13px;padding:56px 20px;text-align:center;border:1px dashed var(--line);border-radius:14px;background:var(--card)}
+  .dph b{display:block;font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:6px}
+  .pc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:16px;box-shadow:0 24px 56px -36px rgba(20,20,20,.4);opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+  .pc.in{opacity:1;transform:none}
+  .pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}
+  .pc-u{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--green);line-height:1}
+  .pc-t{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .pc-m2{text-align:right;font-size:12px;color:var(--ink)}.pc-m2 span{color:var(--muted);font-size:10.5px}
+  .pgrid{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+  .plano{position:relative;flex:0 0 130px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#faf8f2;cursor:zoom-in;transition:box-shadow .3s}
+  .plano:hover{box-shadow:0 10px 22px -12px rgba(20,20,20,.4)}
+  .plano img{width:100%;display:block}
+  .plano .cap{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;padding:5px}
+  .plano .zoom{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(20,20,20,.82);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+  .plano:hover .zoom{opacity:1}.plano .zoom svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+  .pinfo{flex:1;min-width:170px}
+  .pb-l{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .pb-v{font-family:var(--sans);font-size:31px;font-weight:700;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+  .fin{margin-top:14px;background:var(--green);border-radius:11px;padding:13px 14px}
+  .fin .pb-l{color:rgba(234,230,222,.72)}.fin .pb-v{font-size:25px;color:var(--cream)}
+  .fin .rows{margin-top:9px;border-top:1px solid rgba(234,230,222,.2);padding-top:8px}
+  .fin .row{display:flex;justify-content:space-between;font-size:11px;color:rgba(234,230,222,.82);padding:2px 0}.fin .row b{color:var(--cream)}
+  .fin .note{font-size:9.5px;color:rgba(234,230,222,.62);margin-top:8px;line-height:1.4}
+  .dcta{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:16px;background:var(--wa);color:#fff;text-decoration:none;border:none;border-radius:11px;padding:14px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .ulist{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+  .urow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;font-family:var(--sans);transition:transform .15s,box-shadow .2s,border-color .2s}
+  .urow:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 12px 24px -14px rgba(20,20,20,.4)}
+  .urow .ur-l{min-width:0}
+  .urow .ur-pu{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);display:block;line-height:1;white-space:nowrap}
+  .urow .ur-m2{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:5px;display:block;white-space:nowrap}
+  .urow .ur-r{display:flex;align-items:center;gap:10px;flex:none}
+  .urow .ur-pr{font-family:var(--sans);font-size:19px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .urow .ur-ar{color:var(--green);opacity:.5;font-size:18px}
+  @media (max-width:820px){
+    #disponibilidad{overflow-x:hidden}
+    .dstage{grid-template-columns:1fr;gap:18px;margin-top:32px}
+    .rlegend{gap:10px;font-size:10px}
+    .render .fzone{pointer-events:none}
+    .render-hint{display:none}
+    .render{width:100%;max-width:440px}
+    .render img{height:auto;width:100%}
+    .wfloors{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+    .wfloors::-webkit-scrollbar{display:none}
+    .wchip{min-width:52px;padding:10px 12px}.wchip .cn{font-size:17px}
+    .units{grid-template-columns:repeat(3,1fr);gap:8px}
+    .unit .ul{font-size:24px}
+    .pgrid{flex-direction:column;gap:14px}
+    .plano{flex:0 0 auto;width:160px}
+    .pinfo{min-width:0;width:100%}
+    .pc{padding:18px}.pc-u{font-size:26px}.pb-v{font-size:28px}.fin .pb-v{font-size:23px}
+    .urow{padding:13px 15px}.urow .ur-pu{font-size:19px}.urow .ur-pr{font-size:17px}
+  }
 </style>
 <section class="avail" id="disponibilidad" style="scroll-margin-top:72px">
   <div class="wrap">
@@ -446,20 +546,19 @@
       <h2 class="title">El edificio</h2>
       <div class="subt">/ piso por piso</div>
     </div>
-    <div class="layout">
-      <div class="bldcol">
-      <div class="filter-bar" id="filterBar" hidden></div>
-      <div class="bld reveal" id="bld"></div>
-      <div class="tap-hint">Tocá una unidad <b style="color:var(--green);font-weight:600">disponible</b> para ver precio, planta y consultarla.</div>
+    <div class="dstage reveal">
+      <div>
+        <div class="render" id="wRender">
+          <img src="/emprendimientos/quintaglia-3defebrero-2781/img/hero.jpg" alt="Quintaglia · fachada en 3 de Febrero 2781">
+          <div class="render-hint" id="wHint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V4a2 2 0 0 1 4 0v9"/><path d="M17 9a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7h-2a7 7 0 0 1-6-3.5L3 16"/></svg> Tocá un piso disponible</div>
+          <div class="render-cap">Quintaglia · 3 de Febrero 2781</div>
+        </div>
+        <div class="rlegend"><span><i class="lg-g"></i>Con disponibles</span><span><i class="lg-s"></i>Vendido</span><span><i class="lg-r"></i>Reservada</span><span><i class="lg-n"></i>Próximamente</span></div>
       </div>
-      <div class="panel reveal">
-        <div class="detail" id="detail">
-          <div class="empty">Tocá una unidad <b style="color:var(--green)">disponible</b> del edificio para ver su precio y consultarla.</div>
-        </div>
-        <div class="summary">
-          <b>21 unidades disponibles</b> · 20 vendidas · 10 no disponibles · 1 reservada.<br>
-          Financiación <b>50% de anticipo + 24 cuotas</b> (USD o pesos ajustado por CAC).
-        </div>
+      <div class="dpanel">
+        <div class="step" id="wStep">Paso 1 · <b>elegí un piso</b></div>
+        <div class="wfloors" id="wFloors"></div>
+        <div id="wBody"><div class="dph"><b>Elegí un piso</b>Tocá un piso arriba (o en la fachada) para ver los departamentos y precios.</div></div>
       </div>
     </div>
   </div>
@@ -759,6 +858,90 @@
   Array.prototype.forEach.call(document.querySelectorAll('.gal-item'), function(g){
     g.addEventListener('click', function(){ openLB(g.querySelector('img').src); });
   });
+
+  // ── Selector render: fachada → piso → depto → precio ──
+  (function(){
+    var wRender = document.getElementById('wRender');
+    if (!wRender) return;
+    var IMGB = '/emprendimientos/quintaglia-3defebrero-2781/img/';
+    // Posiciones de piso sobre el hero (12 pisos). Ajustable.
+    var FY = [{t:15.5,b:21.5},{t:21.5,b:27.5},{t:27.5,b:33.5},{t:33.5,b:39.5},{t:39.5,b:45.5},{t:45.5,b:51.5},{t:51.5,b:57.5},{t:57.5,b:63.5},{t:63.5,b:69.5},{t:69.5,b:75.5},{t:75.5,b:81.5},{t:81.5,b:87.5}];
+    var BX = {l:23, w:59};
+    function floorStat(f){ if (f.us.some(disp)) return 'g'; if (f.us.some(function(x){return x.s==='v'||x.s==='res';})) return 's'; return 'n'; }
+    var ZN = [], CH = [], chipsHost = document.getElementById('wFloors');
+    FLOORS.forEach(function(f, fi){
+      var st = floorStat(f), y = FY[fi] || {t:0,b:0}, nd = f.us.filter(disp).length;
+      var z = document.createElement('div'); z.className = 'fzone '+st;
+      z.style.left = BX.l+'%'; z.style.width = BX.w+'%'; z.style.top = y.t+'%'; z.style.height = (y.b-y.t)+'%';
+      var meta = st==='g' ? (nd+' disp') : (st==='s' ? 'No disp.' : 'Próx.');
+      z.innerHTML = '<span class="fl">'+f.p+'<small>'+meta+'</small></span>';
+      if (st==='g') z.addEventListener('click', function(){ wSelFloor(fi); }); else z.style.cursor='default';
+      wRender.appendChild(z); ZN[fi] = z;
+    });
+    if (chipsHost){
+      for (var fi = FLOORS.length - 1; fi >= 0; fi--){
+        (function(fi){
+          var f = FLOORS[fi], st = floorStat(f), nd = f.us.filter(disp).length;
+          var b = document.createElement('button'); b.type='button'; b.className='wchip '+st;
+          b.innerHTML = '<span class="cn">'+f.p+'</span><span class="cs">'+(st==='g' ? nd+' disp' : (st==='s' ? '—' : 'próx.'))+'</span>';
+          if (st==='g') b.addEventListener('click', function(){ wSelFloor(fi); }); else b.disabled = true;
+          chipsHost.appendChild(b); CH[fi] = b;
+        })(fi);
+      }
+    }
+    function wCountUp(node, target){ var dur=680, t0=null; function s(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-p,3); node.textContent=fmtU(target*e); if(p<1) requestAnimationFrame(s); else node.textContent=fmtU(target);} requestAnimationFrame(s); }
+    function wSelFloor(fi){
+      var z = ZN[fi];
+      wRender.querySelectorAll('.fzone').forEach(function(e){ e.classList.remove('on'); });
+      if (z) z.classList.add('on'); wRender.classList.add('dim');
+      if (chipsHost){ for (var k=0;k<CH.length;k++){ if (CH[k]) CH[k].classList.toggle('active', k===fi); } if (CH[fi] && CH[fi].scrollIntoView) CH[fi].scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }
+      var f = FLOORS[fi], pn = parseInt(f.p, 10);
+      document.getElementById('wStep').innerHTML = 'Paso 2 · piso <b>'+f.p+'</b> · elegí el departamento';
+      var body = document.getElementById('wBody');
+      var h = '<div class="units">';
+      for (var i=0;i<5;i++){ var x=f.us[i]; if(!x){ h+='<div class="unit" style="visibility:hidden"></div>'; continue; } var tl=tipoLabel(pn,x.u),st2,cls; if(disp(x)){cls='unit disp';st2='Disponible';} else if(x.s==='v'){cls='unit sold';st2='Vendido';} else if(x.s==='res'){cls='unit res';st2='Reservada';} else {cls='unit no';st2='No disp.';} h+='<div class="'+cls+'" data-i="'+i+'"><div class="ul">'+x.u+'</div><div class="ut">'+tl+'</div><div class="ust">'+st2+'</div></div>'; }
+      h += '</div><div id="wPc"></div>';
+      body.innerHTML = h;
+      body.querySelectorAll('.unit.disp').forEach(function(u, idx){ setTimeout(function(){ u.classList.add('in'); }, 60+idx*60); u.addEventListener('click', function(){ wSelUnit(fi, +u.getAttribute('data-i'), u); }); });
+      body.querySelectorAll('.unit:not(.disp)').forEach(function(u, idx){ setTimeout(function(){ u.classList.add('in'); }, 60+idx*60); });
+      if (window.matchMedia('(max-width:820px)').matches) setTimeout(function(){ document.getElementById('wStep').scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
+    }
+    function wSelUnit(fi, ui, node){
+      document.getElementById('wBody').querySelectorAll('.unit').forEach(function(e){ e.classList.remove('sel'); }); node.classList.add('sel');
+      var f = FLOORS[fi], x = f.us[ui], pn = parseInt(f.p, 10), pi = planInfo(pn, x.u);
+      var pref = (x.fin != null) ? x.fin : x.cash;
+      var msg = encodeURIComponent('¡Hola! Me interesa la unidad '+f.p+' '+x.u+' de Quintaglia (3 de Febrero 2781, Núñez), publicada en '+fmtU(pref)+'. ¿Me pasás la planta y más info?');
+      var m2 = pi ? (pi.cub===pi.tot ? pi.tot+' m²' : pi.cub+' m² cub<br><span>'+pi.tot+' m² tot</span>') : '';
+      var priceMain = ''; if (x.cash != null) priceMain = '<div class="pb-l">Cash · 100% adelantado</div><div class="pb-v" id="wCv" data-v="'+x.cash+'">U$S 0</div>';
+      var finHtml = ''; if (x.fin != null){ var ade=Math.round(x.fin*0.50), cuo=Math.round(x.fin*0.50/24); finHtml='<div class="fin"><div class="pb-l">Financiado · 50% + 24 cuotas</div><div class="pb-v"'+(x.cash==null?' id="wCv" data-v="'+x.fin+'"':'')+'>'+(x.cash==null?'U$S 0':fmtU(x.fin))+'</div><div class="rows"><div class="row"><span>Adelanto (50%)</span><b>'+fmtU(ade)+'</b></div><div class="row"><span>24 cuotas de</span><b>'+fmtU(cuo)+'</b></div></div><div class="note">Cuota en USD o en pesos ajustada por CAC.</div></div>'; }
+      var planoSrc = pi ? IMGB+pi.img+'.jpg' : '';
+      var plano = pi ? '<div class="plano" id="wPlano"><img src="'+planoSrc+'" alt="Planta '+x.u+'"><span class="zoom"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg></span><div class="cap">Planta '+x.u+' · ampliar</div></div>' : '';
+      var html = '<div class="pc"><div class="pc-top"><div><div class="pc-u">'+f.p+' · '+x.u+'</div><div class="pc-t">'+(pi?pi.tipo:tipoLabel(pn,x.u))+'</div></div><div class="pc-m2">'+m2+'</div></div><div class="pgrid">'+plano+'<div class="pinfo">'+priceMain+finHtml+'</div></div><a class="dcta" href="https://wa.me/'+TEL+'?text='+msg+'" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg> Consultar esta unidad</a></div>';
+      document.getElementById('wPc').innerHTML = html;
+      var pl = document.getElementById('wPlano'); if (pl) pl.addEventListener('click', function(){ openLB(planoSrc); });
+      var pc = document.querySelector('#wPc .pc'); requestAnimationFrame(function(){ pc.classList.add('in'); });
+      setTimeout(function(){ var cv=document.getElementById('wCv'); if(cv) wCountUp(cv, +cv.getAttribute('data-v')); }, 220);
+      if (window.matchMedia('(max-width:820px)').matches) setTimeout(function(){ document.getElementById('wPc').scrollIntoView({behavior:'smooth', block:'center'}); }, 120);
+    }
+    // Ver todas las unidades de una tipología (con precio)
+    var TIPO_T = { estudio:'Monoambientes', dosamb:'2 ambientes', tresamb:'3 ambientes', cuatroamb:'4 ambientes' };
+    function wSelTipo(key){
+      wRender.querySelectorAll('.fzone').forEach(function(e){ e.classList.remove('on'); }); wRender.classList.remove('dim');
+      for (var k=0;k<CH.length;k++){ if (CH[k]) CH[k].classList.remove('active'); }
+      var list = [];
+      FLOORS.forEach(function(f, fi){ var pn=parseInt(f.p,10); f.us.forEach(function(x, ui){ if(!disp(x)) return; if(tipoKey(pn, x.u)!==key) return; list.push({fi:fi, ui:ui, p:f.p, u:x.u, price:(x.cash!=null?x.cash:x.fin), pi:planInfo(pn, x.u)}); }); });
+      list.sort(function(a,b){ return a.price - b.price; });
+      document.getElementById('wStep').innerHTML = 'Tipología · <b>'+(TIPO_T[key]||'')+'</b> · '+list.length+' '+(list.length===1?'disponible':'disponibles');
+      var h = '<div class="ulist">';
+      list.forEach(function(it){ var m2 = it.pi ? (it.pi.tot+' m²') : ''; h += '<button class="urow" type="button" data-fi="'+it.fi+'" data-ui="'+it.ui+'"><span class="ur-l"><span class="ur-pu">'+it.p+' · '+it.u+'</span><span class="ur-m2">'+m2+'</span></span><span class="ur-r"><span class="ur-pr">'+fmtU(it.price)+'</span><span class="ur-ar">→</span></span></button>'; });
+      h += '</div>';
+      var body = document.getElementById('wBody'); body.innerHTML = h;
+      body.querySelectorAll('.urow').forEach(function(r){ r.addEventListener('click', function(){ var fi=+r.getAttribute('data-fi'), ui=+r.getAttribute('data-ui'); wSelFloor(fi); setTimeout(function(){ var c=document.querySelector('#wBody .unit.disp[data-i="'+ui+'"]'); if(c) c.click(); }, 40); }); });
+      var target = window.matchMedia('(max-width:820px)').matches ? document.getElementById('wStep') : document.getElementById('disponibilidad');
+      if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    document.querySelectorAll('.tipo[data-tipo]').forEach(function(c){ c.style.cursor='pointer'; c.addEventListener('click', function(){ wSelTipo(c.getAttribute('data-tipo')); }); });
+  })();
 
   // ── "A pocos pasos de todo": lugares cercanos por categoría ──
   // BORRADOR · distancias aproximadas a confirmar. Editá los textos abajo.
