@@ -452,7 +452,7 @@
   .lg-g{background:rgba(90,150,105,.85)}.lg-s{background:#a24a3a}.lg-n{background:#c9c8bc}
   .wfloors{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
   .wchip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px;padding:8px 11px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font-family:var(--sans);transition:transform .15s,border-color .2s,background .2s}
-  .wchip .cn{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);line-height:1}
+  .wchip .cn{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:.01em}
   .wchip .cs{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
   .wchip.g{border-color:#cbd6ce}.wchip.g .cn{color:var(--green)}.wchip.g .cs{color:var(--green)}
   .wchip.g:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 8px 18px -10px rgba(64,88,74,.5)}
@@ -509,8 +509,11 @@
     .render-hint{display:none}
     .wfloors{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
     .wfloors::-webkit-scrollbar{display:none}
-    .wchip{min-width:56px;padding:10px 12px}
-    .wchip .cn{font-size:20px}
+    .wchip{min-width:54px;padding:10px 12px}
+    .wchip .cn{font-size:17px}
+    .units{grid-template-columns:repeat(2,1fr);gap:9px}
+    .unit{padding:16px 8px 14px}
+    .unit .ul{font-size:28px}
     .render{width:100%;max-width:440px}
     .render img{height:auto;width:100%}
     .render-cap{font-size:11px}
@@ -849,7 +852,7 @@
     var FY = [{t:20.5,b:27.0},{t:28.5,b:35.0},{t:36.5,b:43.0},{t:44.5,b:50.5},{t:51.5,b:58.5},{t:60.0,b:66.5},{t:67.5,b:74.5},{t:75.0,b:81.5},{t:82.0,b:89.0}];
     var BX = {l:26.5, w:30.0};
     function floorStat(f){ if (f.us.some(disp)) return 'g'; if (f.us.some(function(x){return x.s==='v';})) return 's'; return 'n'; }
-    var ZN = [], chipsHost = document.getElementById('wFloors');
+    var ZN = [], CH = [], chipsHost = document.getElementById('wFloors');
     FLOORS.forEach(function(f, fi){
       var st = floorStat(f), y = FY[fi], nd = f.us.filter(disp).length;
       var z = document.createElement('div'); z.className = 'fzone '+st;
@@ -859,21 +862,26 @@
       if (st==='g') z.addEventListener('click', function(){ wSelFloor(fi); });
       else z.style.cursor = 'default';
       wRender.appendChild(z); ZN[fi] = z;
-      // botón de piso (control principal en mobile)
-      if (chipsHost){
-        var b = document.createElement('button'); b.type='button'; b.className='wchip '+st;
-        b.innerHTML = '<span class="cn">'+f.p+'</span><span class="cs">'+(st==='g' ? nd+' disp' : (st==='s' ? 'vend.' : 'próx.'))+'</span>';
-        if (st==='g') b.addEventListener('click', function(){ wSelFloor(fi); });
-        else b.disabled = true;
-        chipsHost.appendChild(b);
-      }
     });
+    // Botones de piso, ordenados 1° → 9° (izq → der). FLOORS viene 9°..1°, así que voy al revés.
+    if (chipsHost){
+      for (var fi = FLOORS.length - 1; fi >= 0; fi--){
+        (function(fi){
+          var f = FLOORS[fi], st = floorStat(f), nd = f.us.filter(disp).length;
+          var b = document.createElement('button'); b.type='button'; b.className='wchip '+st;
+          b.innerHTML = '<span class="cn">'+f.p+'</span><span class="cs">'+(st==='g' ? nd+' disp' : (st==='s' ? 'vend.' : 'próx.'))+'</span>';
+          if (st==='g') b.addEventListener('click', function(){ wSelFloor(fi); });
+          else b.disabled = true;
+          chipsHost.appendChild(b); CH[fi] = b;
+        })(fi);
+      }
+    }
     function wCountUp(node, target){ var dur=680, t0=null; function s(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-p,3); node.textContent=fmtU(target*e); if(p<1) requestAnimationFrame(s); else node.textContent=fmtU(target);} requestAnimationFrame(s); }
     function wSelFloor(fi){
       var z = ZN[fi];
       wRender.querySelectorAll('.fzone').forEach(function(e){ e.classList.remove('on'); });
       if (z) z.classList.add('on'); wRender.classList.add('dim');
-      if (chipsHost){ var cs = chipsHost.querySelectorAll('.wchip'); for (var k=0;k<cs.length;k++) cs[k].classList.toggle('active', k===fi); var ac=cs[fi]; if (ac && ac.scrollIntoView) ac.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }
+      if (chipsHost){ for (var k=0;k<CH.length;k++){ if (CH[k]) CH[k].classList.toggle('active', k===fi); } if (CH[fi] && CH[fi].scrollIntoView) CH[fi].scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }
       var f = FLOORS[fi], pn = parseInt(f.p, 10);
       document.getElementById('wStep').innerHTML = 'Paso 2 · piso <b>'+f.p+'</b> · elegí el departamento';
       var body = document.getElementById('wBody');
