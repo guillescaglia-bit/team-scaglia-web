@@ -21,7 +21,7 @@ function envoltorio(prestador) {
         <p style="margin:0; color:rgba(255,255,255,0.7); font-size:11px; letter-spacing:3px; text-transform:uppercase;">Team Scaglia · Programa de Beneficios</p>
         <h1 style="margin:8px 0 0; color:#ffffff; font-size:22px; font-weight:500;">Nuevo beneficio para vos 🎁</h1>
       </div>
-      ${banner ? `<div style="background:url('${banner}') center/cover; height:150px;"></div>` : ''}
+      ${banner ? `<img src="${banner}" alt="${p.nombre || ''}" width="520" style="display:block; width:100%; max-width:520px; height:auto; border:0;">` : ''}
       <div style="padding:32px;">
         <div style="text-align:center; margin-bottom:18px;">
           <span style="display:inline-block; background:${p.color || '#253C64'}; color:#fff; font-size:26px; font-weight:bold; padding:8px 22px; border-radius:10px;">${descuento}</span>

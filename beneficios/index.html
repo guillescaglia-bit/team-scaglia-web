@@ -3269,7 +3269,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                     <div style="padding:24px;">
                         <p style="font-size:13px; color:#666; margin:0 0 14px;">Vista previa de lo que van a recibir los clientes:</p>
                         <div style="border:1px solid #eee; border-radius:12px; overflow:hidden; margin-bottom:20px;">
-                            ${banner ? `<div style="background:url('${banner}') center/cover; height:110px;"></div>` : ''}
+                            ${banner ? `<img src="${banner}" alt="${p.nombre || ''}" style="display:block; width:100%; height:auto;">` : ''}
                             <div style="padding:18px; text-align:center;">
                                 <span style="display:inline-block; background:${p.color || '#253C64'}; color:#fff; font-size:20px; font-weight:bold; padding:6px 16px; border-radius:8px;">${descuento}</span>
                                 <div style="color:#253C64; font-weight:700; font-size:17px; margin:12px 0 4px;">${p.icono || ''} ${p.nombre}</div>
