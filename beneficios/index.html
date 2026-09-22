@@ -3253,6 +3253,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const p = appState.prestadores.find(x => x.id === prestadorId);
             if (!p) return;
             const validados = appState.clientes.filter(c => c.validado).length;
+            const agentesActivos = appState.agentes.filter(a => a.activo && a.email).length;
             const banner = p.banner ? (p.banner.startsWith('http') ? p.banner : p.banner) : '';
             const descuento = p.descuento ? `${p.descuento}% OFF` : 'Beneficio exclusivo';
             let modal = document.getElementById('modalAviso');
@@ -3276,22 +3277,33 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                 <div style="color:#666; font-size:13px;">${p.descripcion || ''}</div>
                             </div>
                         </div>
-                        <div style="background:#f4f6fa; border-radius:10px; padding:14px 16px; margin-bottom:18px; font-size:13px; color:#334;">
+                        <div style="background:#f4f6fa; border-radius:10px; padding:14px 16px; margin-bottom:14px; font-size:13px; color:#334;">
                             Se enviará a <strong>${validados}</strong> cliente${validados === 1 ? '' : 's'} validado${validados === 1 ? '' : 's'}.
                         </div>
+                        <label style="display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid #e3e7ef; border-radius:10px; margin-bottom:18px; font-size:13px; color:#334; cursor:pointer;">
+                            <input type="checkbox" id="avisoIncluirAgentes" checked style="width:18px; height:18px; cursor:pointer;">
+                            Incluir también a los <strong>${agentesActivos}</strong> agentes del Team
+                        </label>
                         <div id="avisoResultado" style="display:none; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:13px;"></div>
                         <button id="btnAvisoPrueba" class="btn btn-secondary" style="width:100%; margin-bottom:10px;" onclick="enviarAvisoBeneficio('${p.id}','prueba')">✉️ Enviarme una prueba a mí</button>
-                        <button id="btnAvisoTodos" class="btn btn-primary" style="width:100%;" onclick="confirmarAvisoTodos('${p.id}', ${validados})">🚀 Enviar a los ${validados} clientes</button>
+                        <button id="btnAvisoTodos" class="btn btn-primary" style="width:100%;" onclick="confirmarAvisoTodos('${p.id}')">🚀 Enviar ahora</button>
                         <p style="font-size:11px; color:#aaa; text-align:center; margin:14px 0 0;">Probá primero con "una prueba a mí" antes de enviarlo a todos.</p>
                     </div>
                 </div>`;
             document.body.appendChild(modal);
         }
 
-        function confirmarAvisoTodos(prestadorId, validados) {
-            if (validados < 1) { alert('No hay clientes validados para avisar.'); return; }
+        function confirmarAvisoTodos(prestadorId) {
             const p = appState.prestadores.find(x => x.id === prestadorId);
-            if (!confirm(`¿Enviar el aviso de "${p ? p.nombre : ''}" a ${validados} cliente(s) validado(s)?\n\nEsto manda un mail real a cada uno.`)) return;
+            const incluirAgentes = !!(document.getElementById('avisoIncluirAgentes') || {}).checked;
+            const validados = appState.clientes.filter(c => c.validado).length;
+            const agentesActivos = appState.agentes.filter(a => a.activo && a.email).length;
+            const total = validados + (incluirAgentes ? agentesActivos : 0);
+            if (total < 1) { alert('No hay destinatarios para avisar.'); return; }
+            const detalle = incluirAgentes
+                ? `${validados} cliente(s) validado(s) + ${agentesActivos} agente(s) del Team`
+                : `${validados} cliente(s) validado(s)`;
+            if (!confirm(`¿Enviar el aviso de "${p ? p.nombre : ''}" a ${detalle}?\n\nEsto manda un mail real a cada uno.`)) return;
             enviarAvisoBeneficio(prestadorId, 'todos');
         }
 
@@ -3312,12 +3324,14 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             };
             setBox('Enviando…', true);
             try {
+                const incluirAgentes = modo === 'todos' && !!(document.getElementById('avisoIncluirAgentes') || {}).checked;
+                const agentes = incluirAgentes ? appState.agentes.filter(a => a.activo && a.email).map(a => a.email) : [];
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const resp = await fetch('/api/avisar-beneficio', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
                     body: JSON.stringify({
-                        modo,
+                        modo, incluirAgentes, agentes,
                         prestador: {
                             nombre: p.nombre, descripcion: p.descripcion, descuento: p.descuento,
                             banner: p.banner, icono: p.icono, color: p.color, alcance: p.alcance, url: p.url

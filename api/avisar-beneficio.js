@@ -62,6 +62,8 @@ module.exports = async (req, res) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const prestador = body.prestador || {};
   const modo = body.modo === 'todos' ? 'todos' : 'prueba';
+  const incluirAgentes = body.incluirAgentes === true;
+  const agentesEmails = Array.isArray(body.agentes) ? body.agentes : [];
   if (!prestador.nombre) return res.status(400).json({ error: 'Falta el beneficio a avisar' });
 
   // Verificar que quien llama es el ADMIN
@@ -100,6 +102,13 @@ module.exports = async (req, res) => {
         if (!em || !/^\S+@\S+\.\S+$/.test(em)) continue;
         if (c.no_avisos === true) continue;
         set.add(em);
+      }
+      // Sumar agentes del Team si se pidió
+      if (incluirAgentes) {
+        for (const a of agentesEmails) {
+          const em = (a || '').trim().toLowerCase();
+          if (em && /^\S+@\S+\.\S+$/.test(em)) set.add(em);
+        }
       }
       destinatarios = Array.from(set);
     } catch (e) {
