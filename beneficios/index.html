@@ -1422,7 +1422,7 @@
                     <div id="adminBasedataTab" class="admin-section" style="display: none;">
                         <h3>Base de Datos - Todos los Clientes</h3>
                         <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <input type="text" id="searchClientes" placeholder="Buscar por nombre, email o teléfono..." style="flex: 1; min-width: 200px; padding: 8px; border: 2px solid var(--border-color); border-radius: 6px;">
+                            <input type="text" id="searchClientes" oninput="filtrarBasedata(this.value)" placeholder="Buscar por nombre, email o teléfono..." style="flex: 1; min-width: 200px; padding: 8px; border: 2px solid var(--border-color); border-radius: 6px;">
                             <select id="filterAgente" style="padding: 8px; border: 2px solid var(--border-color); border-radius: 6px;">
                                 <option value="">Todos los agentes</option>
                             </select>
@@ -2178,7 +2178,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <div id="adminBasedataTab" class="admin-section" style="display: none;">
                             <h3>Base de Datos - Todos los Clientes</h3>
                             <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                                <input type="text" id="searchClientes" placeholder="Buscar por nombre, email o teléfono..." style="flex: 1; min-width: 200px; padding: 8px; border: 2px solid var(--border-color); border-radius: 6px;">
+                                <input type="text" id="searchClientes" oninput="filtrarBasedata(this.value)" placeholder="Buscar por nombre, email o teléfono..." style="flex: 1; min-width: 200px; padding: 8px; border: 2px solid var(--border-color); border-radius: 6px;">
                             </div>
                             <div style="margin-top: 20px; overflow-x: auto;">
                                 <table>
@@ -3610,11 +3610,30 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (tab === 'clics') renderClicsAdmin();
         }
 
+        let _basedataFiltro = '';
+        function filtrarBasedata(termino) {
+            _basedataFiltro = (termino || '').trim().toLowerCase();
+            renderBasedataTable();
+        }
+
         function renderBasedataTable() {
             const tbody = document.getElementById('basedataTableBody');
             tbody.innerHTML = '';
 
-            appState.clientes.forEach(cliente => {
+            const f = _basedataFiltro;
+            const lista = f
+                ? appState.clientes.filter(c =>
+                    (c.nombre || '').toLowerCase().includes(f) ||
+                    (c.email || '').toLowerCase().includes(f) ||
+                    (c.telefono || '').toLowerCase().includes(f))
+                : appState.clientes;
+
+            if (!lista.length) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:30px; color:#999;">Sin resultados para "${f}"</td></tr>`;
+                return;
+            }
+
+            lista.forEach(cliente => {
                 const agente = appState.agentes.find(a => a.id === cliente.agenteId);
                 const cupones = appState.cupones.filter(c => c.clienteId === cliente.id);
                 const cuponesCanjeados = cupones.filter(c => c.usadoEn).length;
