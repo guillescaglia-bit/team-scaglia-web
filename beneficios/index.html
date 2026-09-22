@@ -3239,12 +3239,101 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                                 <button class="btn btn-sm btn-danger" onclick="togglePrestadorEstado('${prestador.id}')">
                                     ${prestador.activo ? 'Desactivar' : 'Activar'}
                                 </button>
+                                ${prestador.activo ? `<button class="btn btn-sm btn-primary" onclick="abrirAvisoBeneficio('${prestador.id}')">📣 Avisar</button>` : ''}
                             </div>
                         </td>
                     </tr>
                 `;
             });
             document.getElementById('prestadoresTableBody').innerHTML = html;
+        }
+
+        // ==================== AVISAR BENEFICIO NUEVO (mail a clientes validados) ====================
+        function abrirAvisoBeneficio(prestadorId) {
+            const p = appState.prestadores.find(x => x.id === prestadorId);
+            if (!p) return;
+            const validados = appState.clientes.filter(c => c.validado).length;
+            const banner = p.banner ? (p.banner.startsWith('http') ? p.banner : p.banner) : '';
+            const descuento = p.descuento ? `${p.descuento}% OFF` : 'Beneficio exclusivo';
+            let modal = document.getElementById('modalAviso');
+            if (modal) modal.remove();
+            modal = document.createElement('div');
+            modal.id = 'modalAviso';
+            modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px;';
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:14px; max-width:460px; width:100%; max-height:90vh; overflow:auto; box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+                    <div style="padding:20px 24px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="margin:0; color:#253C64; font-size:18px;">📣 Avisar beneficio nuevo</h3>
+                        <button onclick="document.getElementById('modalAviso').remove()" style="background:none; border:none; font-size:22px; cursor:pointer; color:#999;">&times;</button>
+                    </div>
+                    <div style="padding:24px;">
+                        <p style="font-size:13px; color:#666; margin:0 0 14px;">Vista previa de lo que van a recibir los clientes:</p>
+                        <div style="border:1px solid #eee; border-radius:12px; overflow:hidden; margin-bottom:20px;">
+                            ${banner ? `<div style="background:url('${banner}') center/cover; height:110px;"></div>` : ''}
+                            <div style="padding:18px; text-align:center;">
+                                <span style="display:inline-block; background:${p.color || '#253C64'}; color:#fff; font-size:20px; font-weight:bold; padding:6px 16px; border-radius:8px;">${descuento}</span>
+                                <div style="color:#253C64; font-weight:700; font-size:17px; margin:12px 0 4px;">${p.icono || ''} ${p.nombre}</div>
+                                <div style="color:#666; font-size:13px;">${p.descripcion || ''}</div>
+                            </div>
+                        </div>
+                        <div style="background:#f4f6fa; border-radius:10px; padding:14px 16px; margin-bottom:18px; font-size:13px; color:#334;">
+                            Se enviará a <strong>${validados}</strong> cliente${validados === 1 ? '' : 's'} validado${validados === 1 ? '' : 's'}.
+                        </div>
+                        <div id="avisoResultado" style="display:none; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:13px;"></div>
+                        <button id="btnAvisoPrueba" class="btn btn-secondary" style="width:100%; margin-bottom:10px;" onclick="enviarAvisoBeneficio('${p.id}','prueba')">✉️ Enviarme una prueba a mí</button>
+                        <button id="btnAvisoTodos" class="btn btn-primary" style="width:100%;" onclick="confirmarAvisoTodos('${p.id}', ${validados})">🚀 Enviar a los ${validados} clientes</button>
+                        <p style="font-size:11px; color:#aaa; text-align:center; margin:14px 0 0;">Probá primero con "una prueba a mí" antes de enviarlo a todos.</p>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function confirmarAvisoTodos(prestadorId, validados) {
+            if (validados < 1) { alert('No hay clientes validados para avisar.'); return; }
+            const p = appState.prestadores.find(x => x.id === prestadorId);
+            if (!confirm(`¿Enviar el aviso de "${p ? p.nombre : ''}" a ${validados} cliente(s) validado(s)?\n\nEsto manda un mail real a cada uno.`)) return;
+            enviarAvisoBeneficio(prestadorId, 'todos');
+        }
+
+        async function enviarAvisoBeneficio(prestadorId, modo) {
+            const p = appState.prestadores.find(x => x.id === prestadorId);
+            if (!p) return;
+            const box = document.getElementById('avisoResultado');
+            const btnP = document.getElementById('btnAvisoPrueba');
+            const btnT = document.getElementById('btnAvisoTodos');
+            if (btnP) btnP.disabled = true;
+            if (btnT) btnT.disabled = true;
+            const setBox = (msg, ok) => {
+                if (!box) return;
+                box.style.display = 'block';
+                box.style.background = ok ? '#e8f5e9' : '#ffebee';
+                box.style.color = ok ? '#256029' : '#b71c1c';
+                box.innerHTML = msg;
+            };
+            setBox('Enviando…', true);
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const resp = await fetch('/api/avisar-beneficio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
+                    body: JSON.stringify({
+                        modo,
+                        prestador: {
+                            nombre: p.nombre, descripcion: p.descripcion, descuento: p.descuento,
+                            banner: p.banner, icono: p.icono, color: p.color, alcance: p.alcance, url: p.url
+                        }
+                    })
+                });
+                const j = await resp.json().catch(() => ({}));
+                if (!resp.ok) { setBox('❌ ' + (j.error || 'No se pudo enviar.'), false); }
+                else if (modo === 'prueba') { setBox(`✅ Te enviamos una prueba a <strong>info@teamscaglia.com</strong>. Revisá cómo quedó (mirá también spam).`, true); }
+                else { setBox(`✅ Aviso enviado a <strong>${j.enviados}</strong> de ${j.total} cliente(s).${j.errores && j.errores.length ? '<br><small>Algunos fallaron: ' + j.errores.join(' · ') + '</small>' : ''}`, true); }
+            } catch (e) {
+                setBox('❌ Error de conexión. Probá de nuevo.', false);
+            } finally {
+                if (btnP) btnP.disabled = false;
+                if (btnT) btnT.disabled = false;
+            }
         }
 
         function openModalAgregar(tipo) {
