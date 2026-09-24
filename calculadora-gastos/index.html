@@ -70,6 +70,13 @@
   .inpwrap{position:relative}
   .inpwrap .pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-light);font-size:15px;pointer-events:none}
   .inpwrap.pre-pad input{padding-left:44px}
+  /* Tarjeta cotización BNA */
+  .bnacard{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;background:var(--bg-off)}
+  .bnacard-lbl{font-size:11px;color:var(--text-light);font-weight:500;margin-bottom:3px}
+  .bnacard-val{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:700;color:var(--text);line-height:1}
+  .bnacard-val .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+  .bnacard-upd{font-size:11px;color:var(--text-light);margin-top:4px}
+  .bnacard-edit{background:none;border:none;color:var(--primary);font-family:inherit;font-size:13px;font-weight:600;text-decoration:underline;cursor:pointer;white-space:nowrap;padding:4px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:560px){.row2{grid-template-columns:1fr}}
 
@@ -89,6 +96,9 @@
   details.adv summary .chev{transition:.2s}
   details.adv[open] summary .chev{transform:rotate(90deg)}
   details.adv .sel{width:100%;font-family:inherit;font-size:15px;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+  .advnote{font-size:12px;color:var(--text-light);line-height:1.5;margin:8px 0 2px}
+  .montoesc{font-size:13px;color:var(--text);margin-top:12px;background:var(--bg-off);border-radius:8px;padding:10px 12px;line-height:1.5}
+  .montoesc b{color:var(--primary)}
 
   /* Result */
   #result .big{text-align:center;padding:6px 0 14px}
@@ -177,6 +187,21 @@
       <div class="inpwrap pre-pad"><span class="pre">US$</span>
         <input type="text" id="precio" inputmode="numeric" autocomplete="off" placeholder="150.000">
       </div>
+      <details class="adv" style="margin-top:10px">
+        <summary><span class="chev">▶</span> Valuación fiscal / VIR (opcional)</summary>
+        <p class="advnote">El impuesto de sellos se calcula sobre el <b>mayor importe</b> entre el monto de escritura, la Valuación Fiscal (VF) y el Valor Inmobiliario de Referencia (VIR).</p>
+        <div class="row2" style="margin-top:6px">
+          <div class="field" style="margin-top:0">
+            <label>Valuación Fiscal (VF) <span class="hint">$</span></label>
+            <input type="text" id="vf" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
+          </div>
+          <div class="field" style="margin-top:0">
+            <label>Valor Inm. de Referencia (VIR) <span class="hint">$</span></label>
+            <input type="text" id="vir" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
+          </div>
+        </div>
+        <div class="montoesc" id="montoEscrituraInfo"></div>
+      </details>
     </div>
 
     <div class="switch-row">
@@ -188,8 +213,16 @@
     </div>
 
     <div class="field">
-      <label>Dólar oficial BNA <span class="hint" id="bnaHint">(cargando cotización…)</span></label>
-      <div class="inpwrap pre-pad"><span class="pre">$</span>
+      <div class="bnacard">
+        <div>
+          <div class="bnacard-lbl">Tipo de cambio oficial BNA — vendedor</div>
+          <div class="bnacard-val"><span class="dot"></span><span id="bnaVal">$ —</span></div>
+          <div class="bnacard-upd" id="bnaUpd">Cargando cotización…</div>
+        </div>
+        <button type="button" class="bnacard-edit" id="bnaEditBtn" onclick="editarBna()">Editar</button>
+      </div>
+      <div class="inpwrap pre-pad" id="bnaEditWrap" style="display:none;margin-top:10px">
+        <span class="pre">$</span>
         <input type="text" id="bna" inputmode="numeric" autocomplete="off" placeholder="1.450">
       </div>
     </div>
@@ -200,14 +233,6 @@
         <div class="field" style="margin-top:0">
           <label>Dólar para mostrar gastos</label>
           <div class="inpwrap pre-pad"><span class="pre">$</span><input type="text" id="disp" inputmode="numeric" placeholder="= BNA"></div>
-        </div>
-        <div class="field" style="margin-top:0">
-          <label>Valuación Fiscal (VF) <span class="hint">$</span></label>
-          <input type="text" id="vf" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
-        </div>
-        <div class="field" style="margin-top:0">
-          <label>Valor Inm. de Referencia (VIR) <span class="hint">$</span></label>
-          <input type="text" id="vir" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
         </div>
         <div class="field" style="margin-top:0">
           <label>¿Quién paga el impuesto de sellos?</label>
@@ -336,6 +361,7 @@ function calcularCABA(){
   var comprador=lado(true), vendedor=lado(false);
   return {ok:true, precio:precio, disp:disp, viviendaUnica:viviendaUnica,
           comprador:comprador, vendedor:vendedor,
+          mEscUSD:mUSD, mEscARS:mARS,
           base:base, baseFuente:baseFuente, sellosARS:sellosARS, superaTope: base>TOPE_SELLOS};
 }
 
@@ -373,6 +399,8 @@ function calcular(){
   pba.style.display='none'; res.style.display='block';
 
   var r=calcularCABA();
+  var mi=document.getElementById('montoEscrituraInfo');
+  if(mi) mi.innerHTML = r.ok ? ('Monto de escritura: <b>'+usd(r.mEscUSD)+'</b> · <b>'+pesos(r.mEscARS)+'</b> <span style="color:var(--text-light)">(al dólar BNA)</span>') : '';
   if(!r.ok){ res.innerHTML='<div class="empty">'+(r.falta||'Cargá el precio de la operación para ver el detalle.')+'</div>'; return; }
 
   var lado = rol==='comprador' ? r.comprador : r.vendedor;
@@ -444,15 +472,34 @@ document.getElementById('segRol').addEventListener('click',function(e){
 ['vivienda'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
 ['sellosQuien','escribaniaQuien'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
 
-// ===== Cotización del día (BNA) =====
+// ===== Tarjeta cotización BNA =====
+function bnaMostrar(valor){
+  document.getElementById('bnaVal').textContent = valor>0 ? '$ '+valor.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '$ —';
+}
+function editarBna(){
+  document.getElementById('bnaEditWrap').style.display='block';
+  document.getElementById('bnaEditBtn').style.display='none';
+  var i=document.getElementById('bna'); i.focus();
+}
+// Al editar a mano: reflejar en la tarjeta y marcar "editado"
+document.getElementById('bna').addEventListener('input',function(){
+  var v=num('bna');
+  bnaMostrar(v);
+  document.getElementById('bnaUpd').textContent='Editado manualmente';
+});
+
 (function(){
-  var hint=document.getElementById('bnaHint');
   fetch('https://dolarapi.com/v1/dolares/oficial').then(function(r){return r.json();}).then(function(d){
-    var v=Math.round(d.venta||d.compra||0);
-    if(v){ document.getElementById('bna').value=v.toLocaleString('es-AR'); hint.textContent='(cotización del día · editable)'; calcular(); }
-    else throw 0;
+    var venta=d.venta||d.compra||0;
+    if(!venta) throw 0;
+    document.getElementById('bna').value=Math.round(venta).toLocaleString('es-AR');
+    bnaMostrar(venta);
+    var f = d.fechaActualizacion ? new Date(d.fechaActualizacion) : new Date();
+    document.getElementById('bnaUpd').textContent='Actualizado: '+f.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+    calcular();
   }).catch(function(){
-    hint.textContent='(no se pudo traer · cargalo a mano)';
+    document.getElementById('bnaUpd').textContent='No se pudo traer la cotización. Tocá "Editar" y cargala a mano.';
+    editarBna();
   });
 })();
 
