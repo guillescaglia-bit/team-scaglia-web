@@ -93,7 +93,7 @@
   /* Result */
   #result .big{text-align:center;padding:6px 0 14px}
   #result .who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
-  #result .amt{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,10vw,58px);font-weight:600;color:var(--primary);line-height:1;margin:6px 0 2px}
+  #result .amt{font-family:'Montserrat',sans-serif;font-size:clamp(36px,8.5vw,50px);font-weight:600;color:var(--primary);line-height:1.05;margin:6px 0 2px;letter-spacing:-.01em}
   #result .amt-ars{font-size:15px;color:var(--text-light);font-weight:500}
   #result .pctline{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;color:var(--primary);background:var(--bg-off);padding:6px 14px;border-radius:20px}
   table.det{width:100%;border-collapse:collapse;margin-top:8px}
@@ -103,6 +103,22 @@
   table.det td .ars{display:block;font-size:11px;color:var(--text-light);font-weight:400}
   table.det tr.tot td{border-bottom:none;border-top:2px solid var(--primary);padding-top:13px;font-size:16px;font-weight:700;color:var(--primary)}
   table.det tr .tag{font-size:10px;color:var(--green);font-weight:600;background:var(--green-bg);padding:2px 7px;border-radius:10px;margin-left:6px;white-space:nowrap}
+  table.det td .nota-roja{display:block;color:var(--danger);font-size:11px;font-weight:500;line-height:1.35;margin-top:5px;max-width:230px}
+  /* Bloque base imponible de sellos */
+  .selblk{margin-top:22px;border-top:1px solid var(--border);padding-top:18px}
+  .selblk .h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px}
+  .selblk .base{font-size:24px;font-weight:700;color:var(--text);line-height:1}
+  .selblk .sub{font-size:12px;color:var(--text-light);margin-top:4px}
+  .selbox-ok{background:var(--green-bg);color:#1b6b3a;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;margin:14px 0}
+  table.alic{width:100%;border-collapse:collapse;margin:6px 0 12px}
+  table.alic th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--border)}
+  table.alic th:last-child{text-align:right}
+  table.alic td{font-size:13px;padding:9px 6px;border-bottom:1px solid var(--border);color:var(--text-light)}
+  table.alic td:last-child{text-align:right;white-space:nowrap}
+  table.alic tr.on td{background:#eef1f7;color:var(--text);font-weight:700}
+  table.alic tr.on td:first-child{border-left:3px solid var(--primary)}
+  .selblk .exp{font-size:12px;color:var(--text-light);line-height:1.5;margin-top:4px}
+  .selblk .ojo{font-size:12px;color:var(--danger);line-height:1.5;margin-top:8px}
   .other{margin-top:16px;text-align:center;font-size:13px;color:var(--text-light)}
   .other b{color:var(--primary)}
   .actions{display:flex;gap:10px;margin-top:18px}
@@ -157,7 +173,7 @@
     </div>
 
     <div class="field">
-      <label>Precio de la operación <span class="hint">(en dólares)</span></label>
+      <label>Precio declarado de la operación <span class="hint">(en dólares)</span></label>
       <div class="inpwrap pre-pad"><span class="pre">US$</span>
         <input type="text" id="precio" inputmode="numeric" autocomplete="off" placeholder="150.000">
       </div>
@@ -166,7 +182,7 @@
     <div class="switch-row">
       <div>
         <div class="t">¿Es vivienda única?</div>
-        <div class="s">Y el comprador no tiene otro inmueble en CABA (exime el impuesto de sellos).</div>
+        <div class="s">El que compra no tiene otra propiedad en CABA y declara que la que compra es vivienda única, familiar y de ocupación permanente. (Exime el impuesto de sellos.)</div>
       </div>
       <label class="toggle"><input type="checkbox" id="vivienda"><span class="sl"></span></label>
     </div>
@@ -182,20 +198,16 @@
       <summary><span class="chev">▶</span> Opciones avanzadas</summary>
       <div class="row2" style="margin-top:12px">
         <div class="field" style="margin-top:0">
-          <label>% que se declara en escritura</label>
-          <input type="number" id="pctEscritura" value="100" min="1" max="100" step="1">
-        </div>
-        <div class="field" style="margin-top:0">
           <label>Dólar para mostrar gastos</label>
           <div class="inpwrap pre-pad"><span class="pre">$</span><input type="text" id="disp" inputmode="numeric" placeholder="= BNA"></div>
         </div>
         <div class="field" style="margin-top:0">
           <label>Valuación Fiscal (VF) <span class="hint">$</span></label>
-          <input type="text" id="vf" inputmode="numeric" placeholder="opcional">
+          <input type="text" id="vf" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
         </div>
         <div class="field" style="margin-top:0">
           <label>Valor Inm. de Referencia (VIR) <span class="hint">$</span></label>
-          <input type="text" id="vir" inputmode="numeric" placeholder="opcional">
+          <input type="text" id="vir" inputmode="numeric" placeholder="Si es mayor que el monto declarado">
         </div>
         <div class="field" style="margin-top:0">
           <label>¿Quién paga el impuesto de sellos?</label>
@@ -220,14 +232,6 @@
         <div class="field" style="margin-top:0">
           <label>Gastos notariales (%)</label>
           <input type="number" id="pctNotar" value="0.7" min="0" step="0.1">
-        </div>
-        <div class="field" style="margin-top:0">
-          <label>Comisión del comprador (%)</label>
-          <input type="number" id="pctComC" value="4" min="0" step="0.1">
-        </div>
-        <div class="field" style="margin-top:0">
-          <label>Comisión del vendedor (%)</label>
-          <input type="number" id="pctComV" value="3" min="0" step="0.1">
         </div>
       </div>
     </details>
@@ -302,11 +306,11 @@ function calcularCABA(){
   var sellosQuien=document.getElementById('sellosQuien').value;
   var escribaniaQuien=document.getElementById('escribaniaQuien').value;
   var pctEscribania=num('pctEscribania'), pctNotar=num('pctNotar');
-  var pctComC=num('pctComC'), pctComV=num('pctComV');
 
   var mUSD=precio*(pctEscritura/100);
   var mARS=mUSD*bna;
   var base=Math.max(mARS, vf, vir);
+  var baseFuente = base===mARS ? 'escritura' : (base===vf ? 'vf' : 'vir');
 
   var sellosARS;
   if(viviendaUnica){ sellosARS = base<=TOPE_SELLOS ? 0 : (base-TOPE_SELLOS)*ALICUOTA_GENERAL; }
@@ -315,8 +319,6 @@ function calcularCABA(){
 
   var honor=precio*(pctEscribania/100);
   var notar=mUSD*(pctNotar/100);
-  var comC=precio*(pctComC/100), comV=precio*(pctComV/100);
-  var ivaC=comC*IVA, ivaV=comV*IVA;
 
   var pS = sellosQuien==='comprador'?1 : sellosQuien==='vendedor'?0 : 0.5;
   var pE = escribaniaQuien==='comprador'?1 : escribaniaQuien==='vendedor'?0 : 0.5;
@@ -328,14 +330,39 @@ function calcularCABA(){
     var eh = esComprador ? pE : (1-pE);
     if(eh>0) items.push({c:'Honorarios de escribanía', usd: honor*eh});
     items.push({c:'Gastos notariales', usd: notar});
-    items.push({c:'Comisión', usd: esComprador?comC:comV});
-    items.push({c:'IVA de la comisión', usd: esComprador?ivaC:ivaV});
     var total=items.reduce(function(a,b){return a+b.usd;},0);
     return {items:items, total:total};
   }
   var comprador=lado(true), vendedor=lado(false);
   return {ok:true, precio:precio, disp:disp, viviendaUnica:viviendaUnica,
-          comprador:comprador, vendedor:vendedor};
+          comprador:comprador, vendedor:vendedor,
+          base:base, baseFuente:baseFuente, sellosARS:sellosARS, superaTope: base>TOPE_SELLOS};
+}
+
+// ===== Bloque explicativo "Base imponible de sellos" (estilo We Trust) =====
+function bloqueSellos(r){
+  var tope=pesos(TOPE_SELLOS);
+  var fuenteTxt = r.baseFuente==='vf' ? 'Se usó la Valuación Fiscal (VF).' : r.baseFuente==='vir' ? 'Se usó el Valor Inmobiliario de Referencia (VIR).' : 'Se usó el monto de escritura.';
+  var exento = r.viviendaUnica && r.sellosARS===0;
+  var apl = r.viviendaUnica ? (r.superaTope?1:0) : (r.superaTope?3:2);
+  var rows=[
+    ['Vivienda única, hasta '+tope,'Exento'],
+    ['Vivienda única, más de '+tope,'3,5 % del excedente'],
+    ['Sin exención, hasta '+tope,'2,7 % del total'],
+    ['Sin exención, más de '+tope,'3,5 % del total']
+  ];
+  var trs='';
+  rows.forEach(function(row,i){ trs+='<tr class="'+(i===apl?'on':'')+'"><td>'+row[0]+'</td><td>'+row[1]+'</td></tr>'; });
+  return '<div class="selblk">'+
+    '<div class="h">Base imponible de sellos</div>'+
+    '<div class="base">'+pesos(r.base)+'</div>'+
+    '<div class="sub">'+fuenteTxt+'</div>'+
+    (exento?'<div class="selbox-ok">Operación exenta del Impuesto de Sellos por vivienda única (Ley Tarifaria '+ANIO_VIGENCIA+').</div>':'')+
+    '<div class="h" style="margin-top:16px">Cuándo se paga cada alícuota</div>'+
+    '<table class="alic"><thead><tr><th>Situación</th><th>Se paga</th></tr></thead><tbody>'+trs+'</tbody></table>'+
+    '<div class="exp">El tope es de '+tope+' ('+ANIO_VIGENCIA+') y se compara contra la base imponible, que es <b>el mayor</b> entre monto de escritura, Valuación Fiscal y VIR.</div>'+
+    '<div class="ojo">Ojo: sin la exención se grava <b>el total</b>, no sólo lo que pasa el tope. Es el error más común.</div>'+
+  '</div>';
 }
 
 // ===== Render =====
@@ -358,7 +385,9 @@ function calcular(){
   lado.items.forEach(function(it){
     var tag='';
     if(it.exento) tag=' <span class="tag">exento vivienda única</span>';
-    filas+='<tr><td class="c">'+it.c+tag+'</td><td class="v">'+usd(it.usd)+'<span class="ars">'+pesos(it.usd*disp)+'</span></td></tr>';
+    var nota='';
+    if(it.c==='Gastos notariales') nota='<span class="nota-roja">⚠ Valor orientativo: puede variar según cada caso. Consultá con la escribanía.</span>';
+    filas+='<tr><td class="c">'+it.c+tag+nota+'</td><td class="v">'+usd(it.usd)+'<span class="ars">'+pesos(it.usd*disp)+'</span></td></tr>';
   });
 
   res.innerHTML =
@@ -372,6 +401,7 @@ function calcular(){
       '<tr class="tot"><td>TOTAL</td><td class="v">'+usd(lado.total)+'<span class="ars" style="color:rgba(255,255,255,0);"></span></td></tr>'+
     '</tbody></table>'+
     '<div class="other">'+ (otroNombre.charAt(0).toUpperCase()+otroNombre.slice(1)) +' paga: <b>'+usd(otroLado.total)+'</b> ('+pesos(otroLado.total*disp)+')</div>'+
+    bloqueSellos(r)+
     '<div class="actions">'+
       '<button onclick="copiarResumen()">📋 Copiar resumen</button>'+
       '<button onclick="window.print()">🖨️ Imprimir / PDF</button>'+
@@ -410,7 +440,7 @@ document.getElementById('segRol').addEventListener('click',function(e){
   calcular();
 });
 ['precio','bna','disp','vf','vir'].forEach(ligarMiles);
-['pctEscritura','pctEscribania','pctNotar','pctComC','pctComV'].forEach(function(id){ document.getElementById(id).addEventListener('input',calcular); });
+['pctEscribania','pctNotar'].forEach(function(id){ document.getElementById(id).addEventListener('input',calcular); });
 ['vivienda'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
 ['sellosQuien','escribaniaQuien'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
 
