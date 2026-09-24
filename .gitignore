@@ -14,3 +14,7 @@ manual-de-marca-team-scaglia.pdf
 
 # Temporales de desarrollo
 .tmp-dev/
+
+# Prototipos locales (no van al deploy)
+_wood-*.html
+_*.proto.html
