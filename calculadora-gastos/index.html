@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de gastos de escritura CABA | Team Scaglia</title>
+<meta name="description" content="Calculá los gastos de una compraventa de inmueble en la Ciudad de Buenos Aires: impuesto de sellos, honorarios de escribanía, gastos notariales y comisiones. Estimación para comprador y vendedor.">
+<link rel="canonical" href="https://www.teamscaglia.com/calculadora-gastos/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Team Scaglia">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Calculadora de gastos de escritura · CABA">
+<meta property="og:description" content="Estimá cuánto cuesta la operación al comprador y al vendedor en CABA. Simple, gratis y al instante.">
+<meta property="og:url" content="https://www.teamscaglia.com/calculadora-gastos/">
+<meta property="og:image" content="https://www.teamscaglia.com/og-cover.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de gastos de escritura CABA",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
+  "provider": { "@type": "RealEstateAgent", "name": "Team Scaglia", "url": "https://www.teamscaglia.com" }
+}
+</script>
+<style>
+  :root{
+    --primary:#253C64; --primary-dark:#1a2847; --accent:#626970;
+    --border:#e3e3e0; --text:#2a2a2a; --text-light:#626970;
+    --bg:#ffffff; --bg-off:#f8f7f5; --card:#ffffff;
+    --green:#1f8a4c; --green-bg:#e8f5ee; --danger:#b23b3b;
+    --shadow:0 2px 14px rgba(0,0,0,0.06); --shadow-lg:0 10px 40px rgba(37,60,100,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Montserrat',sans-serif;color:var(--text);background:var(--bg-off);line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .serif{font-family:'Cormorant Garamond',serif}
+
+  /* Header */
+  header.top{background:var(--primary);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+  header.top .logo img{height:34px;display:block}
+  header.top .wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-size:12px;font-weight:600;padding:9px 16px;border-radius:8px;letter-spacing:.02em}
+
+  .wrap{max-width:860px;margin:0 auto;padding:32px 16px 80px}
+  .hero{text-align:center;margin-bottom:26px}
+  .hero .kick{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,6vw,44px);font-weight:600;color:var(--primary);line-height:1.1;margin:8px 0 10px}
+  .hero p{color:var(--text-light);font-size:15px;max-width:560px;margin:0 auto}
+
+  .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
+
+  /* Segmented toggles */
+  .seg{display:flex;gap:6px;background:var(--bg-off);border-radius:12px;padding:5px}
+  .seg button{flex:1;border:none;background:transparent;font-family:inherit;font-size:14px;font-weight:600;color:var(--text-light);padding:12px 8px;border-radius:9px;cursor:pointer;transition:.15s;position:relative}
+  .seg button.on{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,60,100,.25)}
+  .seg button .badge{display:block;font-size:9px;font-weight:600;letter-spacing:.05em;color:var(--accent);margin-top:2px}
+  .seg button.on .badge{color:rgba(255,255,255,.75)}
+  .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;display:block}
+
+  .field{margin-top:16px}
+  .field label{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px}
+  .field .hint{font-size:11px;color:var(--text-light);font-weight:400}
+  input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:16px;padding:13px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);transition:.15s}
+  input:focus{outline:none;border-color:var(--primary)}
+  .inpwrap{position:relative}
+  .inpwrap .pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-light);font-size:15px;pointer-events:none}
+  .inpwrap.pre-pad input{padding-left:44px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.row2{grid-template-columns:1fr}}
+
+  .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:14px;border:1.5px solid var(--border);border-radius:10px}
+  .switch-row .t{font-size:13px;font-weight:600}
+  .switch-row .s{font-size:11px;color:var(--text-light);font-weight:400;margin-top:2px}
+  .toggle{position:relative;width:52px;height:30px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0}
+  .toggle .sl{position:absolute;inset:0;background:#cfcfca;border-radius:30px;transition:.2s;cursor:pointer}
+  .toggle .sl:before{content:"";position:absolute;height:24px;width:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .toggle input:checked + .sl{background:var(--primary)}
+  .toggle input:checked + .sl:before{transform:translateX(22px)}
+
+  details.adv{margin-top:16px;border-top:1px solid var(--border);padding-top:6px}
+  details.adv summary{cursor:pointer;list-style:none;font-size:13px;font-weight:600;color:var(--primary);padding:10px 0;display:flex;align-items:center;gap:8px}
+  details.adv summary::-webkit-details-marker{display:none}
+  details.adv summary .chev{transition:.2s}
+  details.adv[open] summary .chev{transform:rotate(90deg)}
+  details.adv .sel{width:100%;font-family:inherit;font-size:15px;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+
+  /* Result */
+  #result .big{text-align:center;padding:6px 0 14px}
+  #result .who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  #result .amt{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,10vw,58px);font-weight:600;color:var(--primary);line-height:1;margin:6px 0 2px}
+  #result .amt-ars{font-size:15px;color:var(--text-light);font-weight:500}
+  #result .pctline{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;color:var(--primary);background:var(--bg-off);padding:6px 14px;border-radius:20px}
+  table.det{width:100%;border-collapse:collapse;margin-top:8px}
+  table.det td{padding:11px 2px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
+  table.det td.c{font-weight:600;color:var(--text)}
+  table.det td.v{text-align:right;white-space:nowrap;color:var(--text)}
+  table.det td .ars{display:block;font-size:11px;color:var(--text-light);font-weight:400}
+  table.det tr.tot td{border-bottom:none;border-top:2px solid var(--primary);padding-top:13px;font-size:16px;font-weight:700;color:var(--primary)}
+  table.det tr .tag{font-size:10px;color:var(--green);font-weight:600;background:var(--green-bg);padding:2px 7px;border-radius:10px;margin-left:6px;white-space:nowrap}
+  .other{margin-top:16px;text-align:center;font-size:13px;color:var(--text-light)}
+  .other b{color:var(--primary)}
+  .actions{display:flex;gap:10px;margin-top:18px}
+  .actions button{flex:1;font-family:inherit;font-size:13px;font-weight:600;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--primary);cursor:pointer;transition:.15s}
+  .actions button:hover{border-color:var(--primary)}
+  .empty{text-align:center;color:var(--text-light);padding:30px 10px;font-size:14px}
+  .pba-msg{text-align:center;padding:26px 14px}
+  .pba-msg h3{font-family:'Cormorant Garamond',serif;color:var(--primary);font-size:24px;margin-bottom:8px}
+  .pba-msg p{color:var(--text-light);font-size:14px;max-width:420px;margin:0 auto 16px}
+
+  .disc{background:#fbf9f4;border:1px solid #efe7d5;border-radius:12px;padding:16px 18px;margin-bottom:18px}
+  .disc p{font-size:12px;color:#7a6a45;margin:5px 0;padding-left:20px;position:relative}
+  .disc p:before{content:"⚠";position:absolute;left:0;top:0}
+
+  .cta{background:var(--primary);border-radius:16px;padding:28px 22px;text-align:center;color:#fff}
+  .cta h3{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:6px}
+  .cta p{font-size:14px;color:rgba(255,255,255,.8);margin-bottom:18px}
+  .cta a{display:inline-flex;align-items:center;gap:9px;background:#25D366;color:#fff;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.03em;padding:14px 30px;border-radius:10px}
+
+  footer.bot{text-align:center;padding:26px 16px;color:var(--text-light);font-size:12px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--primary);color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="/" class="logo"><img src="/logos/logo-team-blanco-trim.png" alt="Team Scaglia"></a>
+  <a href="https://wa.me/541130977868" target="_blank" rel="noopener" class="wa">WhatsApp</a>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="kick">Team Scaglia</span>
+    <h1>Calculadora de gastos<br>de una operación</h1>
+    <p>Estimá cuánto cuesta escriturar una compraventa. Cargá el precio y mirá el detalle para el comprador y el vendedor.</p>
+  </div>
+
+  <!-- Jurisdicción + rol -->
+  <div class="card">
+    <span class="lbl">¿Dónde está la propiedad?</span>
+    <div class="seg" id="segJuris">
+      <button data-j="caba" class="on">CABA</button>
+      <button data-j="pba">Provincia<span class="badge">Próximamente</span></button>
+    </div>
+
+    <div style="margin-top:16px">
+      <span class="lbl">Ver los gastos de…</span>
+      <div class="seg" id="segRol">
+        <button data-r="comprador" class="on">🔑 Comprador</button>
+        <button data-r="vendedor">🏷️ Vendedor</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Precio de la operación <span class="hint">(en dólares)</span></label>
+      <div class="inpwrap pre-pad"><span class="pre">US$</span>
+        <input type="text" id="precio" inputmode="numeric" autocomplete="off" placeholder="150.000">
+      </div>
+    </div>
+
+    <div class="switch-row">
+      <div>
+        <div class="t">¿Es vivienda única?</div>
+        <div class="s">Y el comprador no tiene otro inmueble en CABA (exime el impuesto de sellos).</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="vivienda"><span class="sl"></span></label>
+    </div>
+
+    <div class="field">
+      <label>Dólar oficial BNA <span class="hint" id="bnaHint">(cargando cotización…)</span></label>
+      <div class="inpwrap pre-pad"><span class="pre">$</span>
+        <input type="text" id="bna" inputmode="numeric" autocomplete="off" placeholder="1.450">
+      </div>
+    </div>
+
+    <details class="adv">
+      <summary><span class="chev">▶</span> Opciones avanzadas</summary>
+      <div class="row2" style="margin-top:12px">
+        <div class="field" style="margin-top:0">
+          <label>% que se declara en escritura</label>
+          <input type="number" id="pctEscritura" value="100" min="1" max="100" step="1">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Dólar para mostrar gastos</label>
+          <div class="inpwrap pre-pad"><span class="pre">$</span><input type="text" id="disp" inputmode="numeric" placeholder="= BNA"></div>
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Valuación Fiscal (VF) <span class="hint">$</span></label>
+          <input type="text" id="vf" inputmode="numeric" placeholder="opcional">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Valor Inm. de Referencia (VIR) <span class="hint">$</span></label>
+          <input type="text" id="vir" inputmode="numeric" placeholder="opcional">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>¿Quién paga el impuesto de sellos?</label>
+          <select class="sel" id="sellosQuien">
+            <option value="mitad">Mitad y mitad</option>
+            <option value="comprador">Comprador</option>
+            <option value="vendedor">Vendedor</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>¿Quién paga la escribanía?</label>
+          <select class="sel" id="escribaniaQuien">
+            <option value="comprador">Comprador</option>
+            <option value="vendedor">Vendedor</option>
+            <option value="mitad">Mitad y mitad</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Honorarios escribanía (%)</label>
+          <input type="number" id="pctEscribania" value="2" min="0" step="0.1">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Gastos notariales (%)</label>
+          <input type="number" id="pctNotar" value="0.7" min="0" step="0.1">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Comisión del comprador (%)</label>
+          <input type="number" id="pctComC" value="4" min="0" step="0.1">
+        </div>
+        <div class="field" style="margin-top:0">
+          <label>Comisión del vendedor (%)</label>
+          <input type="number" id="pctComV" value="3" min="0" step="0.1">
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Resultado -->
+  <div class="card" id="resultCard">
+    <div id="result"><div class="empty">Cargá el precio de la operación para ver el detalle.</div></div>
+    <div id="pbaMsg" class="pba-msg" style="display:none">
+      <h3>Provincia de Buenos Aires — en preparación</h3>
+      <p>Por ahora la calculadora resuelve operaciones en <b>CABA</b>. Para tu operación en Provincia, escribinos y te pasamos el número exacto.</p>
+      <a href="https://wa.me/541130977868" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:12px 26px;border-radius:10px">Escribinos por WhatsApp</a>
+    </div>
+  </div>
+
+  <div class="disc">
+    <p>Los valores son estimativos y no constituyen un presupuesto.</p>
+    <p>Los gastos notariales son una estimación. El importe definitivo lo informa la escribanía actuante.</p>
+    <p>Alícuotas y topes según la Ley Tarifaria 2026 de la Ciudad de Buenos Aires. Aplica sólo a operaciones en CABA.</p>
+  </div>
+
+  <div class="cta">
+    <h3 class="serif">¿Querés el número exacto de tu operación?</h3>
+    <p>Un asesor del Team te arma el presupuesto real, sin cargo.</p>
+    <a href="https://wa.me/541130977868" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+  </div>
+</div>
+
+<footer class="bot">© 2026 · Team Scaglia · Red Suma · Buenos Aires</footer>
+<div class="toast" id="toast">Copiado ✓</div>
+
+<script>
+// ===== Parámetros fiscales — Ley Tarifaria 2026 CABA (actualizar 1 vez al año) =====
+var TOPE_SELLOS       = 226100000;   // pesos
+var ALICUOTA_REDUCIDA = 0.027;       // 2,7 %
+var ALICUOTA_GENERAL  = 0.035;       // 3,5 %
+var IVA               = 0.21;        // 21 %
+var ANIO_VIGENCIA     = 2026;
+
+// ===== Estado UI =====
+var juris = 'caba';
+var rol = 'comprador';
+
+// ===== Helpers de formato (AR: miles con punto, decimales con coma) =====
+function soloNum(str){ return (str||'').replace(/[^\d]/g,''); }
+function num(id){ var el=document.getElementById(id); if(!el) return 0; var v=el.value; if(el.type==='number') return parseFloat(v)||0; return parseFloat(soloNum(v))||0; }
+function fmtMiles(n){ return Math.round(n).toLocaleString('es-AR'); }
+function usd(n){ return 'US$ '+fmtMiles(n); }
+function pesos(n){ return '$ '+fmtMiles(n); }
+function pct(n){ return (Math.round(n*10)/10).toString().replace('.',',')+' %'; }
+
+// Formatear miles mientras se escribe en un input de texto
+function ligarMiles(id){
+  var el=document.getElementById(id);
+  el.addEventListener('input',function(){
+    var d=soloNum(el.value);
+    el.value = d ? parseInt(d,10).toLocaleString('es-AR') : '';
+    calcular();
+  });
+}
+
+// ===== Motor de cálculo (CABA) =====
+function calcularCABA(){
+  var precio=num('precio');
+  var pctEscritura=num('pctEscritura')||100;
+  var bna=num('bna');
+  var disp=num('disp')||bna;
+  if(!precio || !bna) return {falta: !precio ? 'Cargá el precio de la operación.' : 'Cargá el dólar oficial BNA.'};
+
+  var viviendaUnica=document.getElementById('vivienda').checked;
+  var vf=num('vf'), vir=num('vir');
+  var sellosQuien=document.getElementById('sellosQuien').value;
+  var escribaniaQuien=document.getElementById('escribaniaQuien').value;
+  var pctEscribania=num('pctEscribania'), pctNotar=num('pctNotar');
+  var pctComC=num('pctComC'), pctComV=num('pctComV');
+
+  var mUSD=precio*(pctEscritura/100);
+  var mARS=mUSD*bna;
+  var base=Math.max(mARS, vf, vir);
+
+  var sellosARS;
+  if(viviendaUnica){ sellosARS = base<=TOPE_SELLOS ? 0 : (base-TOPE_SELLOS)*ALICUOTA_GENERAL; }
+  else { sellosARS = base<=TOPE_SELLOS ? base*ALICUOTA_REDUCIDA : base*ALICUOTA_GENERAL; }
+  var sellosUSD=sellosARS/disp;
+
+  var honor=precio*(pctEscribania/100);
+  var notar=mUSD*(pctNotar/100);
+  var comC=precio*(pctComC/100), comV=precio*(pctComV/100);
+  var ivaC=comC*IVA, ivaV=comV*IVA;
+
+  var pS = sellosQuien==='comprador'?1 : sellosQuien==='vendedor'?0 : 0.5;
+  var pE = escribaniaQuien==='comprador'?1 : escribaniaQuien==='vendedor'?0 : 0.5;
+
+  function lado(esComprador){
+    var items=[];
+    var sh = esComprador ? pS : (1-pS);
+    items.push({c:'Impuesto de sellos', usd: sellosUSD*sh, exento: viviendaUnica && sellosARS===0, always:true});
+    var eh = esComprador ? pE : (1-pE);
+    if(eh>0) items.push({c:'Honorarios de escribanía', usd: honor*eh});
+    items.push({c:'Gastos notariales', usd: notar});
+    items.push({c:'Comisión', usd: esComprador?comC:comV});
+    items.push({c:'IVA de la comisión', usd: esComprador?ivaC:ivaV});
+    var total=items.reduce(function(a,b){return a+b.usd;},0);
+    return {items:items, total:total};
+  }
+  var comprador=lado(true), vendedor=lado(false);
+  return {ok:true, precio:precio, disp:disp, viviendaUnica:viviendaUnica,
+          comprador:comprador, vendedor:vendedor};
+}
+
+// ===== Render =====
+function calcular(){
+  var res=document.getElementById('result');
+  var pba=document.getElementById('pbaMsg');
+  if(juris==='pba'){ res.style.display='none'; pba.style.display='block'; return; }
+  pba.style.display='none'; res.style.display='block';
+
+  var r=calcularCABA();
+  if(!r.ok){ res.innerHTML='<div class="empty">'+(r.falta||'Cargá el precio de la operación para ver el detalle.')+'</div>'; return; }
+
+  var lado = rol==='comprador' ? r.comprador : r.vendedor;
+  var otroLado = rol==='comprador' ? r.vendedor : r.comprador;
+  var otroNombre = rol==='comprador' ? 'el vendedor' : 'el comprador';
+  var disp=r.disp;
+  var pctSobrePrecio = r.precio>0 ? (lado.total/r.precio*100) : 0;
+
+  var filas='';
+  lado.items.forEach(function(it){
+    var tag='';
+    if(it.exento) tag=' <span class="tag">exento vivienda única</span>';
+    filas+='<tr><td class="c">'+it.c+tag+'</td><td class="v">'+usd(it.usd)+'<span class="ars">'+pesos(it.usd*disp)+'</span></td></tr>';
+  });
+
+  res.innerHTML =
+    '<div class="big">'+
+      '<div class="who">Total gastos · '+(rol==='comprador'?'Comprador':'Vendedor')+'</div>'+
+      '<div class="amt">'+usd(lado.total)+'</div>'+
+      '<div class="amt-ars">'+pesos(lado.total*disp)+'</div>'+
+      '<div class="pctline">'+pct(pctSobrePrecio)+' del valor de la propiedad</div>'+
+    '</div>'+
+    '<table class="det"><tbody>'+filas+
+      '<tr class="tot"><td>TOTAL</td><td class="v">'+usd(lado.total)+'<span class="ars" style="color:rgba(255,255,255,0);"></span></td></tr>'+
+    '</tbody></table>'+
+    '<div class="other">'+ (otroNombre.charAt(0).toUpperCase()+otroNombre.slice(1)) +' paga: <b>'+usd(otroLado.total)+'</b> ('+pesos(otroLado.total*disp)+')</div>'+
+    '<div class="actions">'+
+      '<button onclick="copiarResumen()">📋 Copiar resumen</button>'+
+      '<button onclick="window.print()">🖨️ Imprimir / PDF</button>'+
+    '</div>';
+}
+
+function copiarResumen(){
+  var r=calcularCABA(); if(!r.ok) return;
+  var disp=r.disp;
+  function bloque(nombre,lado){
+    var t=nombre.toUpperCase()+'\n';
+    lado.items.forEach(function(it){ t+='  '+it.c+(it.exento?' (exento)':'')+': '+usd(it.usd)+'\n'; });
+    t+='  TOTAL: '+usd(lado.total)+' ('+pesos(lado.total*disp)+')\n';
+    return t;
+  }
+  var txt='Gastos de la operación — CABA (estimativo)\n'+
+    'Precio: '+usd(r.precio)+'\n\n'+
+    bloque('Comprador', r.comprador)+'\n'+
+    bloque('Vendedor', r.vendedor)+'\n'+
+    'Valores estimativos, no constituyen un presupuesto.\nTeam Scaglia · teamscaglia.com';
+  navigator.clipboard.writeText(txt).then(function(){ toast('Resumen copiado ✓'); },function(){ toast('No se pudo copiar'); });
+}
+function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1800); }
+
+// ===== Wiring =====
+document.getElementById('segJuris').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  juris=b.dataset.j;
+  this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+  calcular();
+});
+document.getElementById('segRol').addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  rol=b.dataset.r;
+  this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+  calcular();
+});
+['precio','bna','disp','vf','vir'].forEach(ligarMiles);
+['pctEscritura','pctEscribania','pctNotar','pctComC','pctComV'].forEach(function(id){ document.getElementById(id).addEventListener('input',calcular); });
+['vivienda'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
+['sellosQuien','escribaniaQuien'].forEach(function(id){ document.getElementById(id).addEventListener('change',calcular); });
+
+// ===== Cotización del día (BNA) =====
+(function(){
+  var hint=document.getElementById('bnaHint');
+  fetch('https://dolarapi.com/v1/dolares/oficial').then(function(r){return r.json();}).then(function(d){
+    var v=Math.round(d.venta||d.compra||0);
+    if(v){ document.getElementById('bna').value=v.toLocaleString('es-AR'); hint.textContent='(cotización del día · editable)'; calcular(); }
+    else throw 0;
+  }).catch(function(){
+    hint.textContent='(no se pudo traer · cargalo a mano)';
+  });
+})();
+
+calcular();
+</script>
+</body>
+</html>
