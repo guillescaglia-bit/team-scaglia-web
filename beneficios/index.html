@@ -2326,7 +2326,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                 html += `
                     <div class="cupone-card" style="border-left-color: ${p.color}; position: relative; overflow: hidden; padding: 0; ${inactivo ? 'filter: grayscale(0.9); opacity: 0.55;' : ''}">
                         <div style="background: ${p.banner ? `url('${p.banner}') left/cover` : p.color}; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; min-height: 120px; display: flex; align-items: center; justify-content: flex-end; padding-right: 24px;">
-                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: ${inactivo ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.62)'}; padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
                                 ${inactivo
                                     ? `<span style="color: white; font-weight: 600; font-size: 15px; letter-spacing: 0.04em;">Próximamente</span>`
                                     : `<span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${p.descuento ? p.descuento + '%' : '★'}</span>
@@ -2468,7 +2468,7 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
                         <!-- Banner superior -->
                         <div style="background: ${prestador.banner ? `url('${prestador.banner}') left/cover` : prestador.color}; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; min-height: 120px; display: flex; align-items: center; justify-content: flex-end; padding-right: 24px;">
                             <!-- Badge: descuento o Próximamente -->
-                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: ${inactivo ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.62)'}; padding: 12px 20px; border-radius: 8px; flex-shrink: 0;">
                                 ${inactivo
                                     ? `<span style="color: white; font-weight: 600; font-size: 15px; letter-spacing: 0.04em;">Próximamente</span>`
                                     : `<span style="color: white; font-weight: bold; font-size: 36px; line-height: 1;">${prestador.descuento ? prestador.descuento + '%' : '?'}</span>
