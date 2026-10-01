@@ -12,7 +12,8 @@ const UNSUB_MAILTO = 'mailto:info@teamscaglia.com?subject=Baja%20de%20avisos%20d
 
 function envoltorio(prestador) {
   const p = prestador;
-  const banner = p.banner ? (p.banner.startsWith('http') ? p.banner : SITE + p.banner) : '';
+  const bsrc = p.bannerMail || p.banner;
+  const banner = bsrc ? (bsrc.startsWith('http') ? bsrc : SITE + bsrc) : '';
   const descuento = p.descuento ? `${p.descuento}% OFF` : 'Beneficio exclusivo';
   return `
   <div style="background:#f4f4f5; padding:32px 0; font-family:Helvetica,Arial,sans-serif;">
