@@ -1598,6 +1598,19 @@
             cupones: [],
         };
 
+        // ── Promo temporal Wilson Tobal: 40% OFF hasta el 31/10/2026 (el 1/11 vuelve solo al 15%) ──
+        (function(){
+            var w = appState.prestadores.find(function(p){ return p.id === '3'; });
+            if (!w) return;
+            var finPromo = new Date('2026-10-31T23:59:59-03:00');
+            if (new Date() <= finPromo) {
+                w.descuento = 40;
+                w.descripcion = 'Interiorismo · 40% OFF (promo hasta 31/10)';
+                w.tyc = '💰 DESCUENTO\n40% de descuento — ¡promo especial!\n\n🛒 MÍNIMO DE COMPRA\nSin mínimo de compra.\n\n🎫 VALIDEZ DEL CUPÓN\nEl cupón tendrá una validez de 30 días desde que el cliente lo recibe.\n\n📅 VIGENCIA\nPromoción especial del 40% válida hasta el 31/10/2026. A partir del 1/11 el beneficio vuelve al 15%.\n\n🚫 EXCEPCIONES\nNo aplica a productos con más de 30 días de demora.\n\n🔄 CÓMO CANJEAR\nPresentá el cupón al reservar (presencial, WhatsApp o teléfono).\n\n📞 CONTACTO\nWilson Tobal\nWhatsApp / Teléfono: +54 9 11 2838-9662\nHorario: 10 a 19:30 hs';
+            }
+            // Después del 31/10 no se toca: queda el 15% y los TyC normales del array.
+        })();
+
         // ==================== FUNCIONES CORE ====================
 
         function showVista(vistaId) {
