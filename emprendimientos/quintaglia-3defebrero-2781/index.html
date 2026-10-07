@@ -1018,5 +1018,31 @@
     cell.addEventListener('click', function(){ openSheet(buildAmenHtml(cell.getAttribute('data-am'))); });
   });
 </script>
+<script>
+/* ── Modo EMBED (para incrustar en otro sitio con <iframe>) ──
+   ?embed=selector  -> muestra SOLO el selector de disponibilidad
+   ?embed=1         -> pagina completa sin la barra superior
+   Reporta su altura al contenedor para que el iframe se ajuste solo. */
+(function(){
+  var p = new URLSearchParams(location.search);
+  if(!p.has('embed')) return;
+  document.documentElement.classList.add('ts-embed');
+  var top = document.getElementById('top'); if(top) top.style.display='none';
+  document.body.style.paddingTop='0';
+  var soloSelector = (p.get('embed')==='selector' || p.get('embed')==='disponibilidad');
+  if(soloSelector){
+    Array.prototype.forEach.call(document.querySelectorAll('body > section, body > header, body > footer'), function(el){
+      if(el.id!=='disponibilidad') el.style.display='none';
+    });
+    var av=document.getElementById('disponibilidad'); if(av){ av.style.margin='0'; av.style.paddingTop='28px'; av.style.scrollMarginTop='0'; }
+  }
+  function postH(){ try{ parent.postMessage({ tsEmbedHeight: Math.ceil(document.documentElement.scrollHeight), src: 'quintaglia' }, '*'); }catch(e){} }
+  postH();
+  window.addEventListener('load', postH);
+  window.addEventListener('resize', postH);
+  document.addEventListener('click', function(){ setTimeout(postH, 420); });
+  if(window.ResizeObserver){ try{ new ResizeObserver(postH).observe(document.body); }catch(e){} } else { setInterval(postH, 1200); }
+})();
+</script>
 </body>
 </html>
