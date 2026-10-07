@@ -547,6 +547,43 @@
       <h2 class="title">El edificio</h2>
       <div class="subt">/ piso por piso</div>
     </div>
+    <style>
+      .vtoggle{display:flex;width:fit-content;margin:26px auto 0;border:1px solid var(--line);border-radius:999px;padding:4px;background:var(--card)}
+      .vtoggle button{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--muted);background:none;border:0;padding:9px 22px;border-radius:999px;cursor:pointer;transition:.2s}
+      .vtoggle button.on{background:var(--green);color:#fff}
+      .wlista{margin-top:26px;overflow-x:auto}
+      table.wltab{width:100%;border-collapse:collapse;font-family:var(--sans)}
+      table.wltab th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+      table.wltab th.srt{cursor:pointer;user-select:none}
+      table.wltab th.srt:hover{color:var(--green)}
+      table.wltab th .ar{opacity:.55;font-size:9px;margin-left:2px}
+      table.wltab td{padding:13px 12px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink)}
+      table.wltab tr.na td{color:var(--muted)}
+      table.wltab tbody tr.av:hover{background:var(--cream)}
+      .wl-piso{font-weight:600}
+      .wl-pr{font-weight:600;white-space:nowrap}
+      .wl-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;white-space:nowrap}
+      .wl-st i{width:9px;height:9px;border-radius:50%;flex:none}
+      .st-av i{background:rgba(90,150,105,.95)} .st-av{color:var(--green)}
+      .st-v i{background:#a24a3a} .st-v{color:#a24a3a}
+      .st-res i{background:#b07d2a} .st-res{color:#b07d2a}
+      .st-no i{background:#c9c8bc} .st-no{color:var(--muted)}
+      .wl-cta{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--green);text-decoration:none;border-bottom:1.5px solid var(--green);padding-bottom:3px;white-space:nowrap}
+      .wl-cta:hover{opacity:.65}
+      @media(max-width:600px){
+        table.wltab thead{display:none}
+        table.wltab,table.wltab tbody{display:block}
+        table.wltab tr{display:block;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+        table.wltab td{display:flex;justify-content:space-between;align-items:center;border:0;padding:6px 0;font-size:13.5px}
+        table.wltab td::before{content:attr(data-l);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-right:12px}
+        table.wltab td.wl-cell-cta{justify-content:flex-end;padding-top:10px}
+        table.wltab td.wl-cell-cta::before{display:none}
+      }
+    </style>
+    <div class="vtoggle">
+      <button id="vtFachada" class="on" type="button">Fachada</button>
+      <button id="vtLista" type="button">Lista de precios</button>
+    </div>
     <div class="dstage reveal">
       <div>
         <div class="render" id="wRender">
@@ -562,6 +599,7 @@
         <div id="wBody"><div class="dph"><b>Elegí un piso</b>Tocá un piso arriba (o en la fachada) para ver los departamentos y precios.</div></div>
       </div>
     </div>
+    <div id="wLista" class="wlista" style="display:none"></div>
   </div>
 </section>
 
@@ -942,6 +980,76 @@
       var target = window.matchMedia('(max-width:820px)').matches ? document.getElementById('wStep') : document.getElementById('disponibilidad');
       if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
     }
+
+    // ── Vista LISTA de precios (toggle Fachada / Lista) ──
+    var _listaBuilt = false, _lsKey = 'piso', _lsDir = 1;
+    function wEstado(x){
+      if (disp(x)) return {c:'st-av', t:'Disponible'};
+      if (x.s==='v') return {c:'st-v', t:'Vendido'};
+      if (x.s==='res') return {c:'st-res', t:'Reservado'};
+      return {c:'st-no', t:'Próximamente'};
+    }
+    function wBuildLista(){
+      var rows = [];
+      FLOORS.forEach(function(f, fi){
+        var pn = parseInt(f.p, 10);
+        f.us.forEach(function(x, ui){
+          var pi = planInfo(pn, x.u), av = disp(x);
+          rows.push({ fi:fi, ui:ui, piso:f.p, pn:pn, u:x.u,
+            tipo: pi ? pi.tipo : tipoLabel(pn, x.u),
+            m2: pi ? pi.tot : null,
+            price: av ? (x.cash!=null?x.cash:x.fin) : null,
+            av: av, st: wEstado(x) });
+        });
+      });
+      rows.sort(function(a,b){
+        if (_lsKey==='precio'){ var pa=a.price==null?Infinity:a.price, pb=b.price==null?Infinity:b.price; if(pa!==pb) return (pa-pb)*_lsDir; }
+        if (a.pn!==b.pn) return (a.pn-b.pn)*_lsDir;
+        return a.u.localeCompare(b.u);
+      });
+      function arrow(k){ return _lsKey===k ? (_lsDir>0?' <span class="ar">▲</span>':' <span class="ar">▼</span>') : ' <span class="ar">↕</span>'; }
+      var h = '<table class="wltab"><thead><tr>'+
+        '<th class="srt" data-k="piso">Piso'+arrow('piso')+'</th>'+
+        '<th>Unidad</th><th>Tipología</th><th>m² tot.</th>'+
+        '<th class="srt" data-k="precio">Precio'+arrow('precio')+'</th>'+
+        '<th>Estado</th><th></th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        var precio = r.price!=null ? fmtU(r.price) : '—';
+        var m2 = r.m2 ? r.m2+' m²' : '—';
+        var cta = r.av ? '<a class="wl-cta" href="#" data-fi="'+r.fi+'" data-ui="'+r.ui+'">Ver →</a>' : '';
+        h += '<tr class="'+(r.av?'av':'na')+'">'+
+          '<td data-l="Piso" class="wl-piso">'+r.piso+'</td>'+
+          '<td data-l="Unidad">'+r.u+'</td>'+
+          '<td data-l="Tipología">'+r.tipo+'</td>'+
+          '<td data-l="m² tot.">'+m2+'</td>'+
+          '<td data-l="Precio" class="wl-pr">'+precio+'</td>'+
+          '<td data-l="Estado"><span class="wl-st '+r.st.c+'"><i></i>'+r.st.t+'</span></td>'+
+          '<td class="wl-cell-cta" data-l="">'+cta+'</td></tr>';
+      });
+      h += '</tbody></table>';
+      var host = document.getElementById('wLista'); if(!host) return;
+      host.innerHTML = h;
+      host.querySelectorAll('th.srt').forEach(function(th){ th.addEventListener('click', function(){ var k=th.getAttribute('data-k'); if(_lsKey===k) _lsDir*=-1; else { _lsKey=k; _lsDir=1; } wBuildLista(); }); });
+      host.querySelectorAll('.wl-cta').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); wListaOpen(+a.getAttribute('data-fi'), +a.getAttribute('data-ui')); }); });
+      _listaBuilt = true;
+    }
+    function wSetView(v){
+      var fach = document.querySelector('#disponibilidad .dstage');
+      var lista = document.getElementById('wLista');
+      var bF = document.getElementById('vtFachada'), bL = document.getElementById('vtLista');
+      if (v==='lista'){ if(!_listaBuilt) wBuildLista(); if(fach) fach.style.display='none'; if(lista) lista.style.display='block'; if(bL) bL.classList.add('on'); if(bF) bF.classList.remove('on'); }
+      else { if(fach) fach.style.display=''; if(lista) lista.style.display='none'; if(bF) bF.classList.add('on'); if(bL) bL.classList.remove('on'); }
+      try{ if(new URLSearchParams(location.search).has('embed')) parent.postMessage({tsEmbedHeight:Math.ceil(document.documentElement.scrollHeight), src:'wood'}, '*'); }catch(e){}
+    }
+    function wListaOpen(fi, ui){
+      wSetView('fachada');
+      wSelFloor(fi);
+      setTimeout(function(){ var c=document.querySelector('#wBody .unit.disp[data-i="'+ui+'"]'); if(c) c.click(); var t=document.getElementById('wStep'); if(t) t.scrollIntoView({behavior:'smooth', block:'start'}); }, 50);
+    }
+    var _bvF=document.getElementById('vtFachada'), _bvL=document.getElementById('vtLista');
+    if(_bvF) _bvF.addEventListener('click', function(){ wSetView('fachada'); });
+    if(_bvL) _bvL.addEventListener('click', function(){ wSetView('lista'); });
+
     document.querySelectorAll('.tipo[data-tipo]').forEach(function(c){ c.style.cursor='pointer'; c.addEventListener('click', function(){ wSelTipo(c.getAttribute('data-tipo')); }); });
   })();
 
