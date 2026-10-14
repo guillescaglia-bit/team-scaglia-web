@@ -3804,6 +3804,18 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             return false;
         }
 
+        // Si el visitante llega desde el link del mail (?email=...), prellenar su email en el login
+        function prefillDesdeMail() {
+            try {
+                var em = new URLSearchParams(location.search).get('email');
+                if (!em) return;
+                em = em.trim();
+                if (!/^\S+@\S+\.\S+$/.test(em)) return;
+                var inp = document.getElementById('loginEmail');
+                if (inp) { inp.value = em; inp.focus(); }
+            } catch (e) {}
+        }
+
         function showAlert(vistaId, mensaje, tipo) {
             const containerId = vistaId === 'vistaAdmin' ? 'adminAlertContainer' :
                                vistaId === 'vistaDashboardAgente' ? 'agenteAlertContainer' : 'alertContainer';
@@ -3917,8 +3929,8 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             if (location.hash === '#validar' || location.hash === '#prestador') {
                 abrirValidador();
             } else {
-                // Si hay sesión activa, restaurar el panel sin pedir login otra vez
-                restaurarSesion();
+                // Si hay sesión activa, restaurar el panel; si no y vino del mail con ?email=, prellenar su email
+                restaurarSesion().then(function(logueado){ if(!logueado) prefillDesdeMail(); });
             }
 
             // Llenar los checkboxes de agentes en el registro

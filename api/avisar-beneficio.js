@@ -10,8 +10,10 @@ const ADMIN_EMAIL = 'info@teamscaglia.com';
 const SITE = 'https://www.teamscaglia.com';
 const UNSUB_MAILTO = 'mailto:info@teamscaglia.com?subject=Baja%20de%20avisos%20de%20beneficios';
 
-function envoltorio(prestador) {
+function envoltorio(prestador, email) {
   const p = prestador;
+  // Link con el email prellenado: al llegar a /beneficios ya trae su mail cargado (menos fricción)
+  const ctaUrl = SITE + '/beneficios' + (email ? '?email=' + encodeURIComponent(email) : '');
   const bsrc = p.bannerMail || p.banner;
   const banner = bsrc ? (bsrc.startsWith('http') ? bsrc : SITE + bsrc) : '';
   const descuento = p.descuento ? `${p.descuento}% OFF` : 'Beneficio exclusivo';
@@ -31,7 +33,7 @@ function envoltorio(prestador) {
         <p style="text-align:center; font-size:14px; line-height:1.6; color:#555; margin:0 0 8px;">${p.descripcion || ''}</p>
         ${p.alcance ? `<p style="text-align:center; font-size:12px; color:#888; margin:0 0 18px;">📍 ${p.alcance}</p>` : '<div style="height:8px"></div>'}
         <div style="text-align:center; margin:22px 0 6px;">
-          <a href="${SITE}/beneficios" style="display:inline-block; background:#253C64; color:#ffffff; text-decoration:none; padding:14px 34px; border-radius:8px; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Generar mi cupón</a>
+          <a href="${ctaUrl}" style="display:inline-block; background:#253C64; color:#ffffff; text-decoration:none; padding:14px 34px; border-radius:8px; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Generar mi cupón</a>
         </div>
         <p style="text-align:center; font-size:12px; color:#aaa; margin:16px 0 0;">Ingresá con tu email en el Programa de Beneficios y generá tu cupón.</p>
       </div>
@@ -119,7 +121,6 @@ module.exports = async (req, res) => {
 
   if (!destinatarios.length) return res.status(200).json({ ok: true, enviados: 0, total: 0 });
 
-  const html = envoltorio(prestador);
   const subject = prestador.descuento
     ? `Nuevo beneficio: ${prestador.nombre} · ${prestador.descuento}% OFF`
     : `Nuevo beneficio para vos: ${prestador.nombre}`;
@@ -132,7 +133,7 @@ module.exports = async (req, res) => {
       from: 'Team Scaglia <info@teamscaglia.com>',
       to: [to],
       subject,
-      html,
+      html: envoltorio(prestador, to),
       headers: { 'List-Unsubscribe': `<${UNSUB_MAILTO}>` },
     }));
     try {
