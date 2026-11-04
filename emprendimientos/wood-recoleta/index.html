@@ -561,7 +561,10 @@
       table.wltab tr.na td{color:var(--muted)}
       table.wltab tbody tr.av:hover{background:var(--cream)}
       .wl-piso{font-weight:600}
-      .wl-pr{font-weight:600;white-space:nowrap}
+      .wl-pr{white-space:nowrap;line-height:1.35}
+      .wl-pc b{font-weight:600;color:var(--ink)}
+      .wl-pf{font-size:12.5px;color:var(--muted)}
+      .wl-pl{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:500}
       .wl-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;white-space:nowrap}
       .wl-st i{width:9px;height:9px;border-radius:50%;flex:none}
       .st-av i{background:rgba(90,150,105,.95)} .st-av{color:var(--green)}
@@ -998,6 +1001,8 @@
             tipo: pi ? pi.tipo : tipoLabel(pn, x.u),
             m2: pi ? pi.tot : null,
             price: av ? (x.cash!=null?x.cash:x.fin) : null,
+            cash: av && x.cash!=null ? x.cash : null,
+            fin: av && x.fin!=null ? x.fin : null,
             av: av, st: wEstado(x) });
         });
       });
@@ -1013,7 +1018,13 @@
         '<th class="srt" data-k="precio">Precio'+arrow('precio')+'</th>'+
         '<th>Estado</th><th></th></tr></thead><tbody>';
       rows.forEach(function(r){
-        var precio = r.price!=null ? fmtU(r.price) : '—';
+        var precio = '—';
+        if (r.av) {
+          var pp = '';
+          if (r.cash!=null) pp += '<div class="wl-pc"><b>'+fmtU(r.cash)+'</b> <span class="wl-pl">contado</span></div>';
+          if (r.fin!=null) pp += '<div class="wl-pf">'+fmtU(r.fin)+' <span class="wl-pl">financiado</span></div>';
+          precio = pp || '—';
+        }
         var m2 = r.m2 ? r.m2+' m²' : '—';
         var cta = r.av ? '<a class="wl-cta" href="#" data-fi="'+r.fi+'" data-ui="'+r.ui+'">Ver →</a>' : '';
         h += '<tr class="'+(r.av?'av':'na')+'">'+
