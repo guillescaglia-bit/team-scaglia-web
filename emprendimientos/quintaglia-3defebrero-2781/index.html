@@ -685,7 +685,7 @@
     {p:'4°', us:[{u:'A',fin:183366},{u:'B',s:'v'},{u:'C',fin:106500},{u:'D',s:'v'},{u:'E',fin:149010}]},
     {p:'3°', us:[{u:'A',fin:177354},{u:'B',s:'v'},{u:'C',fin:102950},{u:'D',fin:102979},{u:'E',fin:144043}]},
     {p:'2°', us:[{u:'A',fin:171342},{u:'B',s:'v'},{u:'C',cash:90000},{u:'D',s:'v'},{u:'E',s:'v'}]},
-    {p:'1°', us:[{u:'A',fin:176400},{u:'B',s:'v'},{u:'C',fin:95034},{u:'D',fin:95060},{u:'E',fin:132967}]}
+    {p:'1°', us:[{u:'A',fin:160941},{u:'B',s:'v'},{u:'C',fin:95034},{u:'D',fin:95060},{u:'E',fin:132967}]}
   ];
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
   var disp = function(x){ return x.fin != null || x.cash != null; };
@@ -703,16 +703,16 @@
   };
   var planInfo = function(pnum, u){
     if (pnum >= 10){
-      if (u==='A') return {img:'plano-3amb', tipo: pnum===10?'4 ambientes':'3 ambientes', cub: pnum===10?'82,44':(pnum===11?'83,72':'70,10'), tot: pnum===10?'100,61':(pnum===11?'123,78':'107,17')};
-      if (u==='D') return {img:'plano-e', tipo:'2 ambientes', cub:'42,62', tot:'49,67'};
-      if (u==='B') return pnum===11 ? {img:'plano-e', tipo:'2 ambientes', cub:'54,46', tot:'74,16'} : {img:'plano-estudio', tipo:'Monoambiente', cub:'31,23', tot:'35,34'};
-      if (u==='C') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,41', tot:'35,51'};
+      if (u==='A') return {img:'plano-3amb', tipo: pnum===10?'4 ambientes':'3 ambientes', cub: pnum===10?'81,88':(pnum===11?'84,22':'70,54'), tot: pnum===10?'95,72':(pnum===11?'125,34':'105,44')};
+      if (u==='D') return {img:'plano-e', tipo:'2 ambientes', cub:'41,36', tot:'48,99'};
+      if (u==='B') return pnum===11 ? {img:'plano-e', tipo:'2 ambientes', cub:'54,03', tot:'72,63'} : {img:'plano-estudio', tipo:'Monoambiente', cub:'31,32', tot:'35,70'};
+      if (u==='C') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,32', tot:'35,69'};
     }
-    if (u === 'A') return {img:'plano-a', tipo:'2 ambientes', cub: pnum===1?'46,19':'46,16', tot: pnum===1?'70,56':'60,12'};
-    if (u === 'E') return {img:'plano-e', tipo:'2 ambientes', cub:'42,62', tot:'49,67'};
-    if (u === 'B') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,26', tot:'35,45'};
-    if (u === 'C') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,39', tot:'35,50'};
-    if (u === 'D') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,41', tot:'35,51'};
+    if (u === 'A') return {img:'plano-a', tipo:'2 ambientes', cub:'45,49', tot:'59,33'};
+    if (u === 'E') return {img:'plano-e', tipo:'2 ambientes', cub:'41,36', tot:'48,99'};
+    if (u === 'B') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,32', tot:'36,05'};
+    if (u === 'C') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,32', tot:'35,70'};
+    if (u === 'D') return {img:'plano-estudio', tipo:'Monoambiente', cub:'31,32', tot:'35,69'};
     return null;
   };
   // "Desde U$S ..." (precio más barato disponible) en cada card de Tipologías
