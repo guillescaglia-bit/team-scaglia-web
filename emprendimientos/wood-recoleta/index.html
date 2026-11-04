@@ -676,14 +676,14 @@
   // ── Disponibilidad · el edificio piso por piso ──
   var FLOORS = [
     {p:'9°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
-    {p:'8°', us:[{u:'A',s:'no'},{u:'B',s:'no'},{u:'C',s:'no'}]},
-    {p:'7°', us:[{u:'A',fin:123336,cash:117169},{u:'B',fin:146484,cash:139160},{u:'C',fin:182988,cash:173839}]},
-    {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:177905,cash:170281}]},
-    {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',fin:87686,cash:83818}]},
-    {p:'4°', us:[{u:'A',s:'v'},{u:'B',cash:117000},{u:'C',fin:89661,cash:85586},{u:'D',fin:85107,cash:81239}]},
-    {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:86944,cash:82597},{u:'D',fin:82528,cash:78402}]},
-    {p:'2°', us:[{u:'A',s:'v'},{u:'B',fin:118400,cash:105422},{u:'C',fin:84227,cash:74718},{u:'D',s:'v'}]},
-    {p:'1°', us:[{u:'A',fin:95928,cash:85650},{u:'B',fin:103572,cash:92475},{u:'C',fin:185000,cash:175750}]}
+    {p:'8°', us:[{u:'A',fin:135327,cash:128561},{u:'B',fin:160923,cash:152877},{u:'C',fin:198237,cash:188325}]},
+    {p:'7°', us:[{u:'A',fin:113315,cash:107919},{u:'B',fin:142000,cash:134900},{u:'C',fin:168121,cash:160115}]},
+    {p:'6°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:162784,cash:155032}]},
+    {p:'5°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',s:'v'},{u:'D',fin:81239,cash:77370}]},
+    {p:'4°', us:[{u:'A',s:'v'},{u:'B',cash:117000},{u:'C',fin:82733,cash:78793},{u:'D',fin:78531,cash:74791}]},
+    {p:'3°', us:[{u:'A',s:'v'},{u:'B',s:'v'},{u:'C',fin:81307,cash:77435},{u:'D',fin:77177,cash:73502}]},
+    {p:'2°', us:[{u:'A',s:'v'},{u:'B',fin:103572,cash:98393},{u:'C',fin:77435,cash:73563},{u:'D',s:'v'}]},
+    {p:'1°', us:[{u:'A',fin:94215,cash:87620},{u:'B',fin:101723,cash:94602},{u:'C',fin:185000,cash:175750}]}
   ];
   var fmtU = function(n){ return 'U$S ' + n.toLocaleString('es-AR'); };
   var disp = function(x){ return x.fin != null || x.cash != null; };
