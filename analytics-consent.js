@@ -28,13 +28,27 @@
   // 3) Aplicar preferencia guardada
   var stored = null;
   try { stored = localStorage.getItem(KEY); } catch (e) {}
+  // Microsoft Clarity (grabaciones de sesión + mapas de calor) — solo con consentimiento
+  var clarityLoaded = false;
+  function loadClarity() {
+    if (clarityLoaded) return;
+    clarityLoaded = true;
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "zibc42uh1j");
+  }
+
   if (stored === 'granted') {
     gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    loadClarity();
   }
 
   function setConsent(val) {
     try { localStorage.setItem(KEY, val); } catch (e) {}
     gtag('consent', 'update', { 'analytics_storage': val });
+    if (val === 'granted') loadClarity();
     hideBanner();
   }
 
@@ -68,7 +82,7 @@
     b.setAttribute('role', 'dialog');
     b.setAttribute('aria-label', 'Aviso de cookies');
     b.innerHTML =
-      '<p>Usamos cookies de analítica (Google Analytics) para entender cómo se usa el sitio y mejorarlo. Más información en nuestra <a href="/privacidad/">Política de privacidad</a>.</p>' +
+      '<p>Usamos cookies de análisis (Google Analytics y Microsoft Clarity) para entender cómo se usa el sitio y mejorarlo. Más información en nuestra <a href="/privacidad/">Política de privacidad</a>.</p>' +
       '<div class="ts-cc-row">' +
       '<button id="ts-cc-reject" type="button">Rechazar</button>' +
       '<button id="ts-cc-accept" type="button">Aceptar</button>' +
