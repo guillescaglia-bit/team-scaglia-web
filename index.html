@@ -1218,7 +1218,7 @@
 
         .footer-copy {
             font-size: 11px;
-            color: #333;
+            color: #9a9a9a;
             letter-spacing: 0.05em;
         }
 
@@ -1560,6 +1560,82 @@
         </div>
     </div>
 
+    <!-- PREGUNTAS FRECUENTES -->
+    <style>
+        .faq-list { max-width: 760px; margin: 0 auto; }
+        .faq-item { border-bottom: 1px solid #e5e7eb; }
+        .faq-item summary { list-style: none; cursor: pointer; padding: 22px 4px; font-family: 'Montserrat',sans-serif; font-size: 16px; font-weight: 500; color: var(--text); display: flex; justify-content: space-between; align-items: center; gap: 18px; transition: color .2s; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::after { content: '+'; font-size: 24px; font-weight: 300; color: var(--accent); line-height: 1; }
+        .faq-item[open] summary::after { content: '\2212'; }
+        .faq-item summary:hover { color: var(--accent); }
+        .faq-item p { padding: 0 4px 24px; font-size: 15px; font-weight: 300; color: var(--text-light); line-height: 1.75; max-width: 680px; }
+    </style>
+    <section class="section" id="faq">
+        <p class="section-label reveal">Preguntas frecuentes</p>
+        <h2 class="section-title reveal" style="margin-bottom:36px;">Sobre la <em>tasación</em></h2>
+        <div class="faq-list reveal">
+            <details class="faq-item">
+                <summary>¿El análisis de mercado de mi propiedad tiene costo?</summary>
+                <p>No. En Team Scaglia realizamos el análisis de mercado de manera gratuita y sin compromiso. Podés conocer el valor estimado de tu inmueble sin estar obligado a ponerlo en venta.</p>
+            </details>
+            <details class="faq-item">
+                <summary>¿Cómo se determina el valor de una propiedad?</summary>
+                <p>Realizamos un análisis comparativo de mercado, evaluando propiedades similares que están actualmente en venta y otras que ya fueron vendidas en la misma zona. Consideramos características como ubicación, superficie, estado y particularidades del inmueble, aplicando ajustes para determinar un precio de publicación fundamentado.</p>
+            </details>
+            <details class="faq-item">
+                <summary>¿Puedo solicitar una tasación aunque todavía no haya decidido vender?</summary>
+                <p>Sí. Conocer el valor de mercado de tu propiedad puede ayudarte a evaluar alternativas y tomar una decisión informada.</p>
+            </details>
+            <details class="faq-item">
+                <summary>¿En qué zonas realiza tasaciones Team Scaglia?</summary>
+                <p>Trabajamos principalmente en la Ciudad de Buenos Aires y Zona Norte del Gran Buenos Aires. Para propiedades ubicadas en otras zonas de Argentina, podemos evaluar la consulta y coordinar el asesoramiento a través de socios estratégicos.</p>
+            </details>
+            <details class="faq-item">
+                <summary>¿Quién avala las tasaciones en Team Scaglia?</summary>
+                <p>Todos los análisis de mercado están validados por el martillero responsable, Diego Mastrangelo (matrícula CPI 7615 · CSI 6609).</p>
+            </details>
+        </div>
+        <div class="reveal" style="text-align:center; margin-top:52px;">
+            <p style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:400; color:var(--text); line-height:1.2; margin-bottom:8px;">¿Querés conocer el valor de tu propiedad?</p>
+            <p style="font-size:14px; font-weight:300; color:var(--text-light); margin-bottom:24px;">Solicitá un análisis de mercado gratuito y sin compromiso.</p>
+            <button class="btn-primary" onclick="abrirModalPublicar('faq')">Solicitar tasación gratuita</button>
+        </div>
+    </section>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿El análisis de mercado de mi propiedad tiene costo?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. En Team Scaglia realizamos el análisis de mercado de manera gratuita y sin compromiso. Podés conocer el valor estimado de tu inmueble sin estar obligado a ponerlo en venta." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo se determina el valor de una propiedad?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Realizamos un análisis comparativo de mercado, evaluando propiedades similares que están actualmente en venta y otras que ya fueron vendidas en la misma zona. Consideramos características como ubicación, superficie, estado y particularidades del inmueble, aplicando ajustes para determinar un precio de publicación fundamentado." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo solicitar una tasación aunque todavía no haya decidido vender?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Sí. Conocer el valor de mercado de tu propiedad puede ayudarte a evaluar alternativas y tomar una decisión informada." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿En qué zonas realiza tasaciones Team Scaglia?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Trabajamos principalmente en la Ciudad de Buenos Aires y Zona Norte del Gran Buenos Aires. Para propiedades ubicadas en otras zonas de Argentina, podemos evaluar la consulta y coordinar el asesoramiento a través de socios estratégicos." }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Quién avala las tasaciones en Team Scaglia?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Todos los análisis de mercado están validados por el martillero responsable, Diego Mastrangelo (matrícula CPI 7615 · CSI 6609)." }
+        }
+      ]
+    }
+    </script>
+
     <!-- CTA 3 WHATSAPP -->
     <div class="cta-minimal">
         <p class="reveal">¿Preferís hablar<br><em>directamente?</em></p>
@@ -1633,7 +1709,7 @@
     <footer>
         <span class="footer-logo"><img src="/logos/logo-teamsuma-blanco-trim.png" alt="Team Scaglia · Red Suma"></span>
         <span class="footer-copy">© 2026 · Team Scaglia · Red Suma · Buenos Aires</span>
-        <span class="footer-copy" style="margin-top:10px; font-size:11px;"><a href="/privacidad/" style="color:inherit; text-decoration:none; opacity:0.7;">Política de privacidad</a> · <a href="#" onclick="event.preventDefault();if(window.abrirPreferenciasCookies)window.abrirPreferenciasCookies();" style="color:inherit; text-decoration:none; opacity:0.7;">Preferencias de cookies</a></span>
+        <span class="footer-copy" style="margin-top:10px; font-size:11px; color:#9a9a9a;"><a href="/privacidad/" style="color:#9a9a9a; text-decoration:none;">Política de privacidad</a> · <a href="#" onclick="event.preventDefault();if(window.abrirPreferenciasCookies)window.abrirPreferenciasCookies();" style="color:#9a9a9a; text-decoration:none;">Preferencias de cookies</a></span>
     </footer>
 
     <!-- MODAL PUBLICAR PROPIEDAD -->
@@ -1853,10 +1929,10 @@
         });
 
         // ─── MODAL PUBLICAR PROPIEDAD ───
-        function abrirModalPublicar() {
+        function abrirModalPublicar(ubicacion) {
             document.getElementById('modalPublicar').style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            if (window.gtag) gtag('event', 'tasacion_click'); // embudo: clic en "Solicitar tasación"
+            if (window.gtag) gtag('event', 'tasacion_click', { ubicacion: ubicacion || 'home' }); // embudo: clic en "Solicitar tasación"
         }
         // GA4 embudo: inicio del formulario de tasación (una sola vez por carga)
         (function(){
