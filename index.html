@@ -1349,9 +1349,9 @@
 
     <!-- CTA 1 -->
     <div class="cta-band">
-        <h2 class="cta-band-title reveal">¿Necesitás vender<br><em>tu propiedad?</em></h2>
-        <p class="cta-band-sub reveal">Más de 800 operaciones avalan nuestro método.</p>
-        <button class="btn-primary reveal" onclick="abrirModalPublicar()">Quiero publicar mi propiedad</button>
+        <h2 class="cta-band-title reveal">Conocé cuánto vale<br><em>tu propiedad</em></h2>
+        <p class="cta-band-sub reveal">Tasación gratuita, profesional y sin compromiso. Más de 800 operaciones nos respaldan.</p>
+        <button class="btn-primary reveal" onclick="abrirModalPublicar()">Solicitar tasación gratuita</button>
     </div>
 
     <!-- NOSOTROS -->
@@ -1388,8 +1388,8 @@
 
     <!-- CTA 2 -->
     <div class="cta-minimal">
-        <p class="reveal">¿Tu propiedad podría estar <em>en mejores manos?</em></p>
-        <button class="btn-primary" style="background: var(--primary); color: white;" onclick="abrirModalPublicar()">Publicar mi propiedad</button>
+        <p class="reveal">¿Querés saber cuánto vale <em>tu propiedad hoy?</em></p>
+        <button class="btn-primary" style="background: var(--primary); color: white;" onclick="abrirModalPublicar()">Solicitar tasación gratuita</button>
     </div>
 
     <!-- PROPIEDADES -->
@@ -1641,8 +1641,9 @@
         <div style="background:var(--bg); max-width:520px; width:100%; max-height:90vh; overflow-y:auto; position:relative; padding:48px 44px;">
             <button onclick="cerrarModalPublicar()" style="position:absolute; top:20px; right:20px; background:none; border:none; cursor:pointer; font-size:24px; line-height:1; color:var(--text-light);">&times;</button>
 
-            <p style="font-size:10px; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--accent); margin-bottom:14px;">Publicá con nosotros</p>
-            <h3 style="font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:400; color:var(--text); line-height:1.1; margin-bottom:32px;">Contanos sobre<br><em style="font-style:italic; color:var(--accent);">tu propiedad</em></h3>
+            <p style="font-size:10px; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--accent); margin-bottom:14px;">Solicitá tu tasación gratuita</p>
+            <h3 style="font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:400; color:var(--text); line-height:1.1; margin-bottom:16px;">Contanos sobre<br><em style="font-style:italic; color:var(--accent);">tu propiedad</em></h3>
+            <p style="font-size:14px; font-weight:300; color:var(--text-light); line-height:1.6; margin-bottom:28px;">Completá tus datos y un integrante de nuestro equipo se va a contactar para ayudarte a conocer el valor de tu propiedad y asesorarte, sin costo ni compromiso.</p>
 
             <form id="formPublicar">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -1855,7 +1856,18 @@
         function abrirModalPublicar() {
             document.getElementById('modalPublicar').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            if (window.gtag) gtag('event', 'tasacion_click'); // embudo: clic en "Solicitar tasación"
         }
+        // GA4 embudo: inicio del formulario de tasación (una sola vez por carga)
+        (function(){
+            var f = document.getElementById('formPublicar');
+            if (!f) return;
+            var started = false;
+            f.addEventListener('focusin', function(){
+                if (started) return; started = true;
+                if (window.gtag) gtag('event', 'form_start', { form: 'publicar_propiedad' });
+            });
+        })();
         function cerrarModalPublicar() {
             document.getElementById('modalPublicar').style.display = 'none';
             document.body.style.overflow = '';
@@ -1885,7 +1897,7 @@
                 const resp = await fetch('/api/lead', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre: `${nombre} ${apellido}`, email, telefono, consulta, origen: 'Publicar propiedad' })
+                    body: JSON.stringify({ nombre: `${nombre} ${apellido}`, email, telefono, consulta, origen: 'Solicitud de tasación' })
                 });
                 if (!resp.ok) throw new Error('fail');
                 if (window.gtag) gtag('event', 'generate_lead', { form: 'publicar_propiedad' });
