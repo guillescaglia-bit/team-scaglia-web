@@ -308,11 +308,21 @@
         #homeNav .hn-logo .logo-color { display: none; }
         #homeNav.scrolled .hn-logo .logo-white { display: none; }
         #homeNav.scrolled .hn-logo .logo-color { display: block; }
-        #homeNav .hn-links { display: flex; gap: 40px; }
-        #homeNav .hn-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.3s; }
-        #homeNav.scrolled .hn-links a { color: var(--text-secondary); }
-        #homeNav .hn-links a:hover { color: #fff; }
-        #homeNav.scrolled .hn-links a:hover { color: var(--primary); }
+        #homeNav .hn-fixed { display: flex; gap: 34px; }
+        #homeNav .hn-fixed a { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.3s; }
+        #homeNav.scrolled .hn-fixed a { color: var(--text-secondary); }
+        #homeNav .hn-fixed a:hover { color: #fff; }
+        #homeNav.scrolled .hn-fixed a:hover { color: var(--primary); }
+        #homeNav .hn-only-mobile { display: none; }
+        #homeNav .hn-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 66px; right: 24px; width: 262px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: 0 16px 44px rgba(0,0,0,0.14); padding: 8px 0; overflow: hidden; z-index: 1001; }
+        #homeNav .hn-links.active { display: flex; animation: hnFade 0.18s ease; }
+        @keyframes hnFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        #homeNav .hn-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary) !important; text-decoration: none; transition: background 0.2s, color 0.2s; padding: 11px 22px; }
+        #homeNav .hn-links a:hover { background: var(--bg-main); color: var(--primary) !important; }
+        #homeNav .hn-group-label { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.55; padding: 12px 22px 4px; }
+        #homeNav .hn-divider { height: 1px; background: var(--border-color); margin: 6px 0; }
+        #homeNav .hn-theme-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 22px 10px; }
+        #homeNav .hn-theme-row span { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
         #homeNav .hn-right { display: flex; align-items: center; gap: 24px; }
         #homeNav .hn-cta { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.3s; display: flex; align-items: center; }
         #homeNav.scrolled .hn-cta { color: var(--text-secondary); }
@@ -320,15 +330,13 @@
         #homeNav.scrolled .hn-cta:hover { color: var(--primary) !important; }
         #homeNav .hn-theme { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; transition: transform 0.3s; line-height: 1; color: inherit; }
         #homeNav .hn-theme:hover { transform: rotate(20deg); }
-        #homeNav .hn-menu { display: none; background: none; border: none; cursor: pointer; color: #fff; font-size: 22px; }
+        #homeNav .hn-menu { display: flex; align-items: center; background: none; border: none; cursor: pointer; color: #fff; font-size: 22px; }
         #homeNav.scrolled .hn-menu { color: var(--text-primary); }
         @media (max-width: 900px) {
             #homeNav { padding: 0 24px; }
-            #homeNav .hn-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 16px 0; }
-            #homeNav .hn-links.active { display: flex; }
-            #homeNav .hn-links a { color: var(--text-secondary) !important; padding: 14px 24px; border-bottom: 1px solid var(--border-color); font-size: 12px; }
-            #homeNav .hn-cta { display: none; }
-            #homeNav .hn-menu { display: block; }
+            #homeNav .hn-fixed { display: none; }
+            #homeNav .hn-only-mobile { display: block; }
+            #homeNav .hn-links { top: 62px; right: 16px; left: 16px; width: auto; }
         }
 
         .login-box {
@@ -1139,21 +1147,36 @@
                     <img src="/logos/logo-team-blanco-trim.png" class="logo-white" alt="Team Scaglia">
                     <img src="/logos/logo-team-color-trim.png" class="logo-color" alt="Team Scaglia">
                 </a>
-                <div class="hn-links" id="hnLinks">
-                    <a href="/#nosotros">Nosotros</a>
+                <div class="hn-fixed">
                     <a href="/#equipo">Equipo</a>
                     <a href="/#propiedades">Propiedades</a>
                     <a href="/#emprendimientos">Emprendimientos</a>
                     <a href="/#inversiones">Inversiones</a>
-                    <a href="/#testimonios">Opiniones</a>
                     <a href="/#contacto">Contacto</a>
+                </div>
+                <div class="hn-links" id="hnLinks">
+                    <div class="hn-group-label">Secciones</div>
+                    <a href="/#nosotros">Nosotros</a>
+                    <a href="/#equipo" class="hn-only-mobile">Equipo</a>
+                    <a href="/#propiedades" class="hn-only-mobile">Propiedades</a>
+                    <a href="/#emprendimientos" class="hn-only-mobile">Emprendimientos</a>
+                    <a href="/#inversiones" class="hn-only-mobile">Inversiones</a>
+                    <a href="/#testimonios">Opiniones</a>
+                    <a href="/#contacto" class="hn-only-mobile">Contacto</a>
+                    <div class="hn-divider"></div>
+                    <div class="hn-group-label">Recursos</div>
+                    <a href="/calculadora-gastos/">Calculadora de gastos</a>
                     <a href="/beneficios">Beneficios a clientes</a>
+                    <div class="hn-divider"></div>
+                    <div class="hn-theme-row">
+                        <span>Modo oscuro</span>
+                        <button class="hn-theme" onclick="toggleThemeBeneficios()" title="Cambiar tema"><span id="hnThemeIcon">🌙</span></button>
+                    </div>
                 </div>
                 <div class="hn-right">
                     <a href="https://wa.me/541130977868?text=%C2%A1Hola!%20%F0%9F%91%8B%20Te%20escribo%20por%20el%20Programa%20de%20Beneficios%20de%20Team%20Scaglia." target="_blank" class="hn-cta" title="WhatsApp">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
                     </a>
-                    <button class="hn-theme" onclick="toggleThemeBeneficios()" title="Cambiar tema"><span id="hnThemeIcon">🌙</span></button>
                     <button class="hn-menu" id="hnMenu">☰</button>
                 </div>
             </nav>
@@ -3902,8 +3925,11 @@ Al registrarte aceptás el tratamiento de tus datos personales (nombre, email, t
             const menu = document.getElementById('hnMenu');
             const links = document.getElementById('hnLinks');
             if (menu && links) {
-                menu.addEventListener('click', () => links.classList.toggle('active'));
+                menu.addEventListener('click', (e) => { e.stopPropagation(); links.classList.toggle('active'); });
                 links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('active')));
+                document.addEventListener('click', (e) => {
+                    if (links.classList.contains('active') && !nav.contains(e.target)) links.classList.remove('active');
+                });
             }
         }
 

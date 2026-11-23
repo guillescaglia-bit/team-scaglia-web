@@ -42,9 +42,27 @@
   .serif{font-family:'Cormorant Garamond',serif}
 
   /* Header */
-  header.top{background:var(--primary);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+  header.top{background:var(--primary);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
   header.top .logo img{height:34px;display:block}
   header.top .wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-size:12px;font-weight:600;padding:9px 16px;border-radius:8px;letter-spacing:.02em}
+  .cnav-fixed{display:flex;gap:28px}
+  .cnav-fixed a{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.85);text-decoration:none;transition:color .2s}
+  .cnav-fixed a:hover{color:#fff}
+  .cnav-only-mobile{display:none}
+  .cnav-right{display:flex;align-items:center;gap:16px}
+  .cnav-menu{display:flex;align-items:center;background:none;border:none;cursor:pointer;color:#fff;font-size:22px;line-height:1;padding:0}
+  .cnav-links{display:none;flex-direction:column;gap:0;position:absolute;top:calc(100% + 6px);right:20px;width:252px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);padding:8px 0;overflow:hidden;z-index:101}
+  .cnav-links.active{display:flex;animation:cnavFade .18s ease}
+  @keyframes cnavFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .cnav-links a{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);text-decoration:none;transition:background .2s,color .2s;padding:11px 22px}
+  .cnav-links a:hover{background:var(--bg-off);color:var(--primary)}
+  .cnav-group-label{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-light);opacity:.55;padding:12px 22px 4px}
+  .cnav-divider{height:1px;background:var(--border);margin:6px 0}
+  @media (max-width:900px){
+    .cnav-fixed{display:none}
+    .cnav-only-mobile{display:block}
+    .cnav-links{right:16px;left:16px;width:auto}
+  }
 
   .wrap{max-width:860px;margin:0 auto;padding:32px 16px 80px}
   .hero{text-align:center;margin-bottom:26px}
@@ -156,7 +174,31 @@
 <body>
 <header class="top">
   <a href="/" class="logo"><img src="/logos/logo-team-blanco-trim.png" alt="Team Scaglia"></a>
-  <a href="https://wa.me/541130977868?text=%C2%A1Hola!%20%F0%9F%91%8B%20Vi%20la%20calculadora%20de%20gastos%20en%20la%20web%20y%20quer%C3%ADa%20hacer%20una%20consulta." target="_blank" rel="noopener" class="wa">WhatsApp</a>
+  <nav class="cnav-fixed">
+    <a href="/#equipo">Equipo</a>
+    <a href="/#propiedades">Propiedades</a>
+    <a href="/#emprendimientos">Emprendimientos</a>
+    <a href="/#inversiones">Inversiones</a>
+    <a href="/#contacto">Contacto</a>
+  </nav>
+  <div class="cnav-right">
+    <a href="https://wa.me/541130977868?text=%C2%A1Hola!%20%F0%9F%91%8B%20Vi%20la%20calculadora%20de%20gastos%20en%20la%20web%20y%20quer%C3%ADa%20hacer%20una%20consulta." target="_blank" rel="noopener" class="wa">WhatsApp</a>
+    <button class="cnav-menu" id="cnavMenu" aria-label="Menú">☰</button>
+  </div>
+  <div class="cnav-links" id="cnavLinks">
+    <div class="cnav-group-label">Secciones</div>
+    <a href="/#nosotros">Nosotros</a>
+    <a href="/#equipo" class="cnav-only-mobile">Equipo</a>
+    <a href="/#propiedades" class="cnav-only-mobile">Propiedades</a>
+    <a href="/#emprendimientos" class="cnav-only-mobile">Emprendimientos</a>
+    <a href="/#inversiones" class="cnav-only-mobile">Inversiones</a>
+    <a href="/#testimonios">Opiniones</a>
+    <a href="/#contacto" class="cnav-only-mobile">Contacto</a>
+    <div class="cnav-divider"></div>
+    <div class="cnav-group-label">Recursos</div>
+    <a href="/calculadora-gastos/">Calculadora de gastos</a>
+    <a href="/beneficios">Beneficios a clientes</a>
+  </div>
 </header>
 
 <div class="wrap">
@@ -504,6 +546,16 @@ document.getElementById('bna').addEventListener('input',function(){
 })();
 
 calcular();
+
+// Menú de navegación (hamburguesa)
+(function(){
+  var menu=document.getElementById('cnavMenu'), links=document.getElementById('cnavLinks'), hdr=document.querySelector('header.top');
+  if(menu&&links){
+    menu.addEventListener('click',function(e){e.stopPropagation();links.classList.toggle('active');});
+    links.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){links.classList.remove('active');});});
+    document.addEventListener('click',function(e){ if(links.classList.contains('active') && !hdr.contains(e.target)) links.classList.remove('active'); });
+  }
+})();
 </script>
 <script src="/ka.js" defer></script>
 </body>

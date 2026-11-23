@@ -103,12 +103,12 @@
         nav.scrolled .logo .logo-white { display: none; }
         nav.scrolled .logo .logo-color { display: block; }
 
-        .nav-links {
+        .nav-fixed {
             display: flex;
-            gap: 40px;
+            gap: 34px;
         }
 
-        .nav-links a {
+        .nav-fixed a {
             font-size: 11px;
             font-weight: 500;
             letter-spacing: 0.12em;
@@ -118,10 +118,72 @@
             transition: color 0.3s;
         }
 
-        nav.scrolled .nav-links a { color: var(--text-light); }
+        nav.scrolled .nav-fixed a { color: var(--text-light); }
+        .nav-fixed a:hover { color: white; }
+        nav.scrolled .nav-fixed a:hover { color: var(--primary); }
 
-        .nav-links a:hover { color: white; }
-        nav.scrolled .nav-links a:hover { color: var(--primary); }
+        .nav-only-mobile { display: none; }
+
+        .nav-links {
+            display: none;
+            flex-direction: column;
+            gap: 0;
+            position: absolute;
+            top: 66px;
+            right: 24px;
+            width: 262px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 16px 44px rgba(0,0,0,0.14);
+            padding: 8px 0;
+            overflow: hidden;
+            z-index: 1001;
+        }
+
+        .nav-links.active { display: flex; animation: navFade 0.18s ease; }
+
+        @keyframes navFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-links a {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light) !important;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            padding: 11px 22px;
+        }
+
+        .nav-links a:hover { background: var(--bg-off); color: var(--primary) !important; }
+
+        .nav-group-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            opacity: 0.55;
+            padding: 12px 22px 4px;
+        }
+
+        .nav-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+        .nav-theme-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 22px 10px;
+        }
+
+        .nav-theme-row span {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
 
         .nav-right {
             display: flex;
@@ -156,7 +218,8 @@
         .theme-toggle:hover { transform: rotate(20deg); }
 
         .menu-toggle {
-            display: none;
+            display: flex;
+            align-items: center;
             background: none;
             border: none;
             cursor: pointer;
@@ -168,11 +231,9 @@
 
         @media (max-width: 900px) {
             nav { padding: 0 24px; }
-            .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 72px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 16px 0; }
-            .nav-links.active { display: flex; }
-            .nav-links a { color: var(--text-light) !important; padding: 14px 24px; border-bottom: 1px solid var(--border); font-size: 12px; }
-            .nav-cta { display: none; }
-            .menu-toggle { display: block; }
+            .nav-fixed { display: none; }
+            .nav-only-mobile { display: block; }
+            .nav-links { top: 62px; right: 16px; left: 16px; width: auto; }
         }
 
         /* ─── HERO ─── */
@@ -1142,22 +1203,36 @@
             <img src="/logos/logo-team-blanco-trim.png" class="logo-white" alt="Team Scaglia">
             <img src="/logos/logo-team-color-trim.png" class="logo-color" alt="Team Scaglia">
         </a>
-        <div class="nav-links" id="navLinks">
-            <a href="#nosotros">Nosotros</a>
+        <div class="nav-fixed">
             <a href="#equipo">Equipo</a>
             <a href="#propiedades">Propiedades</a>
             <a href="#emprendimientos">Emprendimientos</a>
             <a href="#inversiones">Inversiones</a>
-            <a href="#testimonios">Opiniones</a>
             <a href="#contacto">Contacto</a>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <div class="nav-group-label">Secciones</div>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#equipo" class="nav-only-mobile">Equipo</a>
+            <a href="#propiedades" class="nav-only-mobile">Propiedades</a>
+            <a href="#emprendimientos" class="nav-only-mobile">Emprendimientos</a>
+            <a href="#inversiones" class="nav-only-mobile">Inversiones</a>
+            <a href="#testimonios">Opiniones</a>
+            <a href="#contacto" class="nav-only-mobile">Contacto</a>
+            <div class="nav-divider"></div>
+            <div class="nav-group-label">Recursos</div>
             <a href="/calculadora-gastos/">Calculadora de gastos</a>
             <a href="/beneficios">Beneficios a clientes</a>
+            <div class="nav-divider"></div>
+            <div class="nav-theme-row">
+                <span>Modo oscuro</span>
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
+            </div>
         </div>
         <div class="nav-right">
             <a href="https://wa.me/541130977868?text=%C2%A1Hola!%20%F0%9F%91%8B%20Me%20contacto%20desde%20la%20web%20de%20Team%20Scaglia." target="_blank" class="nav-cta" title="WhatsApp" style="display:flex;align-items:center;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.118 1.521 5.851L.057 23.882l6.198-1.427A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.371l-.36-.214-3.681.847.878-3.566-.234-.368A9.818 9.818 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
             </a>
-            <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
             <button class="menu-toggle" id="menuToggle">☰</button>
         </div>
     </nav>
@@ -1793,8 +1868,17 @@
         }, { passive: true });
 
         // ─── MENU MOBILE ───
-        document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('menuToggle').addEventListener('click', (e) => {
+            e.stopPropagation();
             document.getElementById('navLinks').classList.toggle('active');
+        });
+        // Cerrar el menú al tocar fuera
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navbar');
+            const links = document.getElementById('navLinks');
+            if (links.classList.contains('active') && !nav.contains(e.target)) {
+                links.classList.remove('active');
+            }
         });
         // Navegación con URLs limpias: /nosotros en vez de /#nosotros
         function goToSection(id, smooth) {
